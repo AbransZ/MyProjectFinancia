@@ -16,11 +16,11 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyProjectFinanciaTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                  LogginScreen(Modifier.padding(innerPadding))
+
+                    ContainerCreate()
                 }
             }
         }
     }
-}
+
 
