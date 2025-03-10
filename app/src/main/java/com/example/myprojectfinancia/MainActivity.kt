@@ -1,13 +1,16 @@
 package com.example.myprojectfinancia
 
+import Model.Routes
+import View.ContainerCreate
+import View.LogginScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.myprojectfinancia.ui.theme.MyProjectFinanciaTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,10 +20,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyProjectFinanciaTheme {
 
-                    ContainerCreate()
+                val navigationControler = rememberNavController()
+                NavHost(navController = navigationControler, startDestination = (Routes.LoginScreen.routes)){
+                    composable(Routes.LoginScreen.routes) { LogginScreen(modifier =Modifier,navigationControler) }
+                    composable(Routes.CreateScreen.routes) { ContainerCreate(navigationControler) }
+
                 }
             }
         }
     }
+}
 
 

@@ -1,5 +1,6 @@
-package com.example.myprojectfinancia
+package View
 
+import Model.Routes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,13 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 
-@Preview
+
 @Composable
-fun ContainerCreate() {
+fun ContainerCreate(navigationControler: NavHostController) {
 
 
     Box(
@@ -53,7 +54,7 @@ fun ContainerCreate() {
             Spacer(modifier = Modifier.padding(20.dp))
             ButtonCreate()
             Spacer(modifier = Modifier.padding(28.dp))
-            FooterCreate()
+            FooterCreate(navigationControler)
         }
 
 
@@ -63,13 +64,13 @@ fun ContainerCreate() {
 }
 
 @Composable
-fun FooterCreate() {
+fun FooterCreate(navigationControler: NavHostController) {
     Row(Modifier
         .fillMaxWidth()
         .padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
         Text("Ya tienes una cuenta?", fontSize = 18.sp, color = Color(0xFF878787), fontWeight = FontWeight.Bold)
         TextButton(
-            onClick = {},
+            onClick = {navigationControler.navigate(Routes.LoginScreen.routes)},
         ) { Text("Iniciar Sesion", fontSize = 18.sp, color = Color(0xFF016AC4), fontWeight = FontWeight.Bold) }
     }
 }

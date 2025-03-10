@@ -1,5 +1,7 @@
-package com.example.myprojectfinancia
+package View
 
+
+import Model.Routes
 
 import android.app.Activity
 import androidx.compose.foundation.background
@@ -45,15 +47,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.example.myprojectfinancia.R
 
 
 @Composable
-fun LogginScreen(modifier: Modifier) {
+fun LogginScreen(modifier: Modifier, navigationControler: NavHostController) {
     Box(
         Modifier
             .fillMaxSize()
             .padding(top = 26.dp)
-            .background(color = Color(0xFF000000))
+            .background(color = Color(0xFFECECEC))
     ) {
 
         Header(
@@ -70,7 +74,8 @@ fun LogginScreen(modifier: Modifier) {
         Footer(
             Modifier
                 .align(Alignment.BottomCenter)
-                .padding(16.dp)
+                .padding(16.dp),
+            navigationControler
         )
 
     }
@@ -87,7 +92,7 @@ fun Body(modifier: Modifier = Modifier) {
     isEnable = isEmailValid(email) && isPasswordValid(Pass)
     Column(modifier = modifier) {
 
-        greetings(modifier)
+        Greetings(modifier)
         Spacer(modifier = modifier.size(18.dp))
         Email(email) { email = it }
         Spacer(modifier = modifier.size(16.dp))
@@ -117,17 +122,17 @@ fun isPasswordValid(password: String): Boolean {
 }
 
 @Composable
-fun greetings(modifier: Modifier) {
+fun Greetings(modifier: Modifier) {
     Column(modifier.padding(6.dp)) {
         Text(
             text = "Hola, Bienvenido!",
             fontSize = 45.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.White,
+            color = Color(0xFF444444),
             modifier = Modifier.padding(bottom = 6.dp)
         )
         Text(
-            text = "Estamos Feliz de tenerte acá",
+            text = "Estamos Felices de tenerte acá",
             fontSize = 25.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.LightGray
@@ -139,7 +144,7 @@ fun greetings(modifier: Modifier) {
 }
 
 @Composable
-fun Footer(modifier: Modifier) {
+fun Footer(modifier: Modifier, navigationControler: NavHostController) {
     Column(modifier = modifier.fillMaxWidth()) {
 
         Divider(
@@ -147,20 +152,23 @@ fun Footer(modifier: Modifier) {
                 .height(1.dp)
                 .fillMaxWidth()
         )
-        SignIn()
+        SignIn(navigationControler)
     }
 
 
 }
 
 @Composable
-fun SignIn() {
+fun SignIn(navigationControler: NavHostController) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
         Text("Aun no tienes una cuenta?")
-        TextButton(onClick = {}, Modifier.padding(start = 1.dp)) {
+        TextButton(
+            onClick = { navigationControler.navigate(Routes.CreateScreen.routes) },
+            Modifier.padding(start = 1.dp)
+        ) {
             Text(
                 "Crear cuenta",
                 fontSize = 15.sp,
@@ -187,7 +195,7 @@ fun Googlebuttons() {
                 text = "Usar cuenta de Google",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color(0xFF444444)
             )
         }
     }
@@ -235,8 +243,8 @@ fun Buttons(isEnable: Boolean) {
                 onClick = {},
                 enabled = isEnable,
                 colors = ButtonDefaults.buttonColors(
-                    contentColor =Color(0xFFFFFFFF),
-                    containerColor= Color(0xFF3C96F5),
+                    contentColor = Color(0xFFFFFFFF),
+                    containerColor = Color(0xFF3C96F5),
                     disabledContentColor = Color(0xFFA5A5A5),
                     disabledContainerColor = Color(0xFF30669E),
 
@@ -255,7 +263,7 @@ fun Buttons(isEnable: Boolean) {
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun Password(pass: String, onTextChange: (String) -> Unit) {
     var passVisible by rememberSaveable { mutableStateOf(false) }
@@ -266,21 +274,22 @@ fun Password(pass: String, onTextChange: (String) -> Unit) {
             modifier = Modifier.padding(bottom = 8.dp, start = 10.dp),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color.White
+            color = Color(0xFF444444)
         )
         TextField(
             value = pass,
             onValueChange = { onTextChange(it) },
-            label = { Text("Contraseña", color = Color(0xFF979797)) },
+            label = { Text("Contraseña", color = Color(0xFF2B2B2B)) },
             visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedTextColor = Color(0xFFAAAAAA),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color(0xFFAAAAAA),
+                unfocusedContainerColor = Color(0xFFDBDBDB),
+                focusedTextColor = Color(0xFF242424),
                 unfocusedTextColor = Color(0xFF4B4B4B),
-                containerColor = Color(0xFFEFEFEF),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
@@ -288,13 +297,13 @@ fun Password(pass: String, onTextChange: (String) -> Unit) {
 
                 TextButton(onClick = { passVisible = !passVisible }) {
                     if (passVisible) {
-                        Text("Ocultar", color = Color(0xFF979797))
+                        Text("Ocultar", color = Color(0xFF4E4E4E))
                     } else {
-                        Text("Mostrar", color = Color(0xFF979797))
+                        Text("Mostrar", color = Color(0xFF4E4E4E))
                     }
                 }
             },
-            shape = RoundedCornerShape(30.dp)
+            shape = RoundedCornerShape(10.dp)
 
         )
     }
@@ -311,24 +320,25 @@ fun Email(email: String, onTextChange: (String) -> Unit) {
             modifier = Modifier.padding(bottom = 8.dp, start = 10.dp),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color.White
+            color = Color(0xFF444444)
         )
         TextField(
             value = email,
             onValueChange = { onTextChange(it) },
-            label = { Text("Ingresar email", color = Color(0xFF979797)) },
+            label = { Text("Ingresar email", color = Color(0xFF4E4E4E)) },
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            colors = TextFieldDefaults.textFieldColors(
-                focusedTextColor = Color(0xFFAAAAAA),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = Color(0xFF3D3D3D),
                 unfocusedTextColor = Color(0xFF4B4B4B),
-                containerColor = Color(0xFFEFEFEF),
+                focusedContainerColor = Color(0xFFAAAAAA),
+                unfocusedContainerColor = Color(0xFFDBDBDB),
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent
             ),
-            shape = RoundedCornerShape(30.dp)
+            shape = RoundedCornerShape(10.dp)
 
         )
     }
