@@ -3,6 +3,7 @@ package com.example.myprojectfinancia
 import Model.Routes
 import View.ContainerCreate
 import View.LogginScreen
+import ViewModel.loginViewModel
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -21,8 +22,16 @@ class MainActivity : ComponentActivity() {
             MyProjectFinanciaTheme {
 
                 val navigationControler = rememberNavController()
-                NavHost(navController = navigationControler, startDestination = (Routes.LoginScreen.routes)){
-                    composable(Routes.LoginScreen.routes) { LogginScreen(modifier =Modifier,navigationControler) }
+                NavHost(
+                    navController = navigationControler,
+                    startDestination = (Routes.LoginScreen.routes)
+                ) {
+                    composable(Routes.LoginScreen.routes) {
+                        LogginScreen(
+                            modifier = Modifier, navigationControler,
+                            loginViewModel()
+                        )
+                    }
                     composable(Routes.CreateScreen.routes) { ContainerCreate(navigationControler) }
 
                 }

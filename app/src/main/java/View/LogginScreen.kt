@@ -2,6 +2,7 @@ package View
 
 
 import Model.Routes
+import ViewModel.loginViewModel
 
 import android.app.Activity
 import androidx.compose.foundation.background
@@ -32,6 +33,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -45,14 +47,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myprojectfinancia.R
 
 
 @Composable
-fun LogginScreen(modifier: Modifier, navigationControler: NavHostController) {
+fun LogginScreen(
+    modifier: Modifier,
+    navigationControler: NavHostController,
+    loginViewModel: loginViewModel
+) {
     Box(
         Modifier
             .fillMaxSize()
@@ -68,7 +74,8 @@ fun LogginScreen(modifier: Modifier, navigationControler: NavHostController) {
         Body(
             Modifier
                 .align(Alignment.Center)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
+            loginViewModel
         )
 
         Footer(
@@ -82,21 +89,21 @@ fun LogginScreen(modifier: Modifier, navigationControler: NavHostController) {
 
 }
 
-@Preview
-@Composable
-fun Body(modifier: Modifier = Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var Pass by rememberSaveable { mutableStateOf("") }
-    var isEnable by rememberSaveable { mutableStateOf(false) }
 
-    isEnable = isEmailValid(email) && isPasswordValid(Pass)
+@Composable
+fun Body(modifier: Modifier = Modifier, loginViewModel: loginViewModel) {
+    val email: String by loginViewModel.email.observeAsState("")
+    val Pass: String by loginViewModel.password.observeAsState("")
+    val isEnable: Boolean by loginViewModel.isEnable.observeAsState(false)
+
+
     Column(modifier = modifier) {
 
         Greetings(modifier)
         Spacer(modifier = modifier.size(18.dp))
-        Email(email) { email = it }
+        Email(email) { loginViewModel.onLoginChange(email = it, password = Pass) }
         Spacer(modifier = modifier.size(16.dp))
-        Password(Pass) { Pass = it }
+        Password(Pass) { loginViewModel.onLoginChange(email = email, password = it) }
         Spacer(modifier = modifier.size(16.dp))
         ForgotButton()
         Spacer(modifier = modifier.size(24.dp))
@@ -112,14 +119,6 @@ fun Body(modifier: Modifier = Modifier) {
 
 }
 
-fun isEmailValid(email: String): Boolean {
-    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
-}
-
-
-fun isPasswordValid(password: String): Boolean {
-    return password.length >= 8
-}
 
 @Composable
 fun Greetings(modifier: Modifier) {
@@ -291,7 +290,8 @@ fun Password(pass: String, onTextChange: (String) -> Unit) {
                 focusedTextColor = Color(0xFF242424),
                 unfocusedTextColor = Color(0xFF4B4B4B),
                 focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Color(0xFF0D61EA)
             ),
             trailingIcon = {
 
@@ -336,7 +336,8 @@ fun Email(email: String, onTextChange: (String) -> Unit) {
                 focusedContainerColor = Color(0xFFAAAAAA),
                 unfocusedContainerColor = Color(0xFFDBDBDB),
                 focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = Color(0xFF0D61EA)
             ),
             shape = RoundedCornerShape(10.dp)
 
