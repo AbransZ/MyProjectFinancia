@@ -1,4 +1,4 @@
-package com.example.myprojectfinancia.ui.theme
+package com.example.myprojectfinancia.theme
 
 import androidx.compose.ui.graphics.Color
 

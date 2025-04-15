@@ -1,10 +1,12 @@
-package View
+package com.example.myprojectfinancia.Login.ui
 
 
-import Model.Routes
-import ViewModel.loginViewModel
+import com.example.myprojectfinancia.Model.Routes
+
 
 import android.app.Activity
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,8 +25,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -32,6 +34,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -51,20 +55,44 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myprojectfinancia.R
+import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 
 
 @Composable
 fun LogginScreen(
     modifier: Modifier,
     navigationControler: NavHostController,
-    loginViewModel: loginViewModel
+    loginViewModel: LoginViewModel
 ) {
+
+
     Box(
-        Modifier
+        modifier
             .fillMaxSize()
             .padding(top = 26.dp)
             .background(color = Color(0xFFECECEC))
     ) {
+        val context = LocalContext.current
+        val navigationState by loginViewModel.navController.collectAsState()
+
+        LaunchedEffect(navigationState) {
+            Log.i("LoginScreen", "Estado de navegación actualizado: $navigationState")
+            loginViewModel.navController.collect { route ->
+                println("DEBUG: Evento de navegación recibido: $route")
+                route?.let {
+                    Log.i("LoginScreen", "Navegando a $route")
+
+                    navigationControler.navigate(route)
+                }
+            }
+        }
+        LaunchedEffect(Unit) {
+            loginViewModel.message.collect { message ->
+                message?.let {
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
         Header(
             Modifier
@@ -75,7 +103,8 @@ fun LogginScreen(
             Modifier
                 .align(Alignment.Center)
                 .padding(horizontal = 16.dp),
-            loginViewModel
+            loginViewModel,
+            navigationControler
         )
 
         Footer(
@@ -91,34 +120,42 @@ fun LogginScreen(
 
 
 @Composable
-fun Body(modifier: Modifier = Modifier, loginViewModel: loginViewModel) {
+fun Body(
+    modifier: Modifier = Modifier,
+    loginViewModel: LoginViewModel,
+    navigationControler: NavHostController
+) {
     val email: String by loginViewModel.email.observeAsState("")
     val Pass: String by loginViewModel.password.observeAsState("")
     val isEnable: Boolean by loginViewModel.isEnable.observeAsState(false)
+
 
 
     Column(modifier = modifier) {
 
         Greetings(modifier)
         Spacer(modifier = modifier.size(18.dp))
+
         Email(email) { loginViewModel.onLoginChange(email = it, password = Pass) }
         Spacer(modifier = modifier.size(16.dp))
+
         Password(Pass) { loginViewModel.onLoginChange(email = email, password = it) }
         Spacer(modifier = modifier.size(16.dp))
-        ForgotButton()
+
+        ForgotButton(navigationControler)
         Spacer(modifier = modifier.size(24.dp))
-        Buttons(isEnable)
+
+        Buttons(isEnable, loginViewModel, email, Pass)
         Spacer(modifier = modifier.size(32.dp))
-        divider()
+
+        Divider()
         Spacer(modifier = modifier.size(32.dp))
         Googlebuttons()
 
 
     }
 
-
 }
-
 
 @Composable
 fun Greetings(modifier: Modifier) {
@@ -146,7 +183,7 @@ fun Greetings(modifier: Modifier) {
 fun Footer(modifier: Modifier, navigationControler: NavHostController) {
     Column(modifier = modifier.fillMaxWidth()) {
 
-        Divider(
+        HorizontalDivider(
             Modifier
                 .height(1.dp)
                 .fillMaxWidth()
@@ -202,15 +239,15 @@ fun Googlebuttons() {
 
 
 @Composable
-fun divider() {
+fun Divider() {
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .weight(1f)
                 .padding(end = 8.dp), color = Color.LightGray
         )
         Text("O", color = Color.LightGray, fontSize = 14.sp)
-        Divider(
+        HorizontalDivider(
             modifier = Modifier
                 .weight(1f)
                 .padding(start = 8.dp), color = Color.LightGray
@@ -220,9 +257,12 @@ fun divider() {
 }
 
 @Composable
-fun ForgotButton() {
+fun ForgotButton(navigationControler: NavHostController) {
     Box(Modifier.fillMaxWidth()) {
-        TextButton(onClick = {}, Modifier.align(Alignment.CenterEnd)) {
+        TextButton(
+            onClick = { navigationControler.navigate(Routes.ForgotPasswordScreen.routes) },
+            Modifier.align(Alignment.CenterEnd)
+        ) {
             Text(
                 text = "¿Olvidaste la contraseña?",
                 fontSize = 15.sp,
@@ -235,11 +275,14 @@ fun ForgotButton() {
 }
 
 @Composable
-fun Buttons(isEnable: Boolean) {
+fun Buttons(isEnable: Boolean, loginViewModel: LoginViewModel, email: String, Pass: String) {
     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Row() {
             Button(
-                onClick = {},
+                onClick = {
+                    Log.i("LoginScreen", "Login PRESIONADOOOOOOOOO")
+                    loginViewModel.login(email, Pass)
+                          },
                 enabled = isEnable,
                 colors = ButtonDefaults.buttonColors(
                     contentColor = Color(0xFFFFFFFF),
@@ -254,7 +297,9 @@ fun Buttons(isEnable: Boolean) {
                 shape = RoundedCornerShape(30.dp),
 
 
-                ) { Text(text = "Ingresar", color = Color.White, fontSize = 20.sp) }
+                ) {
+                Text(text = "Ingresar", color = Color.White, fontSize = 20.sp)
+            }
 
         }
     }

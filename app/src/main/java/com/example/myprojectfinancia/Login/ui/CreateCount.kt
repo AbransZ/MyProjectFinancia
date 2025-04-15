@@ -1,6 +1,6 @@
-package View
+package com.example.myprojectfinancia.Login.ui
 
-import Model.Routes
+import com.example.myprojectfinancia.Model.Routes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column

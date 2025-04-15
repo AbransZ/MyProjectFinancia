@@ -1,4 +1,4 @@
-package Model
+package com.example.myprojectfinancia.Model
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
