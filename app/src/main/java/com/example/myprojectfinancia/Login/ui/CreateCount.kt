@@ -1,5 +1,6 @@
 package com.example.myprojectfinancia.Login.ui
 
+import android.widget.Toast
 import com.example.myprojectfinancia.Model.Routes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -19,13 +20,16 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -33,10 +37,21 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 
 
 @Composable
-fun ContainerCreate(navigationControler: NavHostController) {
+fun ContainerCreate(navigationControler: NavHostController, loginViewModel: LoginViewModel) {
+    //name
+    val name: String by loginViewModel.name.observeAsState("")
+    //email
+    val email: String by loginViewModel.email.observeAsState("")
+    //contraseña
+    val Pass: String by loginViewModel.password.observeAsState("")
+    //repeticion de contraseña
+    val PassConfirm: String by loginViewModel.passconfirm.observeAsState("")
+    //verificacion de contraseña
+    val onPassMatc: Boolean by loginViewModel.onPassMatch.observeAsState(false)
 
 
     Box(
@@ -45,47 +60,95 @@ fun ContainerCreate(navigationControler: NavHostController) {
             .fillMaxSize()
             .padding(bottom = 20.dp, start = 20.dp, end = 20.dp, top = 50.dp)
     ) {
+        val context = LocalContext.current
+
+        LaunchedEffect(key1 = true) {
+            loginViewModel.navController.collect { route ->
+                route?.let {
+                    navigationControler.navigate(it) {
+                        popUpTo(Routes.LoginScreen.routes) {
+                            inclusive = true
+                        }
+                    }
+                }
+            }
+        }
+        LaunchedEffect(key1 = true) {
+            loginViewModel.message.collect { message ->
+                message?.let {
+                    Toast.makeText(
+                        context,
+                        it,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
 
 
         Column {
             TitleCreate()
             Spacer(modifier = Modifier.padding(20.dp))
-            ContentCreate()
+            ContentCreate(name, email, Pass, PassConfirm, loginViewModel)
             Spacer(modifier = Modifier.padding(20.dp))
-            ButtonCreate()
+            ButtonCreate(loginViewModel, email, Pass, PassConfirm)
             Spacer(modifier = Modifier.padding(28.dp))
             FooterCreate(navigationControler)
         }
-
-
     }
-
-
 }
 
 @Composable
 fun FooterCreate(navigationControler: NavHostController) {
-    Row(Modifier
-        .fillMaxWidth()
-        .padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text("Ya tienes una cuenta?", fontSize = 18.sp, color = Color(0xFF878787), fontWeight = FontWeight.Bold)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(10.dp), verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            "Ya tienes una cuenta?",
+            fontSize = 18.sp,
+            color = Color(0xFF878787),
+            fontWeight = FontWeight.Bold
+        )
         TextButton(
-            onClick = {navigationControler.navigate(Routes.LoginScreen.routes)},
-        ) { Text("Iniciar Sesion", fontSize = 18.sp, color = Color(0xFF016AC4), fontWeight = FontWeight.Bold) }
+            onClick = { navigationControler.navigate(Routes.LoginScreen.routes) },
+        ) {
+            Text(
+                "Iniciar Sesion",
+                fontSize = 18.sp,
+                color = Color(0xFF016AC4),
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
 
 @Composable
-fun ButtonCreate() {
+fun ButtonCreate(
+    loginViewModel: LoginViewModel,
+    email: String,
+    Pass: String,
+    confirm: String,
+
+) {
+
+
+    val isButtonEnable = loginViewModel.onButtonEnable(email, Pass, confirm)
     Button(
-        onClick = {},
+        onClick = { loginViewModel.onConnfirmPass(email, Pass, confirm) },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
+        enabled = isButtonEnable,
         colors = ButtonDefaults.buttonColors(
-            Color(0xFF016AC4)
-        )
-    ) {
+            contentColor = Color(0xFFFFFFFF),
+            containerColor = Color(0xFF3C96F5),
+            disabledContentColor = Color(0xFFA5A5A5),
+            disabledContainerColor = Color(0xFF30669E),
+        ),
+
+        ) {
         Text(
             "Crear",
             color = Color(0xFFFFFFFF),
@@ -97,27 +160,61 @@ fun ButtonCreate() {
 }
 
 @Composable
-fun ContentCreate() {
-    var name by rememberSaveable { mutableStateOf("") }
-    var email by rememberSaveable { mutableStateOf("") }
-    var pass by rememberSaveable { mutableStateOf("") }
-    var ConfirmPass by rememberSaveable { mutableStateOf("") }
+fun ContentCreate(
+    name: String,
+    email: String,
+    Pass: String,
+    PassConfirm: String,
+    loginViewModel: LoginViewModel
+) {
+
 
     Column(Modifier.fillMaxWidth()) {
-        IngresarNombre(name = name) { name = it }
+        IngresarNombre(name) {
+            loginViewModel.onRememberChangeConfirm(
+                name = it,
+                email = email,
+                password = Pass,
+                confirm = PassConfirm
+            )
+        }
         Spacer(Modifier.height(8.dp))
-        IngresarEmail(email = email) { email = it }
+
+        IngresarEmail(email = email) {
+            loginViewModel.onRememberChangeConfirm(
+                name = name,
+                email = it,
+                password = Pass,
+                confirm = PassConfirm
+            )
+        }
         Spacer(Modifier.height(8.dp))
-        IngresarPassword(pass = pass) { pass = it }
+
+        IngresarPassword(pass = Pass) {
+            loginViewModel.onRememberChangeConfirm(
+                name = name,
+                email = email,
+                password = it,
+                confirm = PassConfirm
+            )
+        }
         Spacer(Modifier.height(8.dp))
-        ConfirmPassword(ConfirmPass = ConfirmPass) { ConfirmPass = it }
+
+        ConfirmPassword(PassConfirm) {
+            loginViewModel.onRememberChangeConfirm(
+                name = name,
+                email = email,
+                password = Pass,
+                confirm = it
+            )
+        }
 
     }
 
 }
 
 @Composable
-fun ConfirmPassword(ConfirmPass: String, onValueConfirm: (String) -> Unit) {
+fun ConfirmPassword(ConfirmPass: String, onConfirmChange: (String) -> Unit) {
     var passVisibleConfirm by rememberSaveable { mutableStateOf(false) }
     Text(
         "Confirmar Contraseña",
@@ -128,7 +225,7 @@ fun ConfirmPassword(ConfirmPass: String, onValueConfirm: (String) -> Unit) {
     )
     TextField(
         value = ConfirmPass,
-        onValueChange = { onValueConfirm(it) },
+        onValueChange = { onConfirmChange(it) },
         label = { Text("Contraseña", color = Color.Black) },
         visualTransformation = if (passVisibleConfirm) VisualTransformation.None else PasswordVisualTransformation(),
         modifier = Modifier.fillMaxWidth(),

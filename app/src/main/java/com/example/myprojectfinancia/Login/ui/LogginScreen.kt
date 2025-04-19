@@ -73,16 +73,17 @@ fun LogginScreen(
             .background(color = Color(0xFFECECEC))
     ) {
         val context = LocalContext.current
-        val navigationState by loginViewModel.navController.collectAsState()
 
-        LaunchedEffect(navigationState) {
-            Log.i("LoginScreen", "Estado de navegación actualizado: $navigationState")
+        LaunchedEffect(Unit) {
+
             loginViewModel.navController.collect { route ->
                 println("DEBUG: Evento de navegación recibido: $route")
                 route?.let {
                     Log.i("LoginScreen", "Navegando a $route")
 
-                    navigationControler.navigate(route)
+                    navigationControler.navigate(route){
+                        popUpTo(Routes.LoginScreen.routes) { inclusive = true }
+                    }
                 }
             }
         }

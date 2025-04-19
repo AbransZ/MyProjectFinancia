@@ -1,5 +1,6 @@
 package com.example.myprojectfinancia.Model
 
+
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
@@ -9,9 +10,13 @@ import com.example.myprojectfinancia.Login.ui.ContainerCreate
 import com.example.myprojectfinancia.Login.ui.LogginScreen
 import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 import com.example.myprojectfinancia.Login.ui.forgotPassWord
-import com.example.myprojectfinancia.Starting.UI.InitialView
+import com.example.myprojectfinancia.Home.UI.InitialView
+import com.example.myprojectfinancia.Login.ui.Spalsh
+import com.example.myprojectfinancia.Login.ui.ViewModel.SpalshViewModel
+import com.example.myprojectfinancia.Login.ui.ViewModel.homeViewModel
 
 sealed class Routes(val routes: String) {
+    object SplashScreen : Routes("Splash")
     object LoginScreen : Routes("Login")
     object CreateScreen : Routes("Create")
     object ForgotPasswordScreen : Routes("ForgotPassword")
@@ -20,12 +25,15 @@ sealed class Routes(val routes: String) {
 }
 
 @Composable
-fun Navhost(loginViewModel: LoginViewModel){
+fun Navhost(loginViewModel: LoginViewModel,splashViewModel: SpalshViewModel,homeViewModel: homeViewModel){
     val navigationControler = rememberNavController()
     NavHost(
         navController = navigationControler,
-        startDestination = (Routes.LoginScreen.routes)
+        startDestination = (Routes.SplashScreen.routes)
     ) {
+        composable(Routes.SplashScreen.routes) {
+            Spalsh(splashViewModel, navigationControler)
+        }
         composable(Routes.LoginScreen.routes) {
             LogginScreen(
                 modifier = Modifier, navigationControler,
@@ -33,13 +41,13 @@ fun Navhost(loginViewModel: LoginViewModel){
             )
         }
         composable(Routes.CreateScreen.routes) {
-            ContainerCreate(navigationControler)
+            ContainerCreate(navigationControler,loginViewModel)
         }
         composable(Routes.ForgotPasswordScreen.routes){
             forgotPassWord(modifier = Modifier,navigationControler,loginViewModel)
         }
         composable(Routes.StartingScreen.routes){
-            InitialView()
+            InitialView(navigationControler,homeViewModel)
         }
 
     }
