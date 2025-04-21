@@ -8,6 +8,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.example.myprojectfinancia.Login.Data.DI.AuthService
 import com.example.myprojectfinancia.Model.Routes
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
@@ -23,7 +26,10 @@ import javax.inject.Inject
 @HiltViewModel
 
 //preparar el view model para ser inyectado
-class LoginViewModel @Inject constructor(private val authService: AuthService) : ViewModel() {
+class LoginViewModel @Inject constructor(
+    private val authService: AuthService,
+    private val googleSignInClient: GoogleSignInClient
+) : ViewModel() {
 
     //logica del email
     private val _name = MutableLiveData<String>()
@@ -55,11 +61,118 @@ class LoginViewModel @Inject constructor(private val authService: AuthService) :
     private val _isEnableLogin = MutableLiveData<Boolean>()
     val isEnable: LiveData<Boolean> = _isEnableLogin
 
+    private val _isLoading = MutableLiveData<Boolean>()
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    //muestra el dialogo de recuperacion de contraseña
+    private val _isDialogOK = MutableLiveData<Boolean>()
+    val isDialogOk : LiveData<Boolean> = _isDialogOK
+
+
+    //metodo para recuperar contraseña
+
+     fun sendEmailToRevoverPassword(email:String){
+
+         viewModelScope.launch {
+
+             try {
+                 val emailSended= authService.forgotPassword(email)
+                 if (emailSended){
+                     _isLoading.value=true
+                     _isDialogOK.value=true
+                     Log.i("abrahan","correo enviado")
+
+                 }else{
+                     _errorMessage.emit("correo no enviado")
+                 }
+             }catch (ex:Exception){
+                 _errorMessage.emit("Error al enviar el correo ${ex.message}")
+                 Log.i("abrahan","correo No enviado hubo un error")
+             }finally {
+                 _isLoading.value=false
+             }
+
+         }
+
+    }
+
+    //metodo para manejar el dialog
+    fun onDialogChange(show:Boolean){
+        _isDialogOK.value=show
+    }
+
+    //metodo para obtener clente signin de google
+    fun getGoogleSignInClient() = googleSignInClient
+
     // logica de fields para loginscreen
     fun onLoginChange(email: String, password: String) {
         _email.value = email
         _password.value = password
         _isEnableLogin.value = isEnableLogin(email, password)
+    }
+
+    //metodo para iniciar sesion con google
+    fun resultSinginWithGoogle(account: GoogleSignInAccount?) {
+        viewModelScope.launch {
+            _isLoading.value=true
+            try{
+                account?.let {
+                    val idToken = it.idToken
+                    if (idToken!=null){
+                        val user =authService.loginWithGoogle(idToken)
+                        if (user!=null){
+                            Log.i("abrahan","login con Goolgle es exitoso")
+                            _NavController.emit(Routes.StartingScreen.routes)
+                        }else{
+                            Log.i("abrahan","login con Goolgle es fallido")
+                            _errorMessage.emit("login con Goolgle es fallido")
+                        }
+                    }else{
+                        Log.i("abrahan","no se pudo obtener el token")
+                        _errorMessage.emit("no se pudo obtener el token de google")
+                    }
+                } ?: run{
+                    Log.i("abrahan","no se pudo obtener la cuenta")
+                    _errorMessage.emit("no se pudo obtener la cuenta de google")
+                }
+            }catch (ex:Exception){
+                Log.e("abrahan","Error en el sing in ${ex.message}")
+                _errorMessage.emit("Error en el sing in con Google ${ex.message}")
+
+
+            }finally {
+                _isLoading.value=false
+            }
+        }
+    }
+
+    //metodo para procesar el intent de google sing in
+    fun processGoogleSingIn(task: com.google.android.gms.tasks.Task<GoogleSignInAccount>){
+        try {
+            val account = task.getResult(ApiException::class.java)
+            resultSinginWithGoogle(account)
+
+        }catch (e:ApiException){
+            Log.e("abrahan","Error en el sing in ${e.message}")
+            viewModelScope.launch {
+                _errorMessage.emit("Error en el sing in con Google ${e.message}")
+            }
+        }
+    }
+
+    //metodo auxiliar de errores
+    private suspend fun handleAuxError(ex: Exception) {
+        Log.e("abrahan", "Error en el sing in ${ex.message}")
+        val errorMessage = when (ex) {
+            is FirebaseAuthInvalidUserException ->
+                "No existe una cuenta con este correo electrónico"
+            is FirebaseAuthInvalidCredentialsException ->
+                "Email o contraseña son inválidas"
+            is FirebaseNetworkException ->
+                "Error de conexión. Verifica tu conexión a internet"
+            else -> ex.message ?: "Error al iniciar sesión"
+        }
+        _errorMessage.emit(errorMessage)
     }
 
     // logica de fields para register screen
@@ -102,7 +215,7 @@ class LoginViewModel @Inject constructor(private val authService: AuthService) :
                 }
                 _errorMessage.emit(errorMessage)
             }
-         }
+        }
     }
 
     fun isEnableLogin(email: String, password: String): Boolean {

@@ -9,8 +9,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myprojectfinancia.Login.ui.ContainerCreate
 import com.example.myprojectfinancia.Login.ui.LogginScreen
 import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
-import com.example.myprojectfinancia.Login.ui.forgotPassWord
 import com.example.myprojectfinancia.Home.UI.InitialView
+import com.example.myprojectfinancia.Login.ui.ForgotPassWord
 import com.example.myprojectfinancia.Login.ui.Spalsh
 import com.example.myprojectfinancia.Login.ui.ViewModel.SpalshViewModel
 import com.example.myprojectfinancia.Login.ui.ViewModel.homeViewModel
@@ -44,7 +44,7 @@ fun Navhost(loginViewModel: LoginViewModel,splashViewModel: SpalshViewModel,home
             ContainerCreate(navigationControler,loginViewModel)
         }
         composable(Routes.ForgotPasswordScreen.routes){
-            forgotPassWord(modifier = Modifier,navigationControler,loginViewModel)
+            ForgotPassWord(modifier = Modifier,navigationControler,loginViewModel)
         }
         composable(Routes.StartingScreen.routes){
             InitialView(navigationControler,homeViewModel)

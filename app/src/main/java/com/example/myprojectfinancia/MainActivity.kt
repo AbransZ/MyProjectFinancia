@@ -5,9 +5,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.navigation.compose.NavHost
-import com.example.myprojectfinancia.Login.ui.Spalsh
-
 import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 import com.example.myprojectfinancia.Login.ui.ViewModel.SpalshViewModel
 import com.example.myprojectfinancia.Login.ui.ViewModel.homeViewModel

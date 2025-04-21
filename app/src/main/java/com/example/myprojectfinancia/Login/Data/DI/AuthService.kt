@@ -1,17 +1,22 @@
 package com.example.myprojectfinancia.Login.Data.DI
 
 import android.text.BoringLayout
+import android.util.Log
 import androidx.compose.runtime.saveable.autoSaver
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.GoogleAuthCredential
+import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth) {
+class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth,googleSignInClient: GoogleSignInClient) {
 
     suspend fun login(email: String, password: String): FirebaseUser? {
         return firebaseAuth.signInWithEmailAndPassword(email, password).await().user
@@ -31,6 +36,16 @@ class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth) {
         }
     }
 
+    // auth con google
+    suspend fun loginWithGoogle(idToken: String): FirebaseUser? {
+        val credential = GoogleAuthProvider.getCredential(idToken,null)
+        return firebaseAuthWithCredential(credential)
+    }
+//autenticar con credenciales
+    private suspend fun firebaseAuthWithCredential(credential: AuthCredential): FirebaseUser? {
+        return firebaseAuth.signInWithCredential(credential).await().user
+    }
+
     fun isUsedLogged():Boolean {
         return getCurrentUser() != null
     }
@@ -40,5 +55,11 @@ class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth) {
     }
 
     private fun getCurrentUser() = firebaseAuth.currentUser
+
+    fun forgotPassword(email: String):Boolean{
+        firebaseAuth.sendPasswordResetEmail(email).isSuccessful
+        return true
+    }
+
 
 }

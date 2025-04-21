@@ -7,6 +7,8 @@ import com.example.myprojectfinancia.Model.Routes
 import android.app.Activity
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -35,7 +38,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -51,11 +53,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myprojectfinancia.R
 import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
 
 
 @Composable
@@ -81,7 +84,7 @@ fun LogginScreen(
                 route?.let {
                     Log.i("LoginScreen", "Navegando a $route")
 
-                    navigationControler.navigate(route){
+                    navigationControler.navigate(route) {
                         popUpTo(Routes.LoginScreen.routes) { inclusive = true }
                     }
                 }
@@ -129,6 +132,7 @@ fun Body(
     val email: String by loginViewModel.email.observeAsState("")
     val Pass: String by loginViewModel.password.observeAsState("")
     val isEnable: Boolean by loginViewModel.isEnable.observeAsState(false)
+    val isLoading: Boolean by loginViewModel.isLoading.observeAsState(false)
 
 
 
@@ -151,7 +155,17 @@ fun Body(
 
         Divider()
         Spacer(modifier = modifier.size(32.dp))
-        Googlebuttons()
+        Googlebuttons(loginViewModel)
+
+        if (isLoading){
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+
+            ){
+                CircularProgressIndicator()
+            }
+        }
 
 
     }
@@ -173,11 +187,8 @@ fun Greetings(modifier: Modifier) {
             fontSize = 25.sp,
             fontWeight = FontWeight.SemiBold,
             color = Color.LightGray
-
         )
-
     }
-
 }
 
 @Composable
@@ -191,8 +202,6 @@ fun Footer(modifier: Modifier, navigationControler: NavHostController) {
         )
         SignIn(navigationControler)
     }
-
-
 }
 
 @Composable
@@ -217,9 +226,34 @@ fun SignIn(navigationControler: NavHostController) {
 }
 
 @Composable
-fun Googlebuttons() {
+fun Googlebuttons(loginViewModel: LoginViewModel) {
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                loginViewModel.processGoogleSingIn(task)
+
+            } catch (ex: ApiException) {
+                Log.e("abrahan", "Error en el sing in ${ex.message}")
+                Toast.makeText(
+                    context,
+                    "Error en el sing in ${ex.message}", Toast.LENGTH_SHORT
+                )
+                    .show()
+
+            }
+        }
+    }
     Box(Modifier.fillMaxWidth()) {
-        OutlinedButton(onClick = {}, modifier = Modifier.fillMaxWidth()) {
+        OutlinedButton(
+            onClick = {
+            val signInIntent = loginViewModel.getGoogleSignInClient().signInIntent
+            launcher.launch(signInIntent)
+
+        }, modifier = Modifier.fillMaxWidth()) {
             Icon(
                 painter = painterResource(R.drawable.search),
                 contentDescription = "Cuenta Google",
@@ -283,7 +317,7 @@ fun Buttons(isEnable: Boolean, loginViewModel: LoginViewModel, email: String, Pa
                 onClick = {
                     Log.i("LoginScreen", "Login PRESIONADOOOOOOOOO")
                     loginViewModel.login(email, Pass)
-                          },
+                },
                 enabled = isEnable,
                 colors = ButtonDefaults.buttonColors(
                     contentColor = Color(0xFFFFFFFF),

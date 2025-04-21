@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "166557354981-97ipvhjkv8vock8c8dgp0oua5l6uncvp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.myprojectfinancia",
+            "certificate_hash": "7d0b2516d8c0885cd8bd4f9e679458b49bfc4ae1"
+          }
+        },
+        {
           "client_id": "166557354981-vn9993l338l9sc0k4gpu5tcsh9cp9j1d.apps.googleusercontent.com",
           "client_type": 3
         }
