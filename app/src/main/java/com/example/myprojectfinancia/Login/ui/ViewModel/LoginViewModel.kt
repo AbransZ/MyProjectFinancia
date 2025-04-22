@@ -66,39 +66,42 @@ class LoginViewModel @Inject constructor(
 
     //muestra el dialogo de recuperacion de contraseña
     private val _isDialogOK = MutableLiveData<Boolean>()
-    val isDialogOk : LiveData<Boolean> = _isDialogOK
+    val isDialogOk: LiveData<Boolean> = _isDialogOK
 
 
     //metodo para recuperar contraseña
 
-     fun sendEmailToRevoverPassword(email:String){
+    fun sendEmailToRevoverPassword(email: String) {
 
-         viewModelScope.launch {
+        viewModelScope.launch {
 
-             try {
-                 val emailSended= authService.forgotPassword(email)
-                 if (emailSended){
-                     _isLoading.value=true
-                     _isDialogOK.value=true
-                     Log.i("abrahan","correo enviado")
+            if (!authService.validUser(email)) {
+                _errorMessage.emit("Este correo electrónico no está registrado")
+                Log.i("abrahan", "correo no enviado")
+            } else {
+                try {
+                    val emailSended = authService.forgotPassword(email)
+                    if (emailSended) {
+                        _isLoading.value = true
+                        _isDialogOK.value = true
+                        Log.i("abrahan", "correo enviado")
 
-                 }else{
-                     _errorMessage.emit("correo no enviado")
-                 }
-             }catch (ex:Exception){
-                 _errorMessage.emit("Error al enviar el correo ${ex.message}")
-                 Log.i("abrahan","correo No enviado hubo un error")
-             }finally {
-                 _isLoading.value=false
-             }
-
-         }
-
+                    } else {
+                        _errorMessage.emit("correo no enviado")
+                    }
+                } catch (ex: Exception) {
+                    _errorMessage.emit("Error al enviar el correo ${ex.message}")
+                    Log.i("abrahan", "correo No enviado hubo un error")
+                } finally {
+                    _isLoading.value = false
+                }
+            }
+        }
     }
 
     //metodo para manejar el dialog
-    fun onDialogChange(show:Boolean){
-        _isDialogOK.value=show
+    fun onDialogChange(show: Boolean) {
+        _isDialogOK.value = show
     }
 
     //metodo para obtener clente signin de google
@@ -114,66 +117,52 @@ class LoginViewModel @Inject constructor(
     //metodo para iniciar sesion con google
     fun resultSinginWithGoogle(account: GoogleSignInAccount?) {
         viewModelScope.launch {
-            _isLoading.value=true
-            try{
+            _isLoading.value = true
+            try {
                 account?.let {
                     val idToken = it.idToken
-                    if (idToken!=null){
-                        val user =authService.loginWithGoogle(idToken)
-                        if (user!=null){
-                            Log.i("abrahan","login con Goolgle es exitoso")
+                    if (idToken != null) {
+                        val user = authService.loginWithGoogle(idToken)
+                        if (user != null) {
+                            Log.i("abrahan", "login con Goolgle es exitoso")
                             _NavController.emit(Routes.StartingScreen.routes)
-                        }else{
-                            Log.i("abrahan","login con Goolgle es fallido")
+                        } else {
+                            Log.i("abrahan", "login con Goolgle es fallido")
                             _errorMessage.emit("login con Goolgle es fallido")
                         }
-                    }else{
-                        Log.i("abrahan","no se pudo obtener el token")
+                    } else {
+                        Log.i("abrahan", "no se pudo obtener el token")
                         _errorMessage.emit("no se pudo obtener el token de google")
                     }
-                } ?: run{
-                    Log.i("abrahan","no se pudo obtener la cuenta")
+                } ?: run {
+                    Log.i("abrahan", "no se pudo obtener la cuenta")
                     _errorMessage.emit("no se pudo obtener la cuenta de google")
                 }
-            }catch (ex:Exception){
-                Log.e("abrahan","Error en el sing in ${ex.message}")
+            } catch (ex: Exception) {
+                Log.e("abrahan", "Error en el sing in ${ex.message}")
                 _errorMessage.emit("Error en el sing in con Google ${ex.message}")
 
 
-            }finally {
-                _isLoading.value=false
+            } finally {
+                _isLoading.value = false
             }
         }
     }
 
     //metodo para procesar el intent de google sing in
-    fun processGoogleSingIn(task: com.google.android.gms.tasks.Task<GoogleSignInAccount>){
+    fun processGoogleSingIn(task: com.google.android.gms.tasks.Task<GoogleSignInAccount>) {
         try {
             val account = task.getResult(ApiException::class.java)
             resultSinginWithGoogle(account)
 
-        }catch (e:ApiException){
-            Log.e("abrahan","Error en el sing in ${e.message}")
+        } catch (e: ApiException) {
+            Log.e("abrahan", "Error en el sing in ${e.message}")
             viewModelScope.launch {
                 _errorMessage.emit("Error en el sing in con Google ${e.message}")
             }
         }
     }
 
-    //metodo auxiliar de errores
-    private suspend fun handleAuxError(ex: Exception) {
-        Log.e("abrahan", "Error en el sing in ${ex.message}")
-        val errorMessage = when (ex) {
-            is FirebaseAuthInvalidUserException ->
-                "No existe una cuenta con este correo electrónico"
-            is FirebaseAuthInvalidCredentialsException ->
-                "Email o contraseña son inválidas"
-            is FirebaseNetworkException ->
-                "Error de conexión. Verifica tu conexión a internet"
-            else -> ex.message ?: "Error al iniciar sesión"
-        }
-        _errorMessage.emit(errorMessage)
-    }
 
     // logica de fields para register screen
     fun onRememberChangeConfirm(name: String, email: String, password: String, confirm: String) {

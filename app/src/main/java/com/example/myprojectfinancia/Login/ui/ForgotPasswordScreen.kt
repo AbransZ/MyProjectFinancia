@@ -1,5 +1,6 @@
 package com.example.myprojectfinancia.Login.ui
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,11 +28,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -52,6 +55,18 @@ fun ForgotPassWord(
     navigationControler: NavHostController,
     loginViewModel: LoginViewModel
 ) {
+    val context = LocalContext.current
+    LaunchedEffect(key1 = true) {
+        loginViewModel.message.collect { message ->
+            message?.let {
+                Toast.makeText(
+                    context,
+                    it,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .padding(top = 30.dp)
@@ -99,7 +114,7 @@ fun BodyForgot(modifier: Modifier, loginViewModel: LoginViewModel) {
 
 
             ) {
-            Text(text = "Ingresar", color = Color.White, fontSize = 20.sp)
+            Text(text = "Recuperar", color = Color.White, fontSize = 20.sp)
         }
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
