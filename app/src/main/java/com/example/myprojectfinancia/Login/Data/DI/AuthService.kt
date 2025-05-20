@@ -1,20 +1,13 @@
 package com.example.myprojectfinancia.Login.Data.DI
 
-import android.text.BoringLayout
 import android.util.Log
-import androidx.compose.runtime.saveable.autoSaver
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.AuthCredential
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.auth.GoogleAuthCredential
 import com.google.firebase.auth.GoogleAuthProvider
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
 
 class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth,googleSignInClient: GoogleSignInClient) {
 
@@ -56,9 +49,15 @@ class AuthService @Inject constructor(private val firebaseAuth: FirebaseAuth,goo
 
     private fun getCurrentUser() = firebaseAuth.currentUser
 
-    fun forgotPassword(email: String):Boolean{
-        firebaseAuth.sendPasswordResetEmail(email).isSuccessful
-        return true
+    suspend fun forgotPassword(email: String):Boolean{
+      return try {
+            firebaseAuth.sendPasswordResetEmail(email).await()
+            true
+        }catch (ex:Exception){
+            Log.e("AuthService", "Error al enviar correo: ${ex.message}")
+            false
+        }
+
     }
 
 

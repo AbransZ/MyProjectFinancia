@@ -75,9 +75,9 @@ class LoginViewModel @Inject constructor(
 
         viewModelScope.launch {
 
-            if (!authService.validUser(email)) {
+            if (authService.validUser(email)) {
                 _errorMessage.emit("Este correo electrónico no está registrado")
-                Log.i("abrahan", "correo no enviado")
+                Log.i("abrahan", "correo no enviado porque no esta registrado")
             } else {
                 try {
                     val emailSended = authService.forgotPassword(email)
@@ -87,7 +87,7 @@ class LoginViewModel @Inject constructor(
                         Log.i("abrahan", "correo enviado")
 
                     } else {
-                        _errorMessage.emit("correo no enviado")
+                        _errorMessage.emit("correo no enviado porque no se authentico")
                     }
                 } catch (ex: Exception) {
                     _errorMessage.emit("Error al enviar el correo ${ex.message}")
