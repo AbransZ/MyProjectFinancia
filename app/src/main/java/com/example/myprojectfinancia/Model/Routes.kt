@@ -13,7 +13,7 @@ import com.example.myprojectfinancia.Home.UI.InitialView
 import com.example.myprojectfinancia.Login.ui.ForgotPassWord
 import com.example.myprojectfinancia.Login.ui.Spalsh
 import com.example.myprojectfinancia.Login.ui.ViewModel.SpalshViewModel
-import com.example.myprojectfinancia.Login.ui.ViewModel.homeViewModel
+import com.example.myprojectfinancia.Home.UI.ViewModels.homeViewModel
 
 sealed class Routes(val routes: String) {
     object SplashScreen : Routes("Splash")

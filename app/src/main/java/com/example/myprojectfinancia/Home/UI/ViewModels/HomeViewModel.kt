@@ -1,13 +1,10 @@
-package com.example.myprojectfinancia.Login.ui.ViewModel
+package com.example.myprojectfinancia.Home.UI.ViewModels
 
 import androidx.lifecycle.ViewModel
 import com.example.myprojectfinancia.Login.Data.DI.AuthService
 import com.example.myprojectfinancia.Model.Routes
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.scopes.ViewModelScoped
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 
