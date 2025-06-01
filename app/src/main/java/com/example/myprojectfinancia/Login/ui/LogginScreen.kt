@@ -390,7 +390,7 @@ fun Password(pass: String, onTextChange: (String) -> Unit) {
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun Email(email: String, onTextChange: (String) -> Unit) {
 
