@@ -9,6 +9,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +32,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -45,6 +48,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -73,7 +77,7 @@ fun LogginScreen(
         modifier
             .fillMaxSize()
             .padding(top = 26.dp)
-            .background(color = Color(0xFFECECEC))
+            .background(color = MaterialTheme.colorScheme.background)
     ) {
         val context = LocalContext.current
 
@@ -141,6 +145,7 @@ fun Body(
         Greetings(modifier)
         Spacer(modifier = modifier.size(18.dp))
 
+
         Email(email) { loginViewModel.onLoginChange(email = it, password = Pass) }
         Spacer(modifier = modifier.size(16.dp))
 
@@ -157,12 +162,12 @@ fun Body(
         Spacer(modifier = modifier.size(32.dp))
         Googlebuttons(loginViewModel)
 
-        if (isLoading){
+        if (isLoading) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
 
-            ){
+            ) {
                 CircularProgressIndicator()
             }
         }
@@ -174,12 +179,12 @@ fun Body(
 
 @Composable
 fun Greetings(modifier: Modifier) {
-    Column(modifier.padding(6.dp)) {
+    Column(modifier = modifier) {
         Text(
             text = "Hola, Bienvenido!",
             fontSize = 45.sp,
             fontWeight = FontWeight.Bold,
-            color = Color(0xFF444444),
+            color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 6.dp)
         )
         Text(
@@ -188,6 +193,15 @@ fun Greetings(modifier: Modifier) {
             fontWeight = FontWeight.SemiBold,
             color = Color.LightGray
         )
+        Box(modifier = modifier.fillMaxWidth().padding(top = 15.dp), contentAlignment = Alignment.Center){
+            Image(
+            painter = painterResource(R.drawable.logo),
+            contentDescription = "Logo-Bienvenida",
+            modifier
+                .size(200.dp)
+                .clip(RoundedCornerShape(50))
+        )}
+
     }
 }
 
@@ -210,7 +224,10 @@ fun SignIn(navigationControler: NavHostController) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        Text("Aun no tienes una cuenta?")
+        Text(
+            text = "Aun no tienes una cuenta?",
+            color = MaterialTheme.colorScheme.onBackground
+        )
         TextButton(
             onClick = { navigationControler.navigate(Routes.CreateScreen.routes) },
             Modifier.padding(start = 1.dp)
@@ -219,7 +236,7 @@ fun SignIn(navigationControler: NavHostController) {
                 "Crear cuenta",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xff0060C5)
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -250,23 +267,25 @@ fun Googlebuttons(loginViewModel: LoginViewModel) {
     Box(Modifier.fillMaxWidth()) {
         OutlinedButton(
             onClick = {
-            val signInIntent = loginViewModel.getGoogleSignInClient().signInIntent
-            launcher.launch(signInIntent)
+                val signInIntent = loginViewModel.getGoogleSignInClient().signInIntent
+                launcher.launch(signInIntent)
 
-        }, modifier = Modifier.fillMaxWidth()) {
+            }, modifier = Modifier.fillMaxWidth().height(40.dp)
+
+        ) {
             Icon(
                 painter = painterResource(R.drawable.search),
                 contentDescription = "Cuenta Google",
                 modifier = Modifier
-                    .padding(8.dp)
-                    .size(20.dp),
+                    .padding(end = 8.dp)
+                    .size(40.dp),
                 tint = Color.Unspecified
             )
             Text(
                 text = "Usar cuenta de Google",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF444444)
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }
@@ -302,7 +321,7 @@ fun ForgotButton(navigationControler: NavHostController) {
                 text = "¿Olvidaste la contraseña?",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xff0060C5)
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -320,20 +339,24 @@ fun Buttons(isEnable: Boolean, loginViewModel: LoginViewModel, email: String, Pa
                 },
                 enabled = isEnable,
                 colors = ButtonDefaults.buttonColors(
-                    contentColor = Color(0xFFFFFFFF),
-                    containerColor = Color(0xFF3C96F5),
-                    disabledContentColor = Color(0xFFA5A5A5),
-                    disabledContainerColor = Color(0xFF30669E),
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    disabledContentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.errorContainer,
 
                     ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(60.dp),
+                    .height(40.dp),
                 shape = RoundedCornerShape(30.dp),
 
 
                 ) {
-                Text(text = "Ingresar", color = Color.White, fontSize = 20.sp)
+                Text(
+                    text = "Ingresar",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 20.sp
+                )
             }
 
         }
@@ -353,37 +376,39 @@ fun Password(pass: String, onTextChange: (String) -> Unit) {
             modifier = Modifier.padding(bottom = 8.dp, start = 10.dp),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF444444)
+            color = MaterialTheme.colorScheme.onBackground
         )
-        TextField(
+        OutlinedTextField(
             value = pass,
             onValueChange = { onTextChange(it) },
-            label = { Text("Contraseña", color = Color(0xFF2B2B2B)) },
+            label = { Text("Contraseña", color = MaterialTheme.colorScheme.onBackground) },
             visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = Color(0xFFAAAAAA),
-                unfocusedContainerColor = Color(0xFFDBDBDB),
-                focusedTextColor = Color(0xFF242424),
-                unfocusedTextColor = Color(0xFF4B4B4B),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color(0xFF0D61EA)
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedTextColor = MaterialTheme.colorScheme.onSurface,
+                unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+//                focusedIndicatorColor = Color.Transparent,
+//                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = MaterialTheme.colorScheme.primary
             ),
             trailingIcon = {
 
                 TextButton(onClick = { passVisible = !passVisible }) {
                     if (passVisible) {
-                        Text("Ocultar", color = Color(0xFF4E4E4E))
+                        Text("Ocultar", color = MaterialTheme.colorScheme.onBackground)
                     } else {
-                        Text("Mostrar", color = Color(0xFF4E4E4E))
+                        Text("Mostrar", color = MaterialTheme.colorScheme.onBackground)
                     }
                 }
             },
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape(30.dp)
 
         )
     }
@@ -400,26 +425,28 @@ fun Email(email: String, onTextChange: (String) -> Unit) {
             modifier = Modifier.padding(bottom = 8.dp, start = 10.dp),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF444444)
+            color = MaterialTheme.colorScheme.onBackground
         )
-        TextField(
+        OutlinedTextField(
             value = email,
             onValueChange = { onTextChange(it) },
-            label = { Text("Ingresar email", color = Color(0xFF4E4E4E)) },
-            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Ingresar email", color = MaterialTheme.colorScheme.onBackground) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             colors = TextFieldDefaults.colors(
-                focusedTextColor = Color(0xFF3D3D3D),
-                unfocusedTextColor = Color(0xFF4B4B4B),
-                focusedContainerColor = Color(0xFFAAAAAA),
-                unfocusedContainerColor = Color(0xFFDBDBDB),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color(0xFF0D61EA)
+//                focusedTextColor = Color(0xFF3D3D3D),
+//               unfocusedTextColor = Color(0xFFDCDBDB),
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+////                focusedIndicatorColor = Color.Transparent,
+////                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = MaterialTheme.colorScheme.primary
             ),
-            shape = RoundedCornerShape(10.dp)
+            shape = RoundedCornerShape( 30.dp)
 
         )
     }
@@ -433,5 +460,7 @@ fun Header(modifier: Modifier) {
     Icon(
         imageVector = Icons.Default.Close,
         contentDescription = "Close app",
-        modifier = modifier.clickable { activity.finish() })
+        modifier = modifier.clickable { activity.finish() },
+        tint = MaterialTheme.colorScheme.onBackground
+    )
 }

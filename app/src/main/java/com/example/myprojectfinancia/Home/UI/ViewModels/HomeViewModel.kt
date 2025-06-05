@@ -1,7 +1,10 @@
 package com.example.myprojectfinancia.Home.UI.ViewModels
 
+import android.util.Log
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -33,6 +36,7 @@ class homeViewModel @Inject constructor(
     fun mostrarDialog() {
         _showDialog.value = true
     }
+
     fun ocultarDialog() {
         _showDialog.value = false
         clearfields()
@@ -49,25 +53,20 @@ class homeViewModel @Inject constructor(
 
     // naturaleza de la transaccion
     private val _naturaleza = MutableLiveData<String>("")
-    private val _natureExpanded = MutableLiveData<Boolean>()
     val naturaleza: LiveData<String> = _naturaleza
-    val natureExpanded: LiveData<Boolean> = _natureExpanded
 
     fun onNaturalezaChange(naturaleza: String) {
         _naturaleza.value = naturaleza
     }
 
-    private fun clearfields() {
-        _naturaleza.value=""
-        _montoString.value=""
+    fun clearfields() {
+        _naturaleza.value = ""
+        _montoString.value = ""
+        _categoria.value = ""
+        _montoDouble.value = 0.0
+        _egresosIsPressed.value = false
+        _ingrsosPressed.value = false
     }
-
-    fun onNatureExpandedChange(expanded: Boolean) {
-        _natureExpanded.value = expanded
-
-    }
-
-
 
 
     // valor del monto en string
@@ -91,7 +90,7 @@ class homeViewModel @Inject constructor(
         }
     }
 
-// fecha de la transaccion
+    // fecha de la transaccion
     var fechaActual by mutableStateOf(fechaActual())
 
     companion object {
@@ -102,10 +101,40 @@ class homeViewModel @Inject constructor(
     }
 
 
+    //interaccion Ingresos y egresos
+    private val _ingrsosPressed = MutableStateFlow(false)
+    val ingrsosPressed: StateFlow<Boolean> = _ingrsosPressed
+
+    fun ingresosIsPressed() {
+        _ingrsosPressed.value = true
+        _egresosIsPressed.value = false
+        _naturaleza.value = "Ingreso"
+
+    }
+
+    private val _egresosIsPressed = MutableStateFlow(false)
+    val egresosIsPressed: StateFlow<Boolean> = _egresosIsPressed
+
+    fun gastosIsPressed() {
+        _egresosIsPressed.value = true
+        _ingrsosPressed.value = false
+        _naturaleza.value = "Gasto"
+
+    }
+
+
     fun logout(): String {
         googleSignInClient.revokeAccess()
         authService.logout()
         return Routes.LoginScreen.routes
+    }
+
+    //Movimientos
+    private val _showMovements = MutableStateFlow<Boolean>(false)
+    val showMovements: MutableStateFlow<Boolean> = _showMovements
+
+    fun showMovements(show: Boolean) {
+        _showMovements.value =show
     }
 
 

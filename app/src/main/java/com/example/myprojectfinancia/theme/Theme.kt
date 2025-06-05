@@ -48,25 +48,32 @@ private val LightColors = lightColorScheme(
     onSecondary = Color.Black,
     background = Color(0xFFECECEC),
     onBackground = Color.DarkGray,
-    surface = Color.White,
+    surface = Color(0xFF9696C1),
     onSurface = Color.Black,
     primaryContainer = Color(0xFF8894F5),
-    onPrimaryContainer = Color(0xFF0276F5)
+    onPrimaryContainer = Color(0xFF0276F5),
+    onErrorContainer = Color(0xFF4C3030),
+    errorContainer = Color(0xFF30669E),
+    surfaceVariant = Color(0xFFB9B9E8),
 )
 
 // Esquema de colores para el modo oscuro
 private val DarkColors = darkColorScheme(
     primary = Color(0xFF3C96F5),
     onPrimary = Color.White,
-    secondary = Color(0xFF488AC9),
+    secondary = Color(0xFF224B57),
     onSecondary = Color.White,
     tertiary = Color(0xFF27409A),
     background = Color(0xFF001021),
     onBackground = Color.White,
-    surface = Color(0xFF1D2A3B),
+    surface = Color(0xFF1E314C),
     onSurface = Color.White,
     primaryContainer = Color(0xFF21274B),
-    onPrimaryContainer = Color(0xFF0276F5)
+    onPrimaryContainer = Color(0xFF0276F5),
+    onErrorContainer = Color(0xFF5C1A1A),
+    errorContainer = Color(0xFF30669E),
+    surfaceVariant = Color(0xFF001021),
+
 
 )
 
@@ -74,10 +81,10 @@ private val DarkColors = darkColorScheme(
 fun MyProjectFinanciaTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    /*val colorScheme = when {
+    val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -85,8 +92,7 @@ fun MyProjectFinanciaTheme(
 
         darkTheme -> DarkColors
         else -> LightColors
-    }*/
-    val colorScheme = if(darkTheme) DarkColors else LightColors
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
