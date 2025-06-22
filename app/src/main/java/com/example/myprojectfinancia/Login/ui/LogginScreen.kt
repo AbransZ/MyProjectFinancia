@@ -152,14 +152,14 @@ fun Body(
         Password(Pass) { loginViewModel.onLoginChange(email = email, password = it) }
         Spacer(modifier = modifier.size(16.dp))
 
-        ForgotButton(navigationControler)
+        ForgotButton(navigationControler,loginViewModel)
         Spacer(modifier = modifier.size(24.dp))
 
         Buttons(isEnable, loginViewModel, email, Pass)
         Spacer(modifier = modifier.size(32.dp))
 
         Divider()
-        Spacer(modifier = modifier.size(32.dp))
+        Spacer(modifier = modifier.size(20.dp))
         Googlebuttons(loginViewModel)
 
         if (isLoading) {
@@ -209,11 +209,6 @@ fun Greetings(modifier: Modifier) {
 fun Footer(modifier: Modifier, navigationControler: NavHostController) {
     Column(modifier = modifier.fillMaxWidth()) {
 
-        HorizontalDivider(
-            Modifier
-                .height(1.dp)
-                .fillMaxWidth()
-        )
         SignIn(navigationControler)
     }
 }
@@ -311,10 +306,12 @@ fun Divider() {
 }
 
 @Composable
-fun ForgotButton(navigationControler: NavHostController) {
+fun ForgotButton(navigationControler: NavHostController, loginViewModel: LoginViewModel) {
     Box(Modifier.fillMaxWidth()) {
         TextButton(
-            onClick = { navigationControler.navigate(Routes.ForgotPasswordScreen.routes) },
+            onClick = {
+                navigationControler.navigate(Routes.ForgotPasswordScreen.routes)
+                },
             Modifier.align(Alignment.CenterEnd)
         ) {
             Text(
@@ -336,6 +333,7 @@ fun Buttons(isEnable: Boolean, loginViewModel: LoginViewModel, email: String, Pa
                 onClick = {
                     Log.i("LoginScreen", "Login PRESIONADOOOOOOOOO")
                     loginViewModel.login(email, Pass)
+
                 },
                 enabled = isEnable,
                 colors = ButtonDefaults.buttonColors(
@@ -385,7 +383,7 @@ fun Password(pass: String, onTextChange: (String) -> Unit) {
             visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(40.dp),
+                .height(55.dp),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -394,8 +392,6 @@ fun Password(pass: String, onTextChange: (String) -> Unit) {
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
                 focusedTextColor = MaterialTheme.colorScheme.onSurface,
                 unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
-//                focusedIndicatorColor = Color.Transparent,
-//                unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = MaterialTheme.colorScheme.primary
             ),
             trailingIcon = {
@@ -433,17 +429,13 @@ fun Email(email: String, onTextChange: (String) -> Unit) {
             label = { Text("Ingresar email", color = MaterialTheme.colorScheme.onBackground) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(40.dp),
+                .height(55.dp),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             colors = TextFieldDefaults.colors(
-//                focusedTextColor = Color(0xFF3D3D3D),
-//               unfocusedTextColor = Color(0xFFDCDBDB),
                 focusedContainerColor = MaterialTheme.colorScheme.surface,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-////                focusedIndicatorColor = Color.Transparent,
-////                unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = MaterialTheme.colorScheme.primary
             ),
             shape = RoundedCornerShape( 30.dp)

@@ -18,15 +18,14 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.CheckCircle
 
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -71,19 +70,23 @@ fun ForgotPassWord(
         modifier = Modifier
             .padding(top = 30.dp)
             .fillMaxSize()
-            .background(color = Color(0xFFECECEC))
+            .background(MaterialTheme.colorScheme.background)
     ) {
         HeaderScreen(
             modifier
                 .align(alignment = Alignment.Start), navigationControler
         )
-        BodyForgot(modifier.align(alignment = Alignment.CenterHorizontally), loginViewModel)
+        BodyForgot(modifier.align(alignment = Alignment.CenterHorizontally), loginViewModel,navigationControler)
     }
 
 }
 
 @Composable
-fun BodyForgot(modifier: Modifier, loginViewModel: LoginViewModel) {
+fun BodyForgot(
+    modifier: Modifier,
+    loginViewModel: LoginViewModel,
+    navigationControler: NavHostController
+) {
     val email: String by loginViewModel.email.observeAsState("")
     val isDialogOk: Boolean by loginViewModel.isDialogOk.observeAsState(false)
     val isLoading: Boolean by loginViewModel.isLoading.observeAsState(false)
@@ -100,21 +103,12 @@ fun BodyForgot(modifier: Modifier, loginViewModel: LoginViewModel) {
 
                 loginViewModel.sendEmailToRevoverPassword(email)
             },
-            colors = ButtonDefaults.buttonColors(
-                contentColor = Color(0xFFFFFFFF),
-                containerColor = Color(0xFF3C96F5),
-                disabledContentColor = Color(0xFFA5A5A5),
-                disabledContainerColor = Color(0xFF30669E),
-
-                ),
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp),
             shape = RoundedCornerShape(16.dp),
-
-
             ) {
-            Text(text = "Recuperar", color = Color.White, fontSize = 20.sp)
+            Text(text = "Recuperar", color = MaterialTheme.colorScheme.onPrimary, fontSize = 20.sp)
         }
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -122,9 +116,13 @@ fun BodyForgot(modifier: Modifier, loginViewModel: LoginViewModel) {
         if (isDialogOk) {
             DiaologOk(
                 show = isDialogOk,
-                onDismis = { loginViewModel.onDialogChange(false) },
+                onDismis = { loginViewModel.onDialogChange(false)
+                           navigationControler.navigate(Routes.LoginScreen.routes){
+                               popUpTo(Routes.LoginScreen.routes) { inclusive = true }
+                           }},
                 modifier
             )
+
         }
     }
 }
@@ -172,7 +170,7 @@ fun DiaologOk(show: Boolean, onDismis: () -> Unit, modifier: Modifier) {
                         Icon(
                             imageVector = Icons.Default.CheckCircle,
                             contentDescription = "Checksito",
-                            tint = Color(0xFF2A76F8),
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = modifier.size(80.dp)
                         )
                         Spacer(modifier.padding(25.dp))
@@ -200,25 +198,17 @@ fun EmailToRememberPass(modifier: Modifier, email: String, onTextChange: (String
             modifier = Modifier.padding(bottom = 8.dp, start = 10.dp),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF444444)
+            color = MaterialTheme.colorScheme.onPrimary
         )
         TextField(
             value = email,
             onValueChange = { onTextChange(it) },
-            label = { Text("Ingresar email", color = Color(0xFF4E4E4E)) },
+            label = { Text("Ingresar email", color = MaterialTheme.colorScheme.onPrimary) },
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-            colors = TextFieldDefaults.colors(
-                focusedTextColor = Color(0xFF3D3D3D),
-                unfocusedTextColor = Color(0xFF4B4B4B),
-                focusedContainerColor = Color(0xFFAAAAAA),
-                unfocusedContainerColor = Color(0xFFDBDBDB),
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color(0xFF0D61EA)
-            ),
+
             shape = RoundedCornerShape(10.dp)
 
         )
@@ -246,7 +236,7 @@ fun HeaderScreen(modifier: Modifier, navigationControler: NavHostController) {
                 text = "Recuperar  contraseña",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF454545),
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Text(
@@ -255,13 +245,8 @@ fun HeaderScreen(modifier: Modifier, navigationControler: NavHostController) {
                         "con tu contraseña",
                 fontSize = 25.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFFAFAFAF)
-
+                color = MaterialTheme.colorScheme.onPrimary
             )
-
         }
-
     }
-
-
 }

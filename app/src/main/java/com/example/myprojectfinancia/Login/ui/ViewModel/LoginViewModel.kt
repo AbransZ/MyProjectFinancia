@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
+import com.example.myprojectfinancia.Home.Data.UserFinancia
 import com.example.myprojectfinancia.Login.Data.DI.AuthService
 import com.example.myprojectfinancia.Model.Routes
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
@@ -70,7 +71,6 @@ class LoginViewModel @Inject constructor(
 
 
     //metodo para recuperar contraseña
-
     fun sendEmailToRevoverPassword(email: String) {
 
         viewModelScope.launch {
@@ -163,7 +163,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-
     // logica de fields para register screen
     fun onRememberChangeConfirm(name: String, email: String, password: String, confirm: String) {
         _name.value = name
@@ -171,7 +170,6 @@ class LoginViewModel @Inject constructor(
         _password.value = password
         _Confirm.value = confirm
     }
-
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -183,6 +181,7 @@ class LoginViewModel @Inject constructor(
 
                     Log.i("LoginViewModel", "Login CORRECTOOOOOOOOOO!!!!!!!")
                     _NavController.emit(Routes.StartingScreen.routes)
+                   //clearFields()
 
                 } else {
                     Log.e("LoginViewModel", "Autenticación exitosa pero usuario es null")
@@ -221,9 +220,24 @@ class LoginViewModel @Inject constructor(
             try {
                 Log.i("LoginViewModel", "Iniciando registro para $email")
                 val user = authService.register(email, password)
-                if (user != null) {
-                    _NavController.emit(Routes.StartingScreen.routes)
 
+                val uID = user?.uid
+                Log.i("LoginViewModel", "id obtenido es $uID")
+                val users= UserFinancia(
+                    uid= uID.toString(),
+                    name= _name.value.toString()
+                )
+                if (user != null) {
+                    val registerUser=authService.saveUser(users)
+
+                    Log.i("LoginViewModel", "user no fue nulo ")
+                    if (registerUser){
+                        Log.i("firestore", "Registro Completado con exito")
+                        _NavController.emit(Routes.StartingScreen.routes)
+                        //clearFields()
+                    }else{
+                        Log.e("firestore", "Error al guardar el usuario")
+                    }
                 } else {
                     Log.e("LoginViewModel", "Autenticación exitosa pero usuario es null")
                 }
@@ -254,12 +268,21 @@ class LoginViewModel @Inject constructor(
         val isvalid = onButtonEnable(email, password, confirm)
         if (isvalid) {
             viewModelScope.launch {
-                if (authService.validUser(email)) {
+                _isLoading.value = true
+                try {
+                    if (authService.validUser(email)) {
+                        Log.i("abrahan", "este es el mensaje del confirm")
+                        _errorMessage.emit("Este correo electrónico ya está registrado")
+                    } else {
+                        register(email, password)
+                    }
+                }catch (ex:Exception){
                     Log.i("abrahan", "este es el mensaje del confirm")
-                    _errorMessage.emit("Este correo electrónico ya está registrado")
-                } else {
-                    register(email, password)
+                    _errorMessage.emit("ERROR OnCOnfirm")
+                }finally {
+                    _isLoading.value = false
                 }
+
             }
         } else {
             viewModelScope.launch {
@@ -277,6 +300,14 @@ class LoginViewModel @Inject constructor(
         val isValid = isValidEmail && isValidPassword && passwordsMatch
         _onPassMatch.value = isValid
         return isValid
+    }
+
+    //metodo para limpiar campos
+    fun clearFields() {
+        _name.value = ""
+        _email.value = ""
+        _password.value = ""
+        _Confirm.value = ""
     }
 
 

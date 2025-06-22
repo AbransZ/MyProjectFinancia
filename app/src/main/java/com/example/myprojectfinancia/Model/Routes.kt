@@ -47,7 +47,7 @@ fun Navhost(loginViewModel: LoginViewModel,splashViewModel: SpalshViewModel,home
             ForgotPassWord(modifier = Modifier,navigationControler,loginViewModel)
         }
         composable(Routes.StartingScreen.routes){
-            InitialView(navigationControler,homeViewModel)
+            InitialView(navigationControler,homeViewModel,loginViewModel)
         }
 
     }

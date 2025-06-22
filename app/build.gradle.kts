@@ -101,7 +101,7 @@ implementation ("com.google.firebase:firebase-database-ktx")
 implementation ("com.google.firebase:firebase-auth-ktx")
 implementation("com.google.firebase:firebase-messaging-ktx")
 implementation ("com.google.android.gms:play-services-auth:21.0.0")
-
+implementation("com.google.firebase:firebase-firestore-ktx")
 
 testImplementation(libs.junit)
 androidTestImplementation(libs.androidx.junit)

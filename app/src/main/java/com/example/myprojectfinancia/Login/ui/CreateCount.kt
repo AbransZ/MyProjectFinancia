@@ -11,10 +11,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -52,11 +56,12 @@ fun ContainerCreate(navigationControler: NavHostController, loginViewModel: Logi
     val PassConfirm: String by loginViewModel.passconfirm.observeAsState("")
     //verificacion de contraseña
     val onPassMatc: Boolean by loginViewModel.onPassMatch.observeAsState(false)
+    val isLoading: Boolean by loginViewModel.isLoading.observeAsState(false)
 
 
     Box(
         modifier = Modifier
-            .background(color = Color(0xFFECECEC))
+            .background(color = MaterialTheme.colorScheme.background)
             .fillMaxSize()
             .padding(bottom = 20.dp, start = 20.dp, end = 20.dp, top = 50.dp)
     ) {
@@ -84,17 +89,28 @@ fun ContainerCreate(navigationControler: NavHostController, loginViewModel: Logi
                 }
             }
         }
+        if (isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background),
+                contentAlignment = Alignment.Center
 
+            ) {
+                CircularProgressIndicator(modifier = Modifier.size(50.dp))
+            }
+        }
 
         Column {
             TitleCreate()
             Spacer(modifier = Modifier.padding(20.dp))
             ContentCreate(name, email, Pass, PassConfirm, loginViewModel)
             Spacer(modifier = Modifier.padding(20.dp))
-            ButtonCreate(loginViewModel, email, Pass, PassConfirm)
+            ButtonCreate(loginViewModel, email, Pass, PassConfirm, isLoading)
             Spacer(modifier = Modifier.padding(28.dp))
             FooterCreate(navigationControler)
         }
+
     }
 }
 
@@ -108,7 +124,7 @@ fun FooterCreate(navigationControler: NavHostController) {
         Text(
             "Ya tienes una cuenta?",
             fontSize = 18.sp,
-            color = Color(0xFF878787),
+            color = MaterialTheme.colorScheme.onSecondary,
             fontWeight = FontWeight.Bold
         )
         TextButton(
@@ -117,7 +133,7 @@ fun FooterCreate(navigationControler: NavHostController) {
             Text(
                 "Iniciar Sesion",
                 fontSize = 18.sp,
-                color = Color(0xFF016AC4),
+                color = MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -131,27 +147,25 @@ fun ButtonCreate(
     email: String,
     Pass: String,
     confirm: String,
+    isLoading: Boolean = false
 
 ) {
 
 
-    val isButtonEnable = loginViewModel.onButtonEnable(email, Pass, confirm)
+    val isButtonEnable = loginViewModel.onButtonEnable(email, Pass, confirm) && !isLoading
     Button(
-        onClick = { loginViewModel.onConnfirmPass(email, Pass, confirm) },
+        onClick = {
+            loginViewModel.onConnfirmPass(email, Pass, confirm)
+        },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(10.dp),
         enabled = isButtonEnable,
-        colors = ButtonDefaults.buttonColors(
-            contentColor = Color(0xFFFFFFFF),
-            containerColor = Color(0xFF3C96F5),
-            disabledContentColor = Color(0xFFA5A5A5),
-            disabledContainerColor = Color(0xFF30669E),
-        ),
+
 
         ) {
         Text(
             "Crear",
-            color = Color(0xFFFFFFFF),
+            color = MaterialTheme.colorScheme.onPrimary,
             fontSize = 18.sp,
             fontWeight = FontWeight.ExtraBold
         )
@@ -220,38 +234,36 @@ fun ConfirmPassword(ConfirmPass: String, onConfirmChange: (String) -> Unit) {
         "Confirmar Contraseña",
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF3B3B3B),
+        color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(6.dp)
     )
-    TextField(
+    OutlinedTextField(
         value = ConfirmPass,
         onValueChange = { onConfirmChange(it) },
-        label = { Text("Contraseña", color = Color.Black) },
+        label = { Text("Contraseña", color = MaterialTheme.colorScheme.onBackground) },
         visualTransformation = if (passVisibleConfirm) VisualTransformation.None else PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            cursorColor = MaterialTheme.colorScheme.primary
+        ),
         maxLines = 1,
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = Color(0xFFD5D5D5),
-            unfocusedContainerColor = Color(0xFFD0D0D0),
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black,
-            cursorColor = Color(0xFF4988CD)
-        ),
         trailingIcon = {
 
             TextButton(onClick = { passVisibleConfirm = !passVisibleConfirm }) {
                 if (passVisibleConfirm) {
-                    Text("Ocultar", color = Color(0xFF979797))
+                    Text("Ocultar", color = MaterialTheme.colorScheme.onPrimary)
                 } else {
-                    Text("Mostrar", color = Color(0xFF979797))
+                    Text("Mostrar", color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         },
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(30.dp)
 
     )
 }
@@ -263,38 +275,37 @@ fun IngresarPassword(pass: String, onValuePass: (String) -> Unit) {
         "Ingresar Contraseña",
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF3B3B3B),
+        color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(6.dp)
     )
-    TextField(
+    OutlinedTextField(
         value = pass,
         onValueChange = { onValuePass(it) },
-        label = { Text("Contraseña", color = Color.Black) },
+        label = { Text("Contraseña", color = MaterialTheme.colorScheme.onBackground) },
         visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            cursorColor = MaterialTheme.colorScheme.primary
+        ),
         maxLines = 1,
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = Color(0xFFD5D5D5),
-            unfocusedContainerColor = Color(0xFFD0D0D0),
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black,
-            cursorColor = Color(0xFF4988CD)
-        ),
+
         trailingIcon = {
 
             TextButton(onClick = { passVisible = !passVisible }) {
                 if (passVisible) {
-                    Text("Ocultar", color = Color(0xFF979797))
+                    Text("Ocultar", color = MaterialTheme.colorScheme.onPrimary)
                 } else {
-                    Text("Mostrar", color = Color(0xFF979797))
+                    Text("Mostrar", color = MaterialTheme.colorScheme.onPrimary)
                 }
             }
         },
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(30.dp)
 
     )
 }
@@ -302,32 +313,30 @@ fun IngresarPassword(pass: String, onValuePass: (String) -> Unit) {
 @Composable
 fun IngresarEmail(email: String, onValueEmail: (String) -> Unit) {
     Text(
-        "Ingresar email",
+        "Email",
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF3B3B3B),
+        color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(6.dp)
     )
-    TextField(
+    OutlinedTextField(
         value = email,
         onValueChange = { onValueEmail(it) },
-        label = { Text("Email", color = Color.Black) },
-        modifier = Modifier.fillMaxWidth(),
+        label = { Text("Email", color = MaterialTheme.colorScheme.onBackground) },
         maxLines = 1,
         singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(55.dp),
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = Color(0xFFD5D5D5),
-            unfocusedContainerColor = Color(0xFFD0D0D0),
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black,
-            cursorColor = Color(0xFF4988CD)
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            cursorColor = MaterialTheme.colorScheme.primary
         ),
-        shape = RoundedCornerShape(10.dp)
-
+        shape = RoundedCornerShape(30.dp)
     )
+
 }
 
 @Composable
@@ -336,26 +345,24 @@ fun IngresarNombre(name: String, onvalueName: (String) -> Unit) {
         "Ingresar nombre",
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = Color(0xFF3B3B3B),
+        color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(6.dp)
     )
-    TextField(
+    OutlinedTextField(
         value = name,
         onValueChange = { onvalueName(it) },
-        label = { Text("Nombre", color = Color.Black) },
+        label = { Text("Nombre", color = MaterialTheme.colorScheme.onBackground) },
         modifier = Modifier
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(10.dp),
-        singleLine = true,
+            .fillMaxWidth()
+            .height(55.dp),
         colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            focusedContainerColor = Color(0xFFD5D5D5),
-            unfocusedContainerColor = Color(0xFFD0D0D0),
-            focusedTextColor = Color.Black,
-            unfocusedTextColor = Color.Black,
-            cursorColor = Color(0xFF4988CD)
-        )
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            cursorColor = MaterialTheme.colorScheme.primary
+        ),
+        singleLine = true,
+        shape = RoundedCornerShape(30.dp)
+
     )
 }
 
@@ -367,7 +374,7 @@ fun TitleCreate() {
             modifier = Modifier.align(Alignment.Center),
             fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 

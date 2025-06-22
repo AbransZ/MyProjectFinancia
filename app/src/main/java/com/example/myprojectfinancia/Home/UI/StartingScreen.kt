@@ -60,12 +60,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import com.example.myprojectfinancia.Home.Movimiento
 import com.example.myprojectfinancia.Home.UI.ViewModels.homeViewModel
+import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 import com.example.myprojectfinancia.R
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InitialView(navController: NavHostController, homeViewModel: homeViewModel) {
+fun InitialView(navController: NavHostController, homeViewModel: homeViewModel,loginViewModel: LoginViewModel) {
     val isPressedIngresos by homeViewModel.ingrsosPressed.collectAsState()
     val isPressedGastos by homeViewModel.egresosIsPressed.collectAsState()
     val showDialog by homeViewModel.showDialog.observeAsState(false)
@@ -80,8 +81,10 @@ fun InitialView(navController: NavHostController, homeViewModel: homeViewModel) 
             actions = {
                 Button(onClick = {
                     val route = homeViewModel.logout()
+
                     navController.navigate(route) {
                         popUpTo(0) { inclusive = true }
+                        loginViewModel.clearFields()
                     }
                 }) {
                     Text("Salir", fontWeight = FontWeight.Bold, fontSize = 20.sp)
@@ -122,13 +125,10 @@ fun InitialView(navController: NavHostController, homeViewModel: homeViewModel) 
                 }
             }
         }
-        //}
-        //}
-
     }
 }
 
-@Preview(showBackground = true)
+//Barra de botones
 @Composable
 fun BarraDeBotones() {
     NavigationBar {
@@ -171,7 +171,7 @@ fun BarraDeBotones() {
     }
 }
 
-
+//boton flotante
 @Composable
 fun FAB(homeViewModel: homeViewModel) {
     FloatingActionButton(
@@ -188,6 +188,7 @@ fun FAB(homeViewModel: homeViewModel) {
     }
 }
 
+//Dialogo editar cuenta
 @Composable
 fun EditCuenta(
     showDialog: Boolean,
@@ -231,6 +232,7 @@ fun EditCuenta(
 
 }
 
+//Dialogo agregar cuenta
 @Composable
 fun AggCuenta(
     showDialog: Boolean,
@@ -275,7 +277,6 @@ fun AggCuenta(
 }
 
 //Botones confirmar o cancelar dialogo
-
 @Composable
 fun ButtonsDialog(homeViewModel: homeViewModel, isPressedIngresos: Boolean) {
     Row(
@@ -307,7 +308,7 @@ fun ButtonsDialog(homeViewModel: homeViewModel, isPressedIngresos: Boolean) {
     }
 }
 
-//cuerpo del dialogo agg movimiento
+//cuerpo del dialogo
 @Composable
 fun BodyDialog(
     homeViewModel: homeViewModel,
@@ -348,16 +349,14 @@ fun BodyDialog(
                 }
             }
 
-
             //Campos de texto para ingresar monto y categoria
-
             Spacer(Modifier.padding(8.dp))
             Text("Monto", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.padding(6.dp))
-            OutlinedTextField(value = monto,
+            OutlinedTextField(
+                value = monto,
                 onValueChange = { homeViewModel.onMontoChange(it) },
                 placeholder = { Text("Ingresar monto.") },
-
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.height(56.dp),
@@ -369,7 +368,8 @@ fun BodyDialog(
             Spacer(Modifier.padding(5.dp))
             Text("Categoria", fontSize = 20.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.padding(6.dp))
-            OutlinedTextField(value = categoria,
+            OutlinedTextField(
+                value = categoria,
                 onValueChange = { homeViewModel.onCategoriaChange(it) },
                 placeholder = { Text("Ej. Salario, Comida, Salario.") },
 
@@ -389,29 +389,44 @@ fun BodyDialog(
 
 }
 
-
+// seleccionador de movimientos
 @Composable
-fun Movimientos(homeViewModel: homeViewModel) {
+fun Movimientos(HomeViewModel: homeViewModel) {
     val tabs = listOf("Ingresos", "Gastos")
     var selectedTab by remember { mutableStateOf(0) }
-    val showMovements by homeViewModel.showMovements.collectAsState()
-    val fecha = homeViewModel.fechaActual
-    val monto = homeViewModel.monto.observeAsState("")
-    val categoria = homeViewModel.category.observeAsState("")
-    val naturaleza = homeViewModel.naturaleza.observeAsState("")
+    val showMovements by HomeViewModel.showMovements.collectAsState()
+    val fecha = HomeViewModel.fechaActual
+    val monto = HomeViewModel.monto.observeAsState("")
+    val categoria = HomeViewModel.category.observeAsState("")
+    val naturaleza = HomeViewModel.naturaleza.observeAsState("")
+
+    // Listas de ejemplo para cada pestaña
+    val ingresos = listOf(
+        Movimiento("24/10/2022", "$ 2000", "Salario", "Ingreso"),
+        Movimiento("25/10/2022", "$ 500", "Freelance", "Ingreso"),
+        Movimiento("26/10/2022", "$ 300", "Venta", "Ingreso")
+    )
+
+    val gastos = listOf(
+        Movimiento("24/10/2022", "$ 150", "Comida", "Gasto"),
+        Movimiento("25/10/2022", "$ 80", "Transporte", "Gasto"),
+        Movimiento("26/10/2022", "$ 200", "Entretenimiento", "Gasto")
+    )
 
     Column(
         Modifier
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Box(modifier = Modifier.align(Alignment.End)) {
+        Box(modifier = Modifier
+            .align(Alignment.End)
+            .height(30.dp)) {
             TextButton(
-                onClick = { homeViewModel.showMovements(true) },
-                colors = ButtonDefaults.textButtonColors(MaterialTheme.colorScheme.primary)
+                onClick = { HomeViewModel.showMovements(true) },
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
             ) { Text("Ver Todos") }
         }
-        Spacer(Modifier.padding(5.dp))
+
         TabRow(
             modifier = Modifier
                 .height(30.dp)
@@ -429,10 +444,26 @@ fun Movimientos(homeViewModel: homeViewModel) {
 
             }
         }
-        MovimientosDialog(showMovements, fecha, monto, categoria, naturaleza,homeViewModel)
+        MovimientosDialog(showMovements, fecha, monto, categoria, naturaleza, HomeViewModel)
+        val movimientosAMostrar = if (selectedTab == 0) ingresos else gastos
+        Column() {
+            movimientosAMostrar.forEach { movimiento ->
+                ListMount(
+                    fecha = movimiento.fecha,
+                    monto = movimiento.monto,
+                    categoria = movimiento.categoria,
+                    naturaleza = movimiento.naturaleza
+                )
+            }
+
+
+        }
+
+
     }
 }
 
+//lista de movimientos
 @Composable
 fun MovimientosDialog(
     showMovements: Boolean,
@@ -443,21 +474,23 @@ fun MovimientosDialog(
     homeViewModel: homeViewModel
 ) {
     val movimientos = listOf<Movimiento>()
-    if (showMovements){
-    Dialog(onDismissRequest = {homeViewModel.showMovements(false)}) {
-        LazyColumn {
-            items(movimientos) { movimiento ->
-                ListMount(fecha, monto, categoria, naturaleza)
+
+    if (showMovements) {
+        Dialog(onDismissRequest = { homeViewModel.showMovements(false) }) {
+            LazyColumn {
+                items(10) { movimiento ->
+                    ListMount(fecha, "$ ${monto.value}", categoria.value, naturaleza.value)
+                }
             }
         }
-    }
     }
 
 }
 
+//item de la lista de movimientos
 @Composable
 fun ListMount(
-    fecha: String, monto: State<String>, categoria: State<String>, naturaleza: State<String>
+    fecha: String, monto: String, categoria: String, naturaleza: String
 ) {
 
     ListItem(headlineContent = { Text(categoria.toString()) },
@@ -470,7 +503,7 @@ fun ListMount(
 
 }
 
-
+//Informacion de ahorro pantalla principal
 @Composable
 fun PlanDeAhorro() {
     Row(
@@ -512,7 +545,7 @@ fun PlanDeAhorro() {
     }
 }
 
-
+//Presupuesto pantalla principal
 @Composable
 fun Presupuesto() {
     Box(Modifier.fillMaxWidth()) {
@@ -531,6 +564,7 @@ fun Presupuesto() {
     }
 }
 
+//Saludo pantalla principal
 @Composable
 fun Greeteng() {
     Box(Modifier.padding(10.dp)) {
@@ -538,7 +572,6 @@ fun Greeteng() {
             "Bienvenido 'User'",
             fontSize = 45.sp,
             fontWeight = FontWeight.Bold,
-            // color = Color(0xFF565657)
         )
     }
 }
