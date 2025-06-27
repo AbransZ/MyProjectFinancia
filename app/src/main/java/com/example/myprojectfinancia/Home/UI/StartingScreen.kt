@@ -437,7 +437,7 @@ fun Movimientos(HomeViewModel: homeViewModel) {
             tabs.forEachIndexed { index, title ->
                 Tab(
                     selected = selectedTab == index,
-                    onClick = { selectedTab = index },
+                    onClick = { selectedTab = index }
                 ) {
                     Text(title, fontSize = 24.sp)
                 }

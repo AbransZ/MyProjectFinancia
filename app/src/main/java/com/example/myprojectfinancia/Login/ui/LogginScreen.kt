@@ -71,8 +71,6 @@ fun LogginScreen(
     navigationControler: NavHostController,
     loginViewModel: LoginViewModel
 ) {
-
-
     Box(
         modifier
             .fillMaxSize()

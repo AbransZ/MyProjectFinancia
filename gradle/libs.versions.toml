@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.0"
+agp = "8.9.1"
 converterGson = "2.9.0"
 hiltAndroidCompiler = "2.51.1"
 kotlin = "2.0.0"
@@ -17,7 +17,9 @@ navigationCompose = "2.8.8"
 runtimeRxjava2 = "1.7.8"
 coreSplashscreen = "1.0.1"
 
+
 [libraries]
+
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
