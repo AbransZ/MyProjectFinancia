@@ -12,14 +12,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.NavHostController
-import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 import com.example.myprojectfinancia.Login.ui.ViewModel.SpalshViewModel
-import com.example.myprojectfinancia.Model.Navhost
 import com.example.myprojectfinancia.Model.Routes
 import com.example.myprojectfinancia.R
 import kotlinx.coroutines.delay

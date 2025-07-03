@@ -1,6 +1,4 @@
-package com.example.myprojectfinancia.Home
-
-import androidx.compose.runtime.State
+package com.example.myprojectfinancia.Home.UI.ModelHome
 
 data class Movimiento(
     val fecha: String,

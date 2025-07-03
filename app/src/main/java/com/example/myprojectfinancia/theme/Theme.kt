@@ -43,18 +43,19 @@ private val LightColorScheme = lightColorScheme(
 
 private val LightColors = lightColorScheme(
     primary = Color(0xFF1D416C),
-    onPrimary = Color.White,
+    onPrimary = Color.Black,
     secondary = Color(0xFF32455A),
-    onSecondary = Color.Black,
+    onSecondary = Color(0xFFCDCCCC),
     background = Color(0xFFECECEC),
     onBackground = Color.DarkGray,
     surface = Color(0xC9A3A3EF),
     onSurface = Color.LightGray,
-    primaryContainer = Color(0x958894F5),
+    primaryContainer = Color(0xAD8894F5),
     onPrimaryContainer = Color(0xFF0276F5),
     onErrorContainer = Color(0xFF4C3030),
     errorContainer = Color(0xFF30669E),
     surfaceVariant = Color(0xFFB9B9E8),
+    secondaryContainer = Color(0xAD338AF5)
 )
 
 // Esquema de colores para el modo oscuro
@@ -62,7 +63,7 @@ private val DarkColors = darkColorScheme(
     primary = Color(0xFF3C96F5),
     onPrimary = Color.White,
     secondary = Color(0xFF224B57),
-    onSecondary = Color.White,
+    onSecondary = Color(0xFF848484),
     tertiary = Color(0xFF27409A),
     background = Color(0xFF001021),
     onBackground = Color.White,
@@ -73,6 +74,7 @@ private val DarkColors = darkColorScheme(
     onErrorContainer = Color(0xFF5C1A1A),
     errorContainer = Color(0xFF30669E),
     surfaceVariant = Color(0xFF001021),
+    secondaryContainer = Color(0x9A275ED9)
 
 
 )

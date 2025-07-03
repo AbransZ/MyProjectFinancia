@@ -1,6 +1,4 @@
-package com.example.myprojectfinancia.Home
-
-import java.util.Date
+package com.example.myprojectfinancia.Home.UI.ModelHome
 
 data class montoItem(
     val fecha: Long = System.currentTimeMillis(),
