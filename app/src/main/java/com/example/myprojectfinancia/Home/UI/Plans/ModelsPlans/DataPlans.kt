@@ -1,4 +1,4 @@
-package com.example.myprojectfinancia.Home.UI.ModelsPlans
+package com.example.myprojectfinancia.Home.UI.Plans.ModelsPlans
 
 data class DataPlans(
     val Name:String,

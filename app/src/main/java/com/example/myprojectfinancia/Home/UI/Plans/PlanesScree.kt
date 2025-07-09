@@ -1,8 +1,9 @@
-package com.example.myprojectfinancia.Home.UI
+package com.example.myprojectfinancia.Home.UI.Plans
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -23,22 +26,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myprojectfinancia.theme.MyProjectFinanciaTheme
 
 
-
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-fun SavingScreen(modifier: Modifier = Modifier) {
+fun SavingScreen(padding: PaddingValues, modifier: Modifier) {
     MyProjectFinanciaTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-            Box() {
+            Box(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(padding)
+            ) {
                 Column(modifier.fillMaxSize()) {
                     Greetings()
                     PlanTotal()
@@ -78,7 +82,8 @@ fun PlanTotal(modifier: Modifier = Modifier) {
                 modifier = modifier
                     .height(230.dp)
                     .width(400.dp)
-                    .padding(16.dp)
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Box(modifier.padding(8.dp)) {
                     Column {
@@ -130,7 +135,7 @@ fun PlanTotal(modifier: Modifier = Modifier) {
                                 progress = { 0.5f },
                                 modifier = modifier.height(16.dp),
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                trackColor = MaterialTheme.colorScheme.onBackground,
+                                trackColor = MaterialTheme.colorScheme.onSecondary,
                                 strokeCap = StrokeCap.Round,
 
                                 )
@@ -138,6 +143,7 @@ fun PlanTotal(modifier: Modifier = Modifier) {
                             Text("46%")
 
                         }
+                        Spacer(modifier.padding(10.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                             Text(
                                 "Faltan ---$ o Bs.--- para alcanzar su meta",
@@ -158,15 +164,18 @@ fun PlanesList(modifier: Modifier = Modifier) {
     Box(
         modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
-        LazyColumn {
-            item { Text("Planes de ahorro", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
-            item { PlanesCard() }
-            item { PlanesCard() }
-            item { PlanesCard() }
+        Column {
+            Text("Planes de ahorro", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            LazyColumn {
+                item { PlanesCard() }
+                item { PlanesCard() }
+                item { PlanesCard() }
 
+            }
         }
+
 
 
     }
@@ -176,17 +185,17 @@ fun PlanesList(modifier: Modifier = Modifier) {
 
 @Composable
 fun PlanesCard(modifier: Modifier = Modifier) {
-    MyProjectFinanciaTheme {
         Card(
             modifier = modifier
-                .height(250.dp)
+                .height(200.dp)
                 .width(400.dp)
-                .padding(16.dp)
+                .padding(10.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             Box(
                 modifier
                     .fillMaxWidth()
-                    .padding(14.dp)
+                    .padding(10.dp)
             ) {
                 Column {
                     Row(
@@ -201,7 +210,7 @@ fun PlanesCard(modifier: Modifier = Modifier) {
                         Text(
                             "50% D/C",
                             fontSize = 15.sp,
-                            color = MaterialTheme.colorScheme.secondary
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
 
                     }
@@ -212,10 +221,10 @@ fun PlanesCard(modifier: Modifier = Modifier) {
                         label = { Text("Category", fontSize = 10.sp) },
                         colors = AssistChipDefaults.assistChipColors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            labelColor = MaterialTheme.colorScheme.secondary
+                            labelColor = MaterialTheme.colorScheme.onPrimary
                         )
                     )
-                    Spacer(modifier.padding(2.dp))
+                    Spacer(modifier.padding(5.dp))
                     Box(Modifier.fillMaxWidth()) {
                         Text(
                             "Descripcion especifica sobre el plan financiero agregado por el usuario D/C",
@@ -235,7 +244,7 @@ fun PlanesCard(modifier: Modifier = Modifier) {
                                 .height(12.dp)
                                 .width(350.dp),
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
-                            trackColor = MaterialTheme.colorScheme.onBackground,
+                            trackColor = MaterialTheme.colorScheme.onSecondary,
                             strokeCap = StrokeCap.Round,
 
                             )
@@ -277,6 +286,7 @@ fun PlanesCard(modifier: Modifier = Modifier) {
                             )
                         }
                     }
+                    Spacer(modifier.padding(6.dp))
                     Text(
                         "Consejo considerado por la plataforma para guiar al usuario en cuanto al ingreso mensual que deberia tener su cuota D/C",
                         fontSize = 10.sp,
@@ -286,5 +296,5 @@ fun PlanesCard(modifier: Modifier = Modifier) {
 
             }
         }
-    }
+
 }

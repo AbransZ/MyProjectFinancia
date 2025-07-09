@@ -1,10 +1,11 @@
-package com.example.myprojectfinancia.Home.UI
+package com.example.myprojectfinancia.Home.UI.settings
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,7 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -44,26 +45,25 @@ import androidx.compose.ui.unit.sp
 import com.example.myprojectfinancia.R
 import com.example.myprojectfinancia.theme.MyProjectFinanciaTheme
 
-@Preview(showSystemUi = true)
-@Composable
-fun prueba(modifier: Modifier = Modifier) {
-    MyProjectFinanciaTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            SettingsScreen(modifier)
-        }
-    }
-
-}
-
+//@Preview(showSystemUi = true)
+//@Composable
+//fun prueba(modifier: Modifier = Modifier) {
+//    MyProjectFinanciaTheme {
+//        Surface(
+//            modifier = Modifier.fillMaxSize(),
+//            color = MaterialTheme.colorScheme.background
+//        ) {
+//            SettingsScreen(PaddingValues(5.dp), modifier)
+//        }
+//    }
+//}
 
 @Composable
-fun SettingsScreen(modifier: Modifier = Modifier) {
+fun SettingsScreen(padding: PaddingValues,modifier: Modifier=Modifier ) {
     Box(
         modifier = modifier
             .fillMaxSize()
+            .padding(padding)
             .padding(16.dp)
     ) {
         LazyColumn(modifier = modifier.fillMaxSize()) {
@@ -96,13 +96,13 @@ fun ButtonClose(modifier: Modifier) {
     Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
         Button(
             onClick = {},
-            modifier = modifier.height(50.dp),
+            modifier = Modifier.height(50.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onErrorContainer),
             shape = RoundedCornerShape(10.dp)
         ) {
             Row(modifier = modifier.fillMaxWidth()) {
                 Icon(
-                    imageVector = Icons.Default.Logout,
+                    imageVector = Icons.AutoMirrored.Filled.Logout,
                     contentDescription = "Logout",
                     tint = MaterialTheme.colorScheme.onPrimary
                 )
@@ -125,7 +125,7 @@ fun ButtonClose(modifier: Modifier) {
 @Composable
 fun AboutFinancia(modifier: Modifier) {
     Card(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
@@ -205,7 +205,7 @@ fun AboutFinancia(modifier: Modifier) {
 
 @Composable
 fun ConversorMoneda(modifier: Modifier) {
-    Card(modifier = modifier
+    Card(modifier = Modifier
         .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
         Column(
@@ -283,13 +283,13 @@ fun ConversorMoneda(modifier: Modifier) {
 @Composable
 fun UserItem(modifier: Modifier) {
     Card(
-        modifier = modifier
+        modifier = Modifier
             .height(100.dp)
             .fillMaxWidth(),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceBetween

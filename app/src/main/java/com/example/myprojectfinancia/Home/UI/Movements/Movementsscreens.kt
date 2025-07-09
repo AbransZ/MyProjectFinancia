@@ -1,8 +1,9 @@
-package com.example.myprojectfinancia.Home.UI
+package com.example.myprojectfinancia.Home.UI.Movements
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,23 +32,24 @@ import androidx.compose.ui.unit.sp
 import com.example.myprojectfinancia.R
 import com.example.myprojectfinancia.theme.MyProjectFinanciaTheme
 
-@Preview(showSystemUi = true)
-@Composable
-fun ejemplo(modifier: Modifier = Modifier) {
-    MyProjectFinanciaTheme {
-        MovementsScreens(modifier.background(MaterialTheme.colorScheme.background))
-    }
-}
+//@Preview(showSystemUi = true)
+//@Composable
+//fun ejemplo(modifier: Modifier = Modifier) {
+//    MyProjectFinanciaTheme {
+//        MovementsScreens(modifier.background(MaterialTheme.colorScheme.background))
+//    }
+//}
 
 
 
 @Composable
-fun MovementsScreens(modifier: Modifier = Modifier) {
+fun MovementsScreens(padding: PaddingValues, modifier: Modifier) {
 
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(padding)
+            .padding(10.dp)
             .background(MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = modifier.fillMaxWidth()) {

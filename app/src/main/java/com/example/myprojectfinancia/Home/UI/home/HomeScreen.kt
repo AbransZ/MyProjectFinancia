@@ -26,8 +26,6 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Tab
@@ -98,48 +96,7 @@ fun HomeScreen(modifier: PaddingValues,navController: NavHostController, homeVie
         }
     }
 }
-//Barra de botones
-@Composable
-fun BarraDeBotones() {
-    NavigationBar {
 
-        //Inicio
-        NavigationBarItem(selected = false, onClick = {}, icon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_home),
-                contentDescription = "Home",
-                modifier = Modifier.size(40.dp)
-            )
-        }, label = { Text("Inicio") })
-
-        //planes de ahorro
-        NavigationBarItem(selected = false, onClick = {}, icon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_ahorro),
-                contentDescription = "Planes de ahorro",
-                modifier = Modifier.size(40.dp)
-            )
-        }, label = { Text("P. Ahorro") })
-
-        //Movimientos
-        NavigationBarItem(selected = false, onClick = {}, icon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_walet),
-                contentDescription = "Movimientos",
-                modifier = Modifier.size(40.dp)
-            )
-        }, label = { Text("Movimientos") })
-
-        //Ajustes
-        NavigationBarItem(selected = false, onClick = {}, icon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_settings),
-                contentDescription = "settings",
-                modifier = Modifier.size(40.dp)
-            )
-        }, label = { Text("Ajustes") })
-    }
-}
 
 //boton flotante
 @Composable
