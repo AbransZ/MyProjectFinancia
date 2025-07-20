@@ -259,7 +259,7 @@ fun Googlebuttons(loginViewModel: LoginViewModel) {
                 val signInIntent = loginViewModel.getGoogleSignInClient().signInIntent
                 launcher.launch(signInIntent)
 
-            }, modifier = Modifier.fillMaxWidth().height(40.dp)
+            }, modifier = Modifier.fillMaxWidth().height(48.dp)
 
         ) {
             Icon(

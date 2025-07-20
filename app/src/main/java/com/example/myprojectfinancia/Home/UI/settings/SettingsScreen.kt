@@ -45,21 +45,21 @@ import androidx.compose.ui.unit.sp
 import com.example.myprojectfinancia.R
 import com.example.myprojectfinancia.theme.MyProjectFinanciaTheme
 
-//@Preview(showSystemUi = true)
-//@Composable
-//fun prueba(modifier: Modifier = Modifier) {
-//    MyProjectFinanciaTheme {
-//        Surface(
-//            modifier = Modifier.fillMaxSize(),
-//            color = MaterialTheme.colorScheme.background
-//        ) {
-//            SettingsScreen(PaddingValues(5.dp), modifier)
-//        }
-//    }
-//}
+@Preview(showSystemUi = true)
+@Composable
+fun prueba(modifier: Modifier = Modifier) {
+    MyProjectFinanciaTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            SettingsScreen(PaddingValues(5.dp), modifier)
+        }
+    }
+}
 
 @Composable
-fun SettingsScreen(padding: PaddingValues,modifier: Modifier=Modifier ) {
+fun SettingsScreen(padding: PaddingValues, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -73,15 +73,23 @@ fun SettingsScreen(padding: PaddingValues,modifier: Modifier=Modifier ) {
             item { ConversorMoneda(modifier) }
             item { Spacer(modifier.padding(18.dp)) }
             item {
-                Column {
-                    Text("Sobre Financia", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                    Text(
-                        "Detalles sobre la aplicaccion y version",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSecondary
-                    )
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                ) {
+                    Column (Modifier.padding(10.dp)){
+                        Text("Sobre Financia", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            "Detalles sobre la aplicaccion y version",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
                 }
+
             }
+            item { Spacer(modifier.padding(18.dp)) }
             item { AboutFinancia(modifier) }
             item { Spacer(modifier.padding(18.dp)) }
             item { ButtonClose(modifier) }
@@ -191,7 +199,7 @@ fun AboutFinancia(modifier: Modifier) {
                         textAlign = TextAlign.Center
                     )
                     Text(
-                        "Planes Planes Completados",
+                        "Planes Completados",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSecondary,
@@ -205,9 +213,11 @@ fun AboutFinancia(modifier: Modifier) {
 
 @Composable
 fun ConversorMoneda(modifier: Modifier) {
-    Card(modifier = Modifier
-        .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+    ) {
         Column(
             modifier = modifier
                 .padding(16.dp)
@@ -328,7 +338,11 @@ fun UserItem(modifier: Modifier) {
                 imageVector = Icons.Default.Settings,
                 contentDescription = "Settings",
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = modifier.align(Alignment.CenterVertically).padding(6.dp).size(30.dp).clickable {  }
+                modifier = modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(6.dp)
+                    .size(30.dp)
+                    .clickable { }
             )
         }
 

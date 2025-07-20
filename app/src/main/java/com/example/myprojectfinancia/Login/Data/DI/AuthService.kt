@@ -2,6 +2,7 @@ package com.example.myprojectfinancia.Login.Data.DI
 
 import android.util.Log
 import com.example.myprojectfinancia.Home.Data.UserFinancia
+import com.example.myprojectfinancia.Home.UI.home.Models.MovementsItem
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -59,7 +60,6 @@ class AuthService @Inject constructor(
         return firebaseAuth.currentUser
     }
 
-
     suspend fun forgotPassword(email: String): Boolean {
         return try {
             firebaseAuth.sendPasswordResetEmail(email).await()
@@ -71,8 +71,9 @@ class AuthService @Inject constructor(
 
     }
 
-   suspend fun saveUser(
-        user:UserFinancia
+    //metodo para guardar usuarios en la BD
+    suspend fun saveUser(
+        user: UserFinancia
     ): Boolean {
         return try {
             Log.i("loginViewModel", "=== INICIANDO GUARDADO EN FIRESTORE ===")
@@ -92,6 +93,47 @@ class AuthService @Inject constructor(
             Log.e("firestore", "Error al guardar el usuario: ${ex.message}")
             Log.e("firestore", "Tipo de error: ${ex.javaClass.simpleName}")
             ex.printStackTrace()
+            false
+        }
+    }
+
+    //Metodo para obtener datos del usuario
+    suspend fun getUser(uid: String): Result<UserFinancia> {
+        return try {
+            val document = firestore.collection("users")
+                .document(uid)
+                .get()
+                .await()
+            if (document.exists()) {
+                val usuario = UserFinancia(
+                    uid = document.getString("uid") ?: "",
+                    name = document.getString("name") ?: "deberia decir un nombre aqui"
+                )
+                Result.success(usuario)
+            } else {
+                Result.failure(Exception("Usuario no encontrado"))
+            }
+        } catch (ex: Exception) {
+            Result.failure(ex)
+        }
+    }
+
+    //Metodo para guardar movimientos
+    suspend fun saveMovements(movement: MovementsItem,user: UserFinancia): Boolean {
+        val useruid = user.uid
+        val movementId = UUID.randomUUID().toString()
+        return try {
+
+            firestore.collection("users")
+                .document(useruid)
+                .collection("movimientos")
+                .document(movementId)
+                .set(movement)
+                .await()
+            Log.i("firestore", "Movimiento guardado")
+            true
+        } catch (ex: Exception) {
+            Log.i("firestore", "Movimiento  No guardad Motivo: ${ex.message}")
             false
         }
     }

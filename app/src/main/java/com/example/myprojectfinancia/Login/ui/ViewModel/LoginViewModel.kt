@@ -223,6 +223,7 @@ class LoginViewModel @Inject constructor(
 
                 val uID = user?.uid
                 Log.i("LoginViewModel", "id obtenido es $uID")
+
                 val users= UserFinancia(
                     uid= uID.toString(),
                     name= _name.value.toString()

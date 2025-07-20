@@ -50,19 +50,22 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavHostController
 import com.example.myprojectfinancia.Home.UI.ModelHome.Movimiento
-import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
+import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.R
 
 @Composable
-fun HomeScreen(modifier: PaddingValues,navController: NavHostController, homeViewModel: homeViewModel, loginViewModel: LoginViewModel) {
+fun HomeScreen(
+    modifier: PaddingValues,
+    homeViewModel: homeViewModel
+) {
     val isPressedIngresos by homeViewModel.ingrsosPressed.collectAsState()
     val isPressedGastos by homeViewModel.egresosIsPressed.collectAsState()
     val showDialog by homeViewModel.showDialog.observeAsState(false)
     val monto by homeViewModel.monto.observeAsState("")
     val categoria by homeViewModel.category.observeAsState("")
     val fecha = homeViewModel.fechaActual
+    val name: String by homeViewModel.name.observeAsState("")
 
     Box(
         modifier = Modifier
@@ -76,7 +79,7 @@ fun HomeScreen(modifier: PaddingValues,navController: NavHostController, homeVie
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
 
-            item { Greeteng() }
+            item { Greeteng(name) }
             item { Presupuesto() }
 
             item { PlanDeAhorro() }
@@ -216,6 +219,7 @@ fun ButtonsDialog(homeViewModel: homeViewModel, isPressedIngresos: Boolean) {
                 if (isPressedIngresos) {
                     Log.i("movimientos", "Ingreso se presiono")
                 } else Log.i("movimientos", "Gasto se presiono")
+                homeViewModel.guardarMovimiento()
                 homeViewModel.clearfields()
 
             }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
@@ -346,9 +350,11 @@ fun Movimientos(HomeViewModel: homeViewModel) {
             .fillMaxWidth()
             .padding(16.dp)
     ) {
-        Box(modifier = Modifier
-            .align(Alignment.End)
-            .height(30.dp)) {
+        Box(
+            modifier = Modifier
+                .align(Alignment.End)
+                .height(30.dp)
+        ) {
             TextButton(
                 onClick = { HomeViewModel.showMovements(true) },
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.primary)
@@ -401,7 +407,7 @@ fun MovimientosDialog(
     naturaleza: State<String>,
     homeViewModel: homeViewModel
 ) {
-    val movimientos = listOf<Movimiento>()
+    listOf<Movimiento>()
 
     if (showMovements) {
         Dialog(onDismissRequest = { homeViewModel.showMovements(false) }) {
@@ -421,13 +427,13 @@ fun ListMount(
     fecha: String, monto: String, categoria: String, naturaleza: String
 ) {
 
-    ListItem(headlineContent = { Text(categoria.toString()) },
-        overlineContent = { Text(monto.toString()) },
+    ListItem(headlineContent = { Text(categoria) },
+        overlineContent = { Text(monto) },
         supportingContent = { fecha },
         leadingContent = {
             Icon(painter = painterResource(R.drawable.ic_money), contentDescription = "Money")
         },
-        trailingContent = { Text(naturaleza.toString()) })
+        trailingContent = { Text(naturaleza) })
 
 }
 
@@ -494,12 +500,14 @@ fun Presupuesto() {
 
 //Saludo pantalla principal
 @Composable
-fun Greeteng() {
+fun Greeteng(name: String) {
+
     Box(Modifier.padding(10.dp)) {
         Text(
-            "Bienvenido 'User'",
+            "Bienvenido ${name}",
             fontSize = 45.sp,
             fontWeight = FontWeight.Bold,
         )
+        Log.i("user", "Usuario posee el nombre de ${name}")
     }
 }

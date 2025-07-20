@@ -9,7 +9,7 @@ import com.example.myprojectfinancia.Home.Data.SetupFirebaseNotifications
 
 import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 import com.example.myprojectfinancia.Login.ui.ViewModel.SpalshViewModel
-import com.example.myprojectfinancia.Home.UI.ViewModels.homeViewModel
+import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.Model.Navhost
 import com.example.myprojectfinancia.theme.MyProjectFinanciaTheme
 import dagger.hilt.android.AndroidEntryPoint

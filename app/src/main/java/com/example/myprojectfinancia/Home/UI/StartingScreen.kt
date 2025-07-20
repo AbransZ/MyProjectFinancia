@@ -17,7 +17,7 @@ import com.example.myprojectfinancia.Home.UI.Movements.MovementsScreens
 import com.example.myprojectfinancia.Home.UI.Plans.SavingScreen
 import com.example.myprojectfinancia.Home.UI.ViewModels.FAB
 import com.example.myprojectfinancia.Home.UI.ViewModels.HomeScreen
-import com.example.myprojectfinancia.Home.UI.ViewModels.homeViewModel
+import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.Home.UI.home.Models.NavScreensModel
 import com.example.myprojectfinancia.Home.UI.home.Models.RememberNavStateScreen
 import com.example.myprojectfinancia.Home.UI.settings.SettingsScreen
@@ -26,7 +26,7 @@ import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InitialView(navController: NavHostController, homeViewModel: homeViewModel,loginViewModel: LoginViewModel) {
+fun InitialView(navController: NavHostController, homeViewModel: homeViewModel, loginViewModel: LoginViewModel) {
 
     val Navigation = RememberNavStateScreen()
 
@@ -55,7 +55,7 @@ fun InitialView(navController: NavHostController, homeViewModel: homeViewModel,l
         }) { paddingContent ->
         when (Navigation.currentState) {
             NavScreensModel.Home -> {
-                HomeScreen(paddingContent, navController, homeViewModel, loginViewModel)
+                HomeScreen(paddingContent, homeViewModel)
             }
 
             NavScreensModel.Plans -> {
@@ -74,8 +74,7 @@ fun InitialView(navController: NavHostController, homeViewModel: homeViewModel,l
 
             NavScreensModel.Settings -> {
                 SettingsScreen(
-                    paddingContent,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.background)
+                    paddingContent
                 )
             }
         }

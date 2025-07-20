@@ -1,22 +1,23 @@
-package com.example.myprojectfinancia.Home.UI.ViewModels
+package com.example.myprojectfinancia.Home.UI.home.ViewModels
 
 import android.util.Log
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.myprojectfinancia.Home.Data.UserFinancia
+import com.example.myprojectfinancia.Home.UI.home.Models.MovementsItem
 import com.example.myprojectfinancia.Login.Data.DI.AuthService
 import com.example.myprojectfinancia.Model.Routes
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -26,8 +27,12 @@ import javax.inject.Inject
 @HiltViewModel
 class homeViewModel @Inject constructor(
     private val authService: AuthService,
-    private val googleSignInClient: GoogleSignInClient
+    private val googleSignInClient: GoogleSignInClient,
+    private val firestore: FirebaseFirestore
 ) : ViewModel() {
+
+    private val _name = MutableLiveData<String>()
+    val name: LiveData<String> = _name
 
     // mostrar dialog
     private val _showDialog = MutableLiveData<Boolean>()
@@ -134,8 +139,64 @@ class homeViewModel @Inject constructor(
     val showMovements: MutableStateFlow<Boolean> = _showMovements
 
     fun showMovements(show: Boolean) {
-        _showMovements.value =show
+        _showMovements.value = show
     }
 
+
+    init {
+        mostrarNombre()
+    }
+
+    fun mostrarNombre() {
+        viewModelScope.launch {
+            val userCurrent = authService.getCurrentUser()
+            Log.i("user", "user para SALUDO: $userCurrent")
+            try {
+
+
+                val user = authService.getUser(userCurrent?.uid ?: "")
+
+
+                if (user.isSuccess) {
+
+                    val userName = user.getOrNull()?.name ?: ""
+                    _name.value = userName
+
+                    Log.i("user", "user para SALUDO: $userName")
+
+                } else {
+                    Log.i("user", " error user para SALUDO: ${user.exceptionOrNull()}")
+                    _name.value = ""
+                }
+            } catch (ex: Exception) {
+                Log.i("user", " error user para SALUDO: ${ex.message}")
+
+            }
+
+        }
+
+    }
+
+    fun guardarMovimiento() {
+        viewModelScope.launch {
+            val movimientos = MovementsItem(
+                Fecha = fechaActual ?: "",
+                Categoria = _categoria.value ?: "",
+                Naturaleza = _naturaleza.value ?: "",
+                Monto = _montoDouble.value ?: 0.0
+            )
+
+            val userCurrent = authService.getCurrentUser()
+            val user = UserFinancia(uid = userCurrent?.uid ?: "", name = _name.value ?: "")
+
+            val resultado = authService.saveMovements(movimientos, user)
+
+            if (resultado) {
+                Log.i("movimientos", "Movimiento guardado")
+                ocultarDialog()
+            }
+
+        }
+    }
 
 }
