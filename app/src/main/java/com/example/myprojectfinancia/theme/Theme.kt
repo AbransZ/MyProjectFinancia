@@ -1,6 +1,5 @@
 package com.example.myprojectfinancia.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -11,6 +10,7 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+
 /*
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -45,7 +45,8 @@ private val LightColors = lightColorScheme(
     primary = Color(0xFF1D416C),
     onPrimary = Color.Black,
     secondary = Color(0xFF32455A),
-    onSecondary = Color(0xFFCDCCCC),
+    onSecondary = Color(0xFF8B8B8B),
+    tertiary = Color(0xFF28335E),
     background = Color(0xFFECECEC),
     onBackground = Color.DarkGray,
     surface = Color(0xC97C7CF1),
@@ -62,9 +63,9 @@ private val LightColors = lightColorScheme(
 private val DarkColors = darkColorScheme(
     primary = Color(0xFF3C96F5),
     onPrimary = Color.White,
-    secondary = Color(0xFF224B57),
-    onSecondary = Color(0xFFB8B7B7),
-    tertiary = Color(0xFF27409A),
+    secondary = Color(0xFF3D7F90),
+    onSecondary = Color(0xFFE5E4E4),
+    tertiary = Color(0xFFA2B4F8),
     background = Color(0xFF001021),
     onBackground = Color.White,
     surface = Color(0xFF2C4468),

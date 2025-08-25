@@ -10,27 +10,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.myprojectfinancia.R
-import com.example.myprojectfinancia.theme.MyProjectFinanciaTheme
+import com.example.myprojectfinancia.Home.UI.ViewModels.ListMount
+import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
 
 //@Preview(showSystemUi = true)
 //@Composable
@@ -41,9 +41,20 @@ import com.example.myprojectfinancia.theme.MyProjectFinanciaTheme
 //}
 
 
-
 @Composable
-fun MovementsScreens(padding: PaddingValues, modifier: Modifier) {
+fun MovementsScreens(padding: PaddingValues, modifier: Modifier, homeViewModel: homeViewModel) {
+    val isLoading by homeViewModel.isLoading.collectAsState()
+    val isPressedIngresos by homeViewModel.ingrsosPressed.collectAsState()
+    val isPressedGastos by homeViewModel.egresosIsPressed.collectAsState()
+    val error by homeViewModel.Error.collectAsState()
+
+
+    // carga de pestanas de movimientos
+    LaunchedEffect(isPressedIngresos) {
+        val natureSelected = if (isPressedIngresos) "Ingreso" else "Gasto"
+        homeViewModel.getMovements(nature = natureSelected)
+
+    }
 
     Box(
         modifier = modifier
@@ -53,9 +64,26 @@ fun MovementsScreens(padding: PaddingValues, modifier: Modifier) {
             .background(MaterialTheme.colorScheme.background)
     ) {
         Column(modifier = modifier.fillMaxWidth()) {
-            Selecction(modifier)
+            Selecction(modifier, homeViewModel, isPressedIngresos, isPressedGastos)
+            error?.let { errorMsg ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
+                ) {
+                    Text(
+                        text = "Error al cargar $errorMsg",
+                        modifier = Modifier.padding(12.dp),
+                        color = MaterialTheme.colorScheme.onErrorContainer
+                    )
+                }
+            }
+
             Spacer(modifier = modifier.padding(6.dp))
-            MovementList(modifier)
+            MovementList(modifier, homeViewModel, isLoading)
         }
     }
 
@@ -63,9 +91,8 @@ fun MovementsScreens(padding: PaddingValues, modifier: Modifier) {
 }
 
 @Composable
-fun Selecction(modifier: Modifier) {
-    var isPressedIngresos by remember { mutableStateOf(true) }
-    var isPressedGastos by remember { mutableStateOf(false) }
+fun Selecction(modifier: Modifier, homeViewModel: homeViewModel, isPressedIngresos: Boolean, isPressedGastos: Boolean) {
+
 
     Row(
         modifier = modifier
@@ -74,27 +101,30 @@ fun Selecction(modifier: Modifier) {
     ) {
         Button(
             onClick = {
-                isPressedIngresos = true
-                isPressedGastos = false
+                homeViewModel.ingresosIsPressed()
             },
             colors = ButtonDefaults.buttonColors(
                 if (isPressedIngresos) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.onSecondary
+                else MaterialTheme.colorScheme.onSecondary,
+                contentColor = if (isPressedIngresos) MaterialTheme.colorScheme.onSecondary
+                else MaterialTheme.colorScheme.background
             ), modifier = modifier.weight(1f), shape = MaterialTheme.shapes.small
         ) {
-            Text("Ingresos")
+            Text("Ingresos", fontSize = 20.sp)
         }
         Button(
             onClick = {
-                isPressedIngresos = false
-                isPressedGastos = true
+                homeViewModel.gastosIsPressed()
             },
             colors = ButtonDefaults.buttonColors(
-                if (isPressedGastos) Color(0xFF9E0000)
-                else MaterialTheme.colorScheme.onSecondary
+
+                containerColor = if (isPressedGastos) Color(0xD59E0000)
+                else MaterialTheme.colorScheme.onSecondary,
+                contentColor = if (isPressedGastos) MaterialTheme.colorScheme.onSecondary
+                else MaterialTheme.colorScheme.background
             ), modifier = modifier.weight(1f), shape = MaterialTheme.shapes.small
         ) {
-            Text("Gastos")
+            Text("Gastos", fontSize = 20.sp)
         }
 
 
@@ -102,52 +132,61 @@ fun Selecction(modifier: Modifier) {
 }
 
 @Composable
-fun MovementList(modifier: Modifier) {
+fun MovementList(
+    modifier: Modifier,
+    homeViewModel: homeViewModel,
+    isLoading: Boolean,
+
+    ) {
+    val movements by homeViewModel.Movements.collectAsState()
     Box(modifier = modifier.padding(6.dp)) {
-        LazyColumn() {
-            items(10) {
-                MovementItem(modifier)
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+
+
+        } else {
+            if (movements.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "No hay movimientos aun",
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Light,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+
+                    ) {
+                        items(movements) { items ->
+                            ListMount(items)
+
+                        }
+                    }
+                }
             }
         }
+
     }
 
 
 }
 
-@Composable
-fun MovementItem(modifier: Modifier) {
-    Card(modifier = modifier.padding(3.dp)) {
-        ListItem(headlineContent = {
-            Row {
-                Text(
-                    "Monto: $100 ",
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    "Monto: BS. 10000",
-                    fontSize = 10.sp,
-                    color = MaterialTheme.colorScheme.onSecondary
-                )
 
-            }
-
-        },
-            overlineContent = {
-                Text(
-                    "Categoria",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            },
-            supportingContent = { Text("Naturaleza") },
-            leadingContent = {
-                Icon(painter = painterResource(R.drawable.ic_money), contentDescription = "Money")
-            },
-            trailingContent = { Text("Fecha") }
-        )
-    }
-
-}
 
 

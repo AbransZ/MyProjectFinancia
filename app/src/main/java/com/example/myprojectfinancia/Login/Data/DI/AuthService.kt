@@ -2,7 +2,8 @@ package com.example.myprojectfinancia.Login.Data.DI
 
 import android.util.Log
 import com.example.myprojectfinancia.Home.Data.UserFinancia
-import com.example.myprojectfinancia.Home.UI.home.Models.MovementsItem
+import com.example.myprojectfinancia.Home.UI.Plans.ModelsPlans.DataPlans
+import com.example.myprojectfinancia.Home.UI.home.Models.Movements.MovementsItemSave
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -10,7 +11,6 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
-import java.util.UUID
 import javax.inject.Inject
 
 class AuthService @Inject constructor(
@@ -20,7 +20,8 @@ class AuthService @Inject constructor(
 ) {
 
     suspend fun login(email: String, password: String): FirebaseUser? {
-        return firebaseAuth.signInWithEmailAndPassword(email, password).await().user
+        return firebaseAuth.signInWithEmailAndPassword(email, password)
+            .await().user
     }
 
     suspend fun register(email: String, password: String): FirebaseUser? {
@@ -30,7 +31,8 @@ class AuthService @Inject constructor(
 
     suspend fun validUser(email: String): Boolean {
         return try {
-            val result = firebaseAuth.fetchSignInMethodsForEmail(email).await()
+            val result = firebaseAuth.fetchSignInMethodsForEmail(email)
+                .await()
             result.signInMethods?.isNotEmpty() ?: false
         } catch (ex: Exception) {
             false
@@ -45,7 +47,8 @@ class AuthService @Inject constructor(
 
     //autenticar con credenciales
     private suspend fun firebaseAuthWithCredential(credential: AuthCredential): FirebaseUser? {
-        return firebaseAuth.signInWithCredential(credential).await().user
+        return firebaseAuth.signInWithCredential(credential)
+            .await().user
     }
 
     fun isUsedLogged(): Boolean {
@@ -62,7 +65,8 @@ class AuthService @Inject constructor(
 
     suspend fun forgotPassword(email: String): Boolean {
         return try {
-            firebaseAuth.sendPasswordResetEmail(email).await()
+            firebaseAuth.sendPasswordResetEmail(email)
+                .await()
             true
         } catch (ex: Exception) {
             Log.e("AuthService", "Error al enviar correo: ${ex.message}")
@@ -119,16 +123,16 @@ class AuthService @Inject constructor(
     }
 
     //Metodo para guardar movimientos
-    suspend fun saveMovements(movement: MovementsItem,user: UserFinancia): Boolean {
+    suspend fun saveMovements(movement: MovementsItemSave, user: UserFinancia): Boolean {
         val useruid = user.uid
-        val movementId = UUID.randomUUID().toString()
-        return try {
+        val movimiento = firestore.collection("users")
+            .document(useruid)
+            .collection("movimientos")
+            .document()
 
-            firestore.collection("users")
-                .document(useruid)
-                .collection("movimientos")
-                .document(movementId)
-                .set(movement)
+        val movementWithID = movement.copy(Id = movimiento.id)
+        return try {
+            movimiento.set(movementWithID)
                 .await()
             Log.i("firestore", "Movimiento guardado")
             true
@@ -138,4 +142,152 @@ class AuthService @Inject constructor(
         }
     }
 
+    //Metodo para Guardar planes
+    suspend fun savePlan(plan: DataPlans, user: UserFinancia): Boolean {
+        val useruid = user.uid
+        val planSave = firestore.collection("users")
+            .document(useruid)
+            .collection("planes")
+            .document()
+
+        val planWithId = plan.copy(id = planSave.id)
+        return try {
+            planSave.set(planWithId)
+                .await()
+            Log.i("firestore", "Plan guardado")
+            true
+        } catch (ex: Exception) {
+            Log.i("firestore", "Plan No guardado Motivo: ${ex.message}")
+            false
+        }
+    }
+
+    //Metodo para obtener movimientos
+    fun getMovementsByNature(
+        nature: String, onResult: (List<MovementsItemSave>) -> Unit, onError: (Exception) -> Unit
+    ) {
+        val userId = firebaseAuth.currentUser?.uid
+
+        try {
+            if (userId != null) {
+                Log.i("Movimientos", "Usuario encontrado : ${userId}")
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("movimientos")
+                    .whereEqualTo("naturaleza", nature)
+                    .addSnapshotListener { snapshot, error ->
+
+                        if (error != null) {
+                            onError(error)
+                            return@addSnapshotListener
+                        }
+
+                        if (snapshot != null) {
+                            val movemets = snapshot.documents.map { doc ->
+                                MovementsItemSave(
+                                    Id = doc.id,
+                                    Fecha = doc.getString("fecha") ?: "",
+                                    Categoria = doc.getString("categoria") ?: "",
+                                    Naturaleza = doc.getString("naturaleza") ?: "",
+                                    Monto = doc.getDouble("monto") ?: 0.0
+                                )
+                            }
+                            onResult(movemets)
+                            Log.i("Movimientos", "Movimientos encontrados : ${movemets}")
+                        }
+
+
+                    }
+            } else {
+                Log.i("Movimientos", "Usuario no encontrado")
+                onError(Exception("Ususario no encontrado"))
+                null
+            }
+
+
+        } catch (e: Exception) {
+            Log.i("Movimientos", "Usuario Nulo : ${e}")
+            onError(e)
+            null
+        }
+    }
+
+    //Metodo para obtener todos los movimientos
+    fun getAllMovements(onResult: (List<MovementsItemSave>) -> Unit, onError: (Exception) -> Unit) {
+
+        val userId = firebaseAuth.currentUser?.uid
+        try {
+            if (userId != null) {
+                Log.i("AllMovements", "Usuario encontrado : ${userId}")
+
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("movimientos")
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            onError(error)
+                            Log.i("AllMovements", "error al obtener movimientos ${error}")
+                        }
+                        if (snapshot != null) {
+                            val allMovements = snapshot.documents.map { doc ->
+                                MovementsItemSave(
+                                    Id = doc.id,
+                                    Fecha = doc.getString("fecha") ?: "",
+                                    Naturaleza = doc.getString("naturaleza") ?: "",
+                                    Monto = doc.getDouble("monto") ?: 0.0,
+                                    Categoria = doc.getString("categoria") ?: ""
+                                )
+                            }
+                            onResult(allMovements)
+                            Log.i("AllMovements", "movimientos encontrados ${allMovements}")
+                        } else {
+                            Log.i("AllMovements", "snapshot nulo")
+                            onResult(emptyList())
+                            onError(Exception("Snapshot nulo"))
+                        }
+                    }
+            }
+        } catch (e: Exception) {
+            Log.i("AllMovements", "Error al obtener movimientos")
+            onError(e)
+        }
+    }
+
+    suspend fun getPlans(onResult: (List<DataPlans>) -> Unit, onError: (Exception) -> Unit) {
+        val userId = getCurrentUser()?.uid
+
+        if (userId != null) {
+            Log.i("Plans", "Usuario encontrado : ${userId}")
+            firestore.collection("users")
+                .document(userId)
+                .collection("planes")
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        onError(error)
+                        Log.i("Plans", "error al obtener planes ${error}")
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null) {
+                        val plans = snapshot.documents.map { plan ->
+                            DataPlans(
+                                id = plan.getString("id") ?: "",
+                                Name = plan.getString("name") ?: "",
+                                Description = plan.getString("description") ?: "",
+                                Category = plan.getString("category") ?: "",
+                                Date = plan.getString("date") ?: "",
+                                Objective = plan.getString("objective") ?: "",
+                                Advice = plan.getString("advice") ?: "",
+                                Actualy = plan.getString("actualy") ?: "",
+                            )
+                        }
+                        onResult(plans)
+                        Log.i("Plans", "planes encontrados ${plans}")
+                    } else {
+                        Log.i("Plans", "snapshot nulo")
+                        onResult(emptyList())
+                        onError(Exception("Snapshot nulo"))
+                    }
+                }
+        }
+    }
 }

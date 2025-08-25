@@ -1,6 +1,6 @@
 package com.example.myprojectfinancia.Home.UI.Plans.ModelsPlans
 
-data class DataPlans(
+data class planItem(
     val id: String = "",
     val Name: String,
     val Category: String,

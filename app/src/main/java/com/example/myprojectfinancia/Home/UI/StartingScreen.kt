@@ -15,18 +15,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.myprojectfinancia.Home.UI.Movements.MovementsScreens
 import com.example.myprojectfinancia.Home.UI.Plans.SavingScreen
-import com.example.myprojectfinancia.Home.UI.ViewModels.FAB
+import com.example.myprojectfinancia.Home.UI.Plans.ViewModel.PlansViewModel
 import com.example.myprojectfinancia.Home.UI.ViewModels.HomeScreen
-import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.Home.UI.home.Models.NavScreensModel
 import com.example.myprojectfinancia.Home.UI.home.Models.RememberNavStateScreen
+import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.Home.UI.settings.SettingsScreen
 import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InitialView(navController: NavHostController, homeViewModel: homeViewModel, loginViewModel: LoginViewModel) {
+fun InitialView(
+    navController: NavHostController,
+    homeViewModel: homeViewModel,
+    loginViewModel: LoginViewModel,
+    plansViewModel: PlansViewModel
+) {
 
     val Navigation = RememberNavStateScreen()
 
@@ -47,7 +52,7 @@ fun InitialView(navController: NavHostController, homeViewModel: homeViewModel, 
             }
         )
     },
-        floatingActionButton = { FAB(homeViewModel) },
+
         bottomBar = {
             BarraDeBotones(
                 currentScreen = Navigation.currentState,
@@ -61,6 +66,7 @@ fun InitialView(navController: NavHostController, homeViewModel: homeViewModel, 
             NavScreensModel.Plans -> {
                 SavingScreen(
                     paddingContent,
+                    plansViewModel,
                     modifier = Modifier.background(MaterialTheme.colorScheme.background)
                 )
             }
@@ -68,7 +74,8 @@ fun InitialView(navController: NavHostController, homeViewModel: homeViewModel, 
             NavScreensModel.Movements -> {
                 MovementsScreens(
                     paddingContent,
-                    modifier = Modifier.background(MaterialTheme.colorScheme.background)
+                    modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                    homeViewModel
                 )
             }
 

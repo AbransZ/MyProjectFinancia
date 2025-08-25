@@ -6,10 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.example.myprojectfinancia.Home.Data.SetupFirebaseNotifications
-
+import com.example.myprojectfinancia.Home.UI.Plans.ViewModel.PlansViewModel
+import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
 import com.example.myprojectfinancia.Login.ui.ViewModel.SpalshViewModel
-import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.Model.Navhost
 import com.example.myprojectfinancia.theme.MyProjectFinanciaTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -19,10 +19,12 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-//inyectando viewmodel
-    private val loginViewModel : LoginViewModel by viewModels()
-    private val splashViewModel : SpalshViewModel by viewModels()
-    private val homeViewModel : homeViewModel by viewModels()
+    //inyectando viewmodel
+    private val loginViewModel: LoginViewModel by viewModels()
+    private val splashViewModel: SpalshViewModel by viewModels()
+    private val homeViewModel: homeViewModel by viewModels()
+    private val plansViewModel: PlansViewModel by viewModels()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,11 +35,11 @@ class MainActivity : ComponentActivity() {
 
             MyProjectFinanciaTheme {
 
-                Navhost(loginViewModel,splashViewModel,homeViewModel)
-                }
+                Navhost(loginViewModel, splashViewModel, homeViewModel, plansViewModel)
             }
         }
     }
+}
 
 
 
