@@ -9,6 +9,7 @@ import com.example.myprojectfinancia.Home.UI.Plans.ModelsPlans.planItem
 import com.example.myprojectfinancia.Login.Data.DI.AuthService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -20,6 +21,7 @@ import javax.inject.Inject
 class PlansViewModel @Inject constructor(
     private val authService: AuthService
 ) : ViewModel() {
+
 
     //Variables para Controlar Estados
     private val _isLoading = MutableStateFlow<Boolean>(false)
@@ -53,14 +55,26 @@ class PlansViewModel @Inject constructor(
     private val _dateTarget = MutableStateFlow<String>("")
     val dateTarget: MutableStateFlow<String> = _dateTarget
 
+    private val _aporte = MutableStateFlow<String>("")
+    val aporte: MutableStateFlow<String> = _aporte
+
     //lista de planes
     private val _plans = MutableStateFlow<List<planItem>>(emptyList())
     val plans: MutableStateFlow<List<planItem>> = _plans
 
+    //variable para seleccionar el plan
 
-    //Dialogo Agregar
+    private val _selecctedPlanItem = MutableStateFlow<planItem?>(null)
+    val selectePlanItem: StateFlow<planItem?> = _selecctedPlanItem
+
+
+    //Dialogo Agregar Planes
     private val _showDialogAdd = MutableStateFlow<Boolean>(false)
     val showDialogAdd: MutableStateFlow<Boolean> = _showDialogAdd
+
+    //Dialogo para agrear dinero a los planes
+    private val _showDialogAddMoneey = MutableStateFlow<Boolean>(false)
+    val showDialogAddMoney: StateFlow<Boolean> = _showDialogAddMoneey
 
     //Funciones
 
@@ -90,6 +104,13 @@ class PlansViewModel @Inject constructor(
             }
         }
 
+    }
+
+    //funcion para seleccionar plan
+    fun selectedPlan(plan: planItem) {
+        _selecctedPlanItem.value = plan
+        Log.i("PlansViewModel", "Plan seleccionado: ${plan.Name} - ID ${plan.id}")
+        showDialogAddMoney()
     }
 
     //funcion para obtener planes
@@ -151,6 +172,49 @@ class PlansViewModel @Inject constructor(
         }
     }
 
+    fun addMoneyToPlan(aporte: String) {
+        viewModelScope.launch {
+            try {
+                val selectedPlan = _selecctedPlanItem.value
+                val userCurrent = authService.getCurrentUser()
+                val user = userCurrent?.uid
+
+
+                if (selectedPlan != null && user != null && aporte.isNotEmpty()) {
+                    val aporteDouble = aporte.toDoubleOrNull()
+
+                    if (aporteDouble != null && aporteDouble > 0) {
+                        val result = authService.getPlanById(
+                            planId = selectedPlan.id,
+                            userId = user,
+                            contribution = aporteDouble,
+                            onError = { error ->
+                                Log.e("PlansViewModel", "Error al obtener el plan: ${error.message}")
+                                _error.value = error.message
+                            }
+                        )
+                        if (result) {
+                            getPlans()
+                            _showDialogAddMoneey.value = false
+                            _aporte.value = ""
+                            _selecctedPlanItem.value = null
+                        } else {
+                            _error.value = "El aporte debe ser un numero valido mayor a 0"
+                        }
+                    } else {
+                        _error.value = "No hay plan seleccionado"
+                    }
+                }
+
+            } catch (ex: Exception) {
+                Log.e("PlansViewModel", "Error agregando aporte: ${ex.message}")
+                _isLoading.value = false
+                _error.value = ex.message ?: "Error desconocido"
+            }
+
+        }
+    }
+
     //funcion para limpiar campos
     fun clearFields() {
         _namePlan.value = ""
@@ -159,6 +223,7 @@ class PlansViewModel @Inject constructor(
         _category.value = ""
         _date.value = ""
         _mountActually.value = ""
+        _aporte.value = ""
     }
 
     //funcion para obtener fecha actual
@@ -169,15 +234,31 @@ class PlansViewModel @Inject constructor(
         }
     }
 
-    //Mostrar dialogo
+    //Mostrar dialogo para agg planes
     fun showDialogPlans() {
         _showDialogAdd.value = true
 
     }
 
-    //Ocultar dialogo
+    //Mostrar dialogo para agg dinero a planes
+    fun showDialogAddMoney() {
+        _showDialogAddMoneey.value = true
+
+    }
+
+    //Ocultar dialogo para agg planes
     fun hideDialog() {
         _showDialogAdd.value = false
+    }
+
+    //Ocultar dialogo para agg dinero a planes
+    fun hideDialogMoney() {
+        _showDialogAddMoneey.value = false
+    }
+
+    //Funciones para ingresar datos
+    fun onAportePlanChange(aporte: String) {
+        _aporte.value = aporte
     }
 
     //Funciones para ingresar datos

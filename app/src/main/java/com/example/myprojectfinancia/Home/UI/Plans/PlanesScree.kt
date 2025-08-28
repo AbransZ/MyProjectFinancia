@@ -25,6 +25,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -66,6 +67,7 @@ fun SavingScreen(padding: PaddingValues, plansViewModel: PlansViewModel, modifie
     val dateTarget by plansViewModel.dateTarget.collectAsState()
     val plansList by plansViewModel.plans.collectAsState()
     val isLoading by plansViewModel.isLoading.collectAsState()
+    val aporte by plansViewModel.aporte.collectAsState()
 
     LaunchedEffect(Unit) {
         plansViewModel.initializePlansUser()
@@ -95,6 +97,7 @@ fun SavingScreen(padding: PaddingValues, plansViewModel: PlansViewModel, modifie
                         category = category,
                         mountActually = mountActually
                     )
+                    AddmoneyToPlans(modifier, plansViewModel, aporte, plansList)
 
                 }
                 FABP(
@@ -106,6 +109,130 @@ fun SavingScreen(padding: PaddingValues, plansViewModel: PlansViewModel, modifie
         }
     }
 
+}
+
+@Composable
+fun AddmoneyToPlans(modifier: Modifier, plansViewModel: PlansViewModel, aporte: String, plansList: List<planItem>) {
+    val showDialogMoney by plansViewModel.showDialogAddMoney.collectAsState()
+    val selectedPlan by plansViewModel.selectePlanItem.collectAsState()
+
+    if (showDialogMoney) {
+        Dialog(onDismissRequest = { plansViewModel.hideDialogMoney() }) {
+            Card(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                shape = RoundedCornerShape(30.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                )
+            ) {
+                Column(
+                    modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+
+                    BodyDialogMoney(modifier, plansViewModel, aporte, selectedPlan)
+                    Spacer(modifier.height(5.dp))
+                    ButtonsDialogMoney(modifier, plansViewModel, aporte)
+                }
+
+            }
+        }
+    }
+}
+
+@Composable
+fun ButtonsDialogMoney(modifier: Modifier, plansViewModel: PlansViewModel, aporte: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(6.dp), horizontalArrangement = Arrangement.End
+    ) {
+        Button(
+            onClick = {
+
+                plansViewModel.addMoneyToPlan(aporte)
+
+            }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        ) { Text("Guardar") }
+        Spacer(Modifier.width(10.dp))
+        Button(
+            onClick = { plansViewModel.hideDialogMoney() },
+            shape = MaterialTheme.shapes.small,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            )
+        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary) }
+    }
+}
+
+@Composable
+fun BodyDialogMoney(modifier: Modifier, plansViewModel: PlansViewModel, aporte: String, plan: planItem?) {
+
+
+    Column(modifier.fillMaxWidth()) {
+        Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    plan?.Name.toString(),
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier.height(10.dp))
+                plan?.let { plan ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(12.dp)
+                        ) {
+                            Text(
+                                text = plan.Name,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Actual: $${plan.Actualy}",
+                                fontSize = 14.sp
+                            )
+                            Text(
+                                text = "Meta: $${plan.Objective}",
+                                fontSize = 14.sp
+                            )
+                        }
+                    }
+                }
+                Text("Agregar aporte al plan", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.padding(6.dp))
+
+
+                OutlinedTextField(
+                    value = aporte,
+                    onValueChange = { plansViewModel.onAportePlanChange(it) },
+                    placeholder = { Text("00.0") },
+                    prefix = { Text("$") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    shape = MaterialTheme.shapes.medium,
+                    maxLines = 1,
+                    singleLine = true,
+                    modifier = Modifier.height(56.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                )
+            }
+
+
+        }
+
+    }
 }
 
 //Boton para agg Plan
@@ -536,7 +663,7 @@ fun PlanesList(
                                 .fillMaxHeight()
                         ) {
                             items(plansList) { plan ->
-                                PlanesCard(planItem = plan)
+                                PlanesCard(modifier, plan, plansViewModel)
                             }
                         }
                     }
@@ -552,9 +679,10 @@ fun PlanesList(
 
 //Item de planes
 @Composable
-fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem) {
+fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel: PlansViewModel) {
 
-    Card(
+    ElevatedCard(
+        onClick = { plansViewModel.selectedPlan(planItem) },
         modifier = modifier
             .height(200.dp)
             .width(400.dp)

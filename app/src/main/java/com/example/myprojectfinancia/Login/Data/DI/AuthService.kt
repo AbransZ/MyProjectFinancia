@@ -253,6 +253,7 @@ class AuthService @Inject constructor(
         }
     }
 
+    //funcion suspendida para obtener planes
     suspend fun getPlans(onResult: (List<DataPlans>) -> Unit, onError: (Exception) -> Unit) {
         val userId = getCurrentUser()?.uid
 
@@ -288,6 +289,51 @@ class AuthService @Inject constructor(
                         onError(Exception("Snapshot nulo"))
                     }
                 }
+        }
+    }
+
+    //funcion suspendida para obtener plan especifico para agregar aporte
+    suspend fun getPlanById(
+        planId: String,
+        userId: String,
+        contribution: Double,
+        onError: (Exception) -> Unit
+    ): Boolean {
+        return try {
+            val planRef = firestore.collection("users")
+                .document(userId)
+                .collection("planes")
+                .document(planId)
+
+            val plan = planRef
+                .get()
+                .await()
+
+            if (plan.exists()) {
+                val amountActualy = plan.getString("actualy") ?: ""
+                val amountActuallyNum = amountActualy.toDoubleOrNull() ?: 0.00
+
+                val newAMount = amountActuallyNum + contribution
+
+                val newAdvice = "Se recomienda ahorrar $${newAMount * 50 / 100}"
+
+                val updates = hashMapOf<String, Any>(
+                    "actualy" to newAMount.toString(),
+                    "advice" to newAdvice
+                )
+                planRef.update(updates)
+                    .await()
+                true
+            } else {
+                Log.i("getplan_service", "No se encontro el plan")
+                onError(Exception("No se encontro el plan"))
+                false
+            }
+
+        } catch (ex: Exception) {
+            Log.i("getplan_service", "Error al obtener el plan: ${ex.message}")
+            onError(ex)
+            false
         }
     }
 }
