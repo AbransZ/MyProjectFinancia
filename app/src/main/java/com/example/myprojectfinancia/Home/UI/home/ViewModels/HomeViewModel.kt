@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myprojectfinancia.Home.Data.UserFinancia
+import com.example.myprojectfinancia.Home.UI.Plans.Domain.budgetRepository
 import com.example.myprojectfinancia.Home.UI.home.Models.Movements.MovementsItemSave
 import com.example.myprojectfinancia.Home.UI.home.Models.Movements.Movimiento
 import com.example.myprojectfinancia.Login.Data.DI.AuthService
@@ -28,16 +29,14 @@ import javax.inject.Inject
 class homeViewModel @Inject constructor(
     private val authService: AuthService,
     private val googleSignInClient: GoogleSignInClient,
+    private val budgetRepository: budgetRepository
 ) : ViewModel() {
 
+//VARIABLES DE DATOS
 
     //variable para el nombre
     private val _name = MutableStateFlow<String>("")
     val name: StateFlow<String> = _name
-
-    // mostrar dialog
-    private val _showDialog = MutableLiveData<Boolean>(false)
-    val showDialog: LiveData<Boolean> = _showDialog
 
     private val _categoria = MutableLiveData<String>("")
     val category: LiveData<String> = _categoria
@@ -45,14 +44,6 @@ class homeViewModel @Inject constructor(
     // naturaleza de la transaccion
     private val _naturaleza = MutableStateFlow<String>("")
     val naturaleza: StateFlow<String> = _naturaleza
-
-    //Movimientos
-    private val _allMovements = MutableStateFlow<List<Movimiento>>(emptyList())
-    val allMovements: StateFlow<List<Movimiento>> = _allMovements
-
-    //Error de todos los movimientos
-    private val _ErrorAllMovements = MutableStateFlow<String?>(null)
-    val ErrorAllMovements: StateFlow<String?> = _ErrorAllMovements
 
     // valor del monto en string
     private val _montoString = MutableLiveData<String>("")
@@ -65,6 +56,34 @@ class homeViewModel @Inject constructor(
     // fecha de la transaccion
     var fechaActual by mutableStateOf(fechaActual())
 
+    //variable para el nombre
+    private val _nameEdit = MutableStateFlow<String>("")
+    val nameEdit: StateFlow<String> = _nameEdit
+
+    private val _categoriaEdit = MutableStateFlow<String>("")
+    val categoryEdit: StateFlow<String> = _categoriaEdit
+
+    // naturaleza de la transaccion
+    private val _naturalezaEdit = MutableStateFlow<String>("")
+    val naturalezaEdit: StateFlow<String> = _naturalezaEdit
+
+    // valor del monto en string
+    private val _montoStringEdit = MutableStateFlow<String>("")
+    val montoEdit: StateFlow<String> = _montoStringEdit
+
+    //interaccion Ingresos y egresos Editables
+    private val _ingrsosPressedEdit = MutableStateFlow(true)
+    val ingrsosPressedEdit: StateFlow<Boolean> = _ingrsosPressedEdit
+
+    //boton de gastos presionado Edit
+    private val _egresosIsPressedEdit = MutableStateFlow(false)
+    val egresosIsPressedEdit: StateFlow<Boolean> = _egresosIsPressedEdit
+
+
+    // mostrar dialog
+    private val _showDialog = MutableLiveData<Boolean>(false)
+    val showDialog: LiveData<Boolean> = _showDialog
+
     //interaccion Ingresos y egresos
     private val _ingrsosPressed = MutableStateFlow(true)
     val ingrsosPressed: StateFlow<Boolean> = _ingrsosPressed
@@ -73,21 +92,31 @@ class homeViewModel @Inject constructor(
     private val _egresosIsPressed = MutableStateFlow(false)
     val egresosIsPressed: StateFlow<Boolean> = _egresosIsPressed
 
+
+    //Movimientos
+    private val _allMovements = MutableStateFlow<List<Movimiento>>(emptyList())
+    val allMovements: StateFlow<List<Movimiento>> = _allMovements
+
+    //Error de todos los movimientos
+    private val _ErrorAllMovements = MutableStateFlow<String?>(null)
+    val ErrorAllMovements: StateFlow<String?> = _ErrorAllMovements
+
+
     //Movimientos Dialogo Variables
     private val _showMovements = MutableStateFlow<Boolean>(false)
     val showMovements: MutableStateFlow<Boolean> = _showMovements
 
-    //Ingresos y Gastos variables
-    private val _TotalIngresos = MutableStateFlow<Double>(0.0)
-    val TotalIngresos: StateFlow<Double> = _TotalIngresos
+    //Mostrar Dialogo para editar movimientos
+    private val _showMovementsEdit = MutableStateFlow<Boolean>(false)
+    val showMovementsEdit: MutableStateFlow<Boolean> = _showMovementsEdit
 
-    //total de gastos
-    private val _TotalGastos = MutableStateFlow<Double>(0.0)
-    val TotalGastos: StateFlow<Double> = _TotalGastos
 
     //variable presupuesto
-    private val _Presupuesto = MutableStateFlow<Double>(0.0)
-    val Presupuesto: StateFlow<Double> = _Presupuesto
+    val presupuesto: StateFlow<Double> = budgetRepository.totalBudget
+
+    //variable de movimiento
+    private val selectedMovement = MutableStateFlow<Movimiento?>(null)
+    val selectedMovimiento: StateFlow<Movimiento?> = selectedMovement
 
     //dialogo agg presupuesto
     private val _showBudget = MutableStateFlow<Boolean>(false)
@@ -114,14 +143,21 @@ class homeViewModel @Inject constructor(
 
     //FUNCIONESSS
 
+    // funcion para seleccionar un movimiento
+    fun selectedMovement(movimiento: Movimiento) {
+        selectedMovement.value = movimiento
+
+    }
+
+
     fun onBudgetCategoryChange(categoria: String) {
         _budgetCategory.value = categoria
     }
 
     fun aumentarPresupuesto() {
-        val presupuestoFinal = _Presupuesto.value + _bufgetMountNum.value
+        val presupuestoFinal = presupuesto.value + _bufgetMountNum.value
         guardarPresupuestoTotal()
-        _Presupuesto.value = presupuestoFinal
+        budgetRepository.updateBudget(presupuestoFinal)
 
     }
 
@@ -192,12 +228,16 @@ class homeViewModel @Inject constructor(
         _ingrsosPressed.value = true
     }
 
+    //mostrar dialogo de movimientos
+    fun showMovementsEdit() {
+        _showMovementsEdit.value = true
+
+    }
+
     //Limpieza de datos
     private fun clearAllData() {
         _name.value = ""
-        _TotalIngresos.value = 0.0
-        _TotalGastos.value = 0.0
-        _Presupuesto.value = 0.0
+        budgetRepository.updateBudget(0.00)
         _Movements.value = emptyList()
         _allMovements.value = emptyList()
         _Error.value = null
@@ -247,8 +287,6 @@ class homeViewModel @Inject constructor(
 
     //cerrar sesion
     fun logout(): String {
-//        clearAllData()
-//
         viewModelScope.launch {
             try {
                 clearAllData()
@@ -315,7 +353,7 @@ class homeViewModel @Inject constructor(
     }
 
 
-    //INICIO DE ITERACCION CON LA BD
+    //INICIO DE INTERACCION CON LA BD
 
 
     fun initializeData() {
@@ -406,7 +444,8 @@ class homeViewModel @Inject constructor(
                         naturaleza = it.Naturaleza
                     )
                 }
-                calculateBudget(movements)
+                budgetRepository.calculateBudget(movements)
+
                 _isLoading.value = false
                 _ErrorAllMovements.value = null
                 Log.i("Allmovimientos", "movimientos: $movements")
@@ -421,26 +460,15 @@ class homeViewModel @Inject constructor(
         )
     }
 
-    //Calcular Presupuesto
-    fun calculateBudget(movements: List<MovementsItemSave>) {
-        var ingresos = 0.0
-        var gasto = 0.0
 
-        movements.forEach { movement ->
-            when (movement.Naturaleza) {
-                "Ingreso" -> ingresos += movement.Monto
-                "Gasto" -> gasto += movement.Monto
-            }
-        }
-        _TotalIngresos.value = ingresos
-        _TotalGastos.value = gasto
-        _Presupuesto.value = ingresos - gasto
+    //funcion de limbiar  error
+    fun clearError() {
+        _Error.value = null
+    }
 
-        Log.i(
-            "presupuesto",
-            "ingresos: $ingresos , gastos: $gasto , presupuesto: ${_Presupuesto.value}"
-        )
-
+    //funcion de limbiar  error de movimientos
+    fun clearErrorMovements() {
+        _ErrorAllMovements.value = null
     }
 
 

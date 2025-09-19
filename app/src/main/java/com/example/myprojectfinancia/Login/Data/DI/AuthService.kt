@@ -195,8 +195,6 @@ class AuthService @Inject constructor(
                             onResult(movemets)
                             Log.i("Movimientos", "Movimientos encontrados : ${movemets}")
                         }
-
-
                     }
             } else {
                 Log.i("Movimientos", "Usuario no encontrado")
@@ -204,11 +202,92 @@ class AuthService @Inject constructor(
                 null
             }
 
-
         } catch (e: Exception) {
             Log.i("Movimientos", "Usuario Nulo : ${e}")
             onError(e)
             null
+        }
+    }
+
+    //Obtener movimientos por ID
+    suspend fun getMovementsById(
+        movementId: String, movimiento: (MovementsItemSave) -> Unit, onError: (Exception) ->
+        Unit
+    ) {
+        val userId = firebaseAuth.currentUser?.uid
+        try {
+            if (userId != null) {
+                firestore.collection("users")
+                    .document(userId)
+                    .collection("movimientos")
+                    .document(movementId)
+                    .addSnapshotListener { snapshot, error ->
+                        if (error != null) {
+                            Log.i("Movimientos", "Error al obtener movimiento por ID : ${error}")
+                            onError(error)
+                            return@addSnapshotListener
+                        }
+                        if (snapshot != null) {
+                            val movementById = MovementsItemSave(
+                                Id = snapshot.getString("id") ?: "",
+                                Fecha = snapshot.getString("fecha") ?: "",
+                                Categoria = snapshot.getString("categoria") ?: "",
+                                Naturaleza = snapshot.getString("naturaleza") ?: "",
+                                Monto = snapshot.getDouble("monto") ?: 0.0
+                            )
+                            movimiento(movementById)
+                        } else {
+                            Log.i("Movimientos", "snapshot nulo")
+                            onError(Exception("Movimiento nulo"))
+                        }
+                    }
+            }
+
+        } catch (ex: Exception) {
+            Log.i("Movimientos", "Error al obtener movimiento : ${ex}")
+            onError(ex)
+        }
+
+
+    }
+
+
+//*******Terminar metodos de movimientos********
+
+
+    //Actualizar movimientos
+    suspend fun updateMovements(
+        movementId: String,
+        movement: MovementsItemSave,
+        onError: (Exception) -> Unit
+    ): Boolean {
+        val userId = firebaseAuth.currentUser?.uid
+
+        return try {
+            if (userId != null) {
+                val movementRef = firestore.collection("users")
+                    .document(userId)
+                    .collection("movimientos")
+                    .document(movementId)
+
+                val updates = hashMapOf<String, Any>(
+                    "categoria" to movement.Categoria,
+                    "monto" to movement.Monto
+                )
+                movementRef.update(updates)
+                    .await()
+                true
+
+            } else {
+                Log.i("Movimientos", "snapshot nulo")
+                onError(Exception("Movimiento nulo"))
+                false
+            }
+
+        } catch (ex: Exception) {
+            Log.i("Movimientos", "Error al actualizar movimiento : ${ex}")
+            onError(ex)
+            false
         }
     }
 
@@ -335,5 +414,55 @@ class AuthService @Inject constructor(
             onError(ex)
             false
         }
+    }
+
+
+    suspend fun updatePlanByID(
+        planId: String,
+        userId: String,
+        updatesPlans: DataPlans,
+        onError: (Exception) -> Unit
+    ): Boolean {
+        return try {
+            val planRef = firestore.collection("users")
+                .document(userId)
+                .collection("planes")
+                .document(planId)
+
+            val plan = planRef
+                .get()
+                .await()
+
+            if (plan.exists()) {
+                val name = updatesPlans.Name ?: ""
+                val description = updatesPlans.Description ?: ""
+                val category = updatesPlans.Category ?: ""
+                val date = plan.getString("date") ?: ""
+                val objective = updatesPlans.Objective ?: ""
+                val amountActualy = updatesPlans.Actualy ?: ""
+
+                val updates = hashMapOf<String, Any>(
+                    "name" to name,
+                    "description" to description,
+                    "category" to category,
+                    "date" to date,
+                    "objective" to objective,
+                    "actualy" to amountActualy
+                )
+                planRef.update(updates)
+                    .await()
+                true
+
+            } else {
+                Log.i("update_service", "No se encontro el plan")
+                onError(Exception("No se encontro el plan"))
+                false
+            }
+        } catch (ex: Exception) {
+            onError(ex)
+            Log.i("update_service", "Error al actualizar el plan: ${ex.message}")
+            false
+        }
+
     }
 }

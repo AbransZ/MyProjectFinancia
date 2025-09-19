@@ -1,6 +1,7 @@
 package com.example.myprojectfinancia.Home.UI.ViewModels
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -67,6 +69,7 @@ fun HomeScreen(
     modifier: PaddingValues,
     homeViewModel: homeViewModel
 ) {
+    val context = LocalContext.current
     val isPressedIngresos by homeViewModel.ingrsosPressed.collectAsState()
     val isPressedGastos by homeViewModel.egresosIsPressed.collectAsState()
     val showDialog by homeViewModel.showDialog.observeAsState(false)
@@ -74,15 +77,30 @@ fun HomeScreen(
     val categoria by homeViewModel.category.observeAsState("")
     val fecha = homeViewModel.fechaActual
     val name: String by homeViewModel.name.collectAsState("")
-    val ingresos by homeViewModel.TotalIngresos.collectAsState()
-    val gastos by homeViewModel.TotalGastos.collectAsState()
-    val presupuesto by homeViewModel.Presupuesto.collectAsState()
+    val presupuesto by homeViewModel.presupuesto.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState()
+    val error by homeViewModel.Error.collectAsState()
+    val showMovementsEdit by homeViewModel.showMovementsEdit.collectAsState()
+    val selectedMovimiento by homeViewModel.selectedMovimiento.collectAsState()
+    val nameEdit by homeViewModel.nameEdit.collectAsState(name)
+    val categoryEdit by homeViewModel.categoryEdit.collectAsState(categoria)
+    val naturalezaEdit by homeViewModel.naturalezaEdit.collectAsState()
+    val montoEdit by homeViewModel.montoEdit.collectAsState(monto)
+    val isPressedIngresosEdit by homeViewModel.ingrsosPressedEdit.collectAsState(isPressedIngresos)
+    val isPressedGastosEdit by homeViewModel.egresosIsPressedEdit.collectAsState(isPressedGastos)
 
+    LaunchedEffect(error) {
+        error?.let {
+            Toast.makeText(context, it, Toast.LENGTH_LONG)
+                .show()
+            homeViewModel.clearError()
+        }
+    }
 
     LaunchedEffect(Unit) {
         homeViewModel.initializeNewUser()
     }
+    //Caja que contiene toda la Screen
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -107,6 +125,10 @@ fun HomeScreen(
                 fecha
             )
             PreupuestoDialog(homeViewModel = homeViewModel)
+            EditCuenta(
+                showMovementsEdit, montoEdit, categoryEdit, homeViewModel, isPressedIngresosEdit, isPressedGastosEdit,
+                fecha
+            )
 
         }
         FAB(
@@ -468,7 +490,7 @@ fun MovimientosDialog(
     homeViewModel: homeViewModel
 ) {
     val movements by homeViewModel.allMovements.collectAsState()
-    val error by homeViewModel.ErrorAllMovements.collectAsState("")
+    val error by homeViewModel.ErrorAllMovements.collectAsState()
 
     LaunchedEffect(showMovements) {
         if (showMovements) {
@@ -616,7 +638,8 @@ fun PresupuestoCard(presupuesto: Double, homeViewModel: homeViewModel) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(16.dp)
+            .clickable { homeViewModel.showMovementsEdit },
         colors = CardDefaults.cardColors(
             containerColor = Color.Transparent
         )
