@@ -6,15 +6,15 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.myprojectfinancia.Home.UI.InitialView
-import com.example.myprojectfinancia.Home.UI.Plans.ViewModel.PlansViewModel
-import com.example.myprojectfinancia.Home.UI.home.ViewModels.homeViewModel
-import com.example.myprojectfinancia.Login.ui.ContainerCreate
-import com.example.myprojectfinancia.Login.ui.ForgotPassWord
-import com.example.myprojectfinancia.Login.ui.LogginScreen
-import com.example.myprojectfinancia.Login.ui.Spalsh
-import com.example.myprojectfinancia.Login.ui.ViewModel.LoginViewModel
-import com.example.myprojectfinancia.Login.ui.ViewModel.SpalshViewModel
+import com.example.myprojectfinancia.Index.Login.ViewModel.LoginViewModel
+import com.example.myprojectfinancia.Index.Login.ViewModel.SpalshViewModel
+import com.example.myprojectfinancia.Index.Login.ui.ContainerCreate
+import com.example.myprojectfinancia.Index.Login.ui.ForgotPassWord
+import com.example.myprojectfinancia.Index.Login.ui.LogginScreen
+import com.example.myprojectfinancia.Index.Login.ui.Spalsh
+import com.example.myprojectfinancia.Index.Plans.ViewModel.PlansViewModel
+import com.example.myprojectfinancia.Index.UI.InitialView
+import com.example.myprojectfinancia.Index.home.ViewModels.homeViewModel
 
 sealed class Routes(val routes: String) {
     object SplashScreen : Routes("Splash")
