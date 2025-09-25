@@ -5,6 +5,6 @@ data class DolarOficial(
     val nombre: String,
     val compra: Double?,
     val venta: Double?,
-    val precio: Double,
+    val promedio: Double,
     val fecha: String
 )
