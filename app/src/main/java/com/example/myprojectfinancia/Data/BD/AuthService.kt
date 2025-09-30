@@ -189,7 +189,7 @@ class AuthService @Inject constructor(
                                     Fecha = doc.getString("fecha") ?: "",
                                     Categoria = doc.getString("categoria") ?: "",
                                     Naturaleza = doc.getString("naturaleza") ?: "",
-                                    Monto = doc.getDouble("monto") ?: 0.0
+                                    MontoBs = doc.getDouble("montoBs") ?: 0.0
                                 )
                             }
                             onResult(movemets)
@@ -233,7 +233,7 @@ class AuthService @Inject constructor(
                                 Fecha = snapshot.getString("fecha") ?: "",
                                 Categoria = snapshot.getString("categoria") ?: "",
                                 Naturaleza = snapshot.getString("naturaleza") ?: "",
-                                Monto = snapshot.getDouble("monto") ?: 0.0
+                                MontoBs = snapshot.getDouble("monto") ?: 0.0
                             )
                             movimiento(movementById)
                         } else {
@@ -272,7 +272,7 @@ class AuthService @Inject constructor(
 
                 val updates = hashMapOf<String, Any>(
                     "categoria" to movement.Categoria,
-                    "monto" to movement.Monto,
+                    "montoBs" to movement.MontoBs,
                     "naturaleza" to movement.Naturaleza
                 )
                 movementRef.update(updates)
@@ -314,7 +314,7 @@ class AuthService @Inject constructor(
                                     Id = doc.id,
                                     Fecha = doc.getString("fecha") ?: "",
                                     Naturaleza = doc.getString("naturaleza") ?: "",
-                                    Monto = doc.getDouble("monto") ?: 0.0,
+                                    MontoBs = doc.getDouble("montoBs") ?: 0.0,
                                     Categoria = doc.getString("categoria") ?: ""
                                 )
                             }

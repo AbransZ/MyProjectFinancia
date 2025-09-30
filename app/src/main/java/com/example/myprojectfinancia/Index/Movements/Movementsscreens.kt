@@ -45,6 +45,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.myprojectfinancia.Data.API.network.DolarOficial
 import com.example.myprojectfinancia.Index.home.Models.Movements.Movimiento
 import com.example.myprojectfinancia.Index.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.R
@@ -74,11 +75,14 @@ fun MovementsScreens(padding: PaddingValues, modifier: Modifier, homeViewModel: 
     val isPressedIngresosEdit by homeViewModel.ingrsosPressedEdit.collectAsState(isPressedIngresos)
     val isPressedGastosEdit by homeViewModel.egresosIsPressedEdit.collectAsState(isPressedGastos)
     val fecha = homeViewModel.fechaActual
+    val DolarObject by homeViewModel.DolarObject.collectAsState()
+    val montoBs by homeViewModel.montoBsEdit.collectAsState("")
 
 
     // carga de pestanas de movimientos
     LaunchedEffect(movements) {
         homeViewModel.getAllMovements()
+
     }
 
     Box(
@@ -108,9 +112,16 @@ fun MovementsScreens(padding: PaddingValues, modifier: Modifier, homeViewModel: 
             }
             Greeting(Modifier)
             EditCuenta(
-                showMovementsEdit, montoEdit, categoryEdit, naturaleza, homeViewModel, isPressedIngresosEdit,
+                showMovementsEdit,
+                montoEdit,
+                categoryEdit,
+                naturaleza,
+                homeViewModel,
+                isPressedIngresosEdit,
                 isPressedGastosEdit,
-                fecha
+                fecha,
+                montoBs,
+                DolarObject
             )
             Spacer(modifier = modifier.padding(6.dp))
             MovementList(modifier, homeViewModel, isLoading, movements)
@@ -195,12 +206,23 @@ fun ListMountMovements(
     homeViewModel: homeViewModel,
     movimiento: Movimiento
 ) {
+    val montoBs = movimiento.montoBs.toDouble()
+    val precioUSD = homeViewModel.convertBsToUSD(montoBs)
     Card(
         modifier = Modifier
             .padding(5.dp)
             .clickable { homeViewModel.showMovementsEdit(movimiento) }) {
         ListItem(
-            headlineContent = { Text(movimiento.monto) },
+            headlineContent = {
+                Row {
+                    Text("$${precioUSD}/ ", fontSize = 18.sp)
+                    if (montoBs != null) {
+                        Text("Bs.${String.format("%.2f", montoBs)}", fontSize = 12.sp)
+                    } else {
+                        Text("Bs.---", fontSize = 10.sp)
+                    }
+                }
+            },
             overlineContent = { Text(movimiento.categoria) },
             supportingContent = { Text(movimiento.fecha) },
             leadingContent = {
@@ -255,7 +277,9 @@ fun BodyDialogEdit(
     montoEdit: String,
     categoriaEdit: String,
     naturalezaEdit: String,
-    fecha: String
+    fecha: String,
+    montoBs: String,
+    DolarObject: DolarOficial?
 ) {
     Box(
         Modifier
@@ -300,9 +324,23 @@ fun BodyDialogEdit(
             Spacer(Modifier.padding(6.dp))
             OutlinedTextField(
                 value = montoEdit,
-                onValueChange = { homeViewModel.onMontoChangeEdit(it) },
+                onValueChange = { homeViewModel.onMontoChangeEdit(it, DolarObject?.promedio) },
                 placeholder = { Text("Ingresar monto.") },
                 prefix = { Text("$") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.height(56.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            )
+            Spacer(Modifier.padding(6.dp))
+            OutlinedTextField(
+                value = montoBs,
+                onValueChange = { homeViewModel.onMontoBsChangeEdit(it, DolarObject?.promedio) },
+                placeholder = { Text("Ingresar monto.") },
+                prefix = { Text("Bs") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.height(56.dp),
@@ -345,7 +383,9 @@ fun EditCuenta(
     homeViewModel: homeViewModel,
     isPressedIngresosEdit: Boolean,
     isPressedGastosEdit: Boolean,
-    fecha: String
+    fecha: String,
+    montoBs: String,
+    DolarObject: DolarOficial?
 ) {
     if (showDialogEdit) {
         Dialog(onDismissRequest = { homeViewModel.ocultarDialogEdit() }) {
@@ -375,7 +415,9 @@ fun EditCuenta(
                         montoEdit,
                         categoriaEdit,
                         naturalezaEdit,
-                        fecha
+                        fecha,
+                        montoBs,
+                        DolarObject
                     )
                     ButtonsDialogEdit(
                         homeViewModel,

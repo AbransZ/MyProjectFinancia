@@ -5,5 +5,5 @@ data class MovementsItemSave(
     val Fecha: String = "",
     val Categoria: String = "",
     val Naturaleza: String = "",
-    val Monto: Double = 0.00
+    val MontoBs: Double = 0.00
 )

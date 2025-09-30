@@ -29,13 +29,19 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.myprojectfinancia.Data.API.network.DolarOficial
 import com.example.myprojectfinancia.Index.home.ViewModels.homeViewModel
 
 @Composable
-fun PreupuestoDialog(modifier: Modifier = Modifier, homeViewModel: homeViewModel) {
+fun PreupuestoDialog(
+    modifier: Modifier = Modifier,
+    homeViewModel: homeViewModel,
+    DolarObject: DolarOficial?
+) {
     val showBudget = homeViewModel.showBudget.collectAsState(false)
     val monto by homeViewModel.budgetMount.collectAsState()
     val nombreAporte by homeViewModel.budgetCategory.collectAsState()
+    val montoBs by homeViewModel.budgetBsMount.collectAsState()
 
     if (showBudget.value) {
         Dialog(onDismissRequest = { homeViewModel.ocultarDialogBudget() }) {
@@ -47,7 +53,7 @@ fun PreupuestoDialog(modifier: Modifier = Modifier, homeViewModel: homeViewModel
 
             ) {
                 Column {
-                    DialogBudget(homeViewModel, monto, nombreAporte)
+                    DialogBudget(homeViewModel, monto, montoBs, nombreAporte, DolarObject)
                     ButtonBudget(homeViewModel)
                 }
 
@@ -90,7 +96,13 @@ fun ButtonBudget(homeViewModel: homeViewModel) {
 }
 
 @Composable
-fun DialogBudget(homeViewModel: homeViewModel, monto: String, nombreAporte: String) {
+fun DialogBudget(
+    homeViewModel: homeViewModel,
+    monto: String,
+    montoBs: String,
+    nombreAporte: String,
+    dolarObject: DolarOficial?
+) {
     Box(
         Modifier
             .fillMaxWidth()
@@ -113,8 +125,23 @@ fun DialogBudget(homeViewModel: homeViewModel, monto: String, nombreAporte: Stri
             Spacer(Modifier.padding(6.dp))
             OutlinedTextField(
                 value = monto,
-                onValueChange = { homeViewModel.onBudgetChange(it) },
+                onValueChange = { homeViewModel.onBudgetChange(it, dolarObject?.promedio) },
                 placeholder = { Text("Ingresar monto.") },
+                prefix = { Text("$") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.height(56.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            )
+            Spacer(Modifier.padding(6.dp))
+            OutlinedTextField(
+                value = montoBs,
+                onValueChange = { homeViewModel.onBudgetBsChange(it, dolarObject?.promedio) },
+                placeholder = { Text("Ingresar monto.") },
+                prefix = { Text("Bs.") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.height(56.dp),

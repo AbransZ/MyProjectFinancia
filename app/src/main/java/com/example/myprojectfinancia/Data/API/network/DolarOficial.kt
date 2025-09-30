@@ -1,4 +1,4 @@
-package com.example.myprojectfinancia.Data.network
+package com.example.myprojectfinancia.Data.API.network
 
 data class DolarOficial(
     val fuente: String,

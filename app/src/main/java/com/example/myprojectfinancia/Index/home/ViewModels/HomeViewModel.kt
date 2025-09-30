@@ -8,9 +8,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myprojectfinancia.Data.API.StateUI.UiStateDolar
+import com.example.myprojectfinancia.Data.API.network.DolarOficial
+import com.example.myprojectfinancia.Data.API.repository.DolarOficialRepository
 import com.example.myprojectfinancia.Data.BD.AuthService
+import com.example.myprojectfinancia.Domain.budgetRepository
 import com.example.myprojectfinancia.Index.Data.UserFinancia
-import com.example.myprojectfinancia.Index.Plans.Domain.budgetRepository
 import com.example.myprojectfinancia.Index.home.Models.Movements.MovementsItemSave
 import com.example.myprojectfinancia.Index.home.Models.Movements.Movimiento
 import com.example.myprojectfinancia.Model.Routes
@@ -18,6 +21,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -29,7 +33,8 @@ import javax.inject.Inject
 class homeViewModel @Inject constructor(
     private val authService: AuthService,
     private val googleSignInClient: GoogleSignInClient,
-    private val budgetRepository: budgetRepository
+    private val budgetRepository: budgetRepository,
+    private val dolarRepository: DolarOficialRepository
 ) : ViewModel() {
 
 //VARIABLES DE DATOS
@@ -75,6 +80,14 @@ class homeViewModel @Inject constructor(
     private val _montoDoubleEdit = MutableLiveData<Double?>(0.0)
     val montoDoubleEdit: LiveData<Double?> = _montoDoubleEdit
 
+    // valor del monto en string
+    private val _montoBsStringEdit = MutableStateFlow<String>("")
+    val montoBsEdit: StateFlow<String> = _montoBsStringEdit
+
+    // valor del monto en double
+    private val _montoBsDoubleEdit = MutableLiveData<Double?>(0.0)
+    val montoBsDoubleEdit: LiveData<Double?> = _montoBsDoubleEdit
+
 
     //interaccion Ingresos y egresos Editables
     private val _ingrsosPressedEdit = MutableStateFlow(true)
@@ -116,8 +129,9 @@ class homeViewModel @Inject constructor(
     val showMovementsEdit: MutableStateFlow<Boolean> = _showMovementsEdit
 
 
-    //variable presupuesto
+    //variable presupuesto total
     val presupuesto: StateFlow<Double> = budgetRepository.totalBudget
+    val presupuestoLibre: StateFlow<Double> = budgetRepository.budgetFree
 
     //variable de movimiento
     private val selectedMovement = MutableStateFlow<Movimiento?>(null)
@@ -135,6 +149,9 @@ class homeViewModel @Inject constructor(
     private val _bufgetMount = MutableStateFlow<String>("")
     val budgetMount: StateFlow<String> = _bufgetMount
 
+    private val _bufgetBsMount = MutableStateFlow<String>("")
+    val budgetBsMount: StateFlow<String> = _bufgetBsMount
+
     private val _bufgetMountNum = MutableStateFlow<Double>(0.00)
     val budgetMountNum: StateFlow<Double> = _bufgetMountNum
 
@@ -149,8 +166,64 @@ class homeViewModel @Inject constructor(
     private val _Error = MutableStateFlow<String?>(null)
     var Error: StateFlow<String?> = _Error
 
+    //***********VARIABLES PARA USAR EN EL CALCULO DEL DOLAR**************
+    //estado de la peticion
+    private val _UIDolar = MutableStateFlow<UiStateDolar>(UiStateDolar.neutral)
+    val UIDolar: StateFlow<UiStateDolar> = _UIDolar.asStateFlow()
+
+    //variaable que contiene el objeto de la peticion del dolar
+    private val _DolarObject = MutableStateFlow<DolarOficial?>(null)
+    val DolarObject: StateFlow<DolarOficial?> = _DolarObject.asStateFlow()
+
+    //variable para ingresar monto en bs
+    private val _montoBsString = MutableStateFlow<String>("")
+    val montoBsstring: StateFlow<String> = _montoBsString.asStateFlow()
+
+    private val _montoBsDouble = MutableStateFlow<Double>(0.0)
+    val montoBsDouble: StateFlow<Double> = _montoBsDouble.asStateFlow()
+
 
     //FUNCIONESSS
+
+    //funcion para obtener el precio del dolar
+    fun getDolarBCV() {
+        viewModelScope.launch {
+            _UIDolar.value = UiStateDolar.isLoading
+
+            val result = dolarRepository.getDolarPrice()
+
+            result.onSuccess { dolar ->
+                _DolarObject.value = dolar
+                _UIDolar.value = UiStateDolar.success(dolar)
+
+            }
+                .onFailure { error ->
+                    _UIDolar.value = UiStateDolar.error(
+                        error.message ?: "Error desconocido"
+                    )
+                }
+        }
+    }
+
+    //funcion para convertir dolares a bs
+    fun calculateDolar(montoUSD: Double): String? {
+        return _DolarObject.value?.promedio?.let { BS ->
+            String.format("%.2f", montoUSD * BS)
+        }
+    }
+
+    //funcion para convertir bs a dolares
+    fun convertBsToUSD(montoBs: Double): String? {
+        return _DolarObject.value?.promedio?.let { precioDolar ->
+            if (precioDolar > 0) {
+                String.format("%.2f", montoBs / precioDolar)
+            } else {
+                _Error.value = "Error al convertir Bs a USD"
+                null
+
+            }
+        }
+    }
 
     // Función para actualizar el tab seleccionado
     fun updateSelectedTab(tabIndex: Int) {
@@ -166,8 +239,16 @@ class homeViewModel @Inject constructor(
     fun selectedMovement(movimiento: Movimiento) {
         selectedMovement.value = movimiento
 
-        _montoStringEdit.value = movimiento.monto
-        _montoDoubleEdit.value = movimiento.monto.toDoubleOrNull() ?: 0.0
+        // Cargar el valor en Bs desde el movimiento
+        val montoBsValue = movimiento.montoBs.toDoubleOrNull() ?: 0.0
+        _montoBsStringEdit.value = movimiento.montoBs
+        _montoBsDoubleEdit.value = montoBsValue
+
+        // Calcular y cargar el valor en USD
+        val montoUSD = convertBsToUSD(montoBsValue) ?: "0.00"
+        _montoStringEdit.value = montoUSD
+        _montoDoubleEdit.value = montoUSD.toDoubleOrNull() ?: 0.0
+
         _categoriaEdit.value = movimiento.categoria
         _naturalezaEdit.value = movimiento.naturaleza
 
@@ -199,7 +280,7 @@ class homeViewModel @Inject constructor(
     }
 
     fun aumentarPresupuesto() {
-        val presupuestoFinal = presupuesto.value + _bufgetMountNum.value
+        val presupuestoFinal = presupuesto.value + _bufgetMount.value.toDouble()
         guardarPresupuestoTotal()
         getAllMovements()
         budgetRepository.updateBudget(presupuestoFinal)
@@ -212,7 +293,7 @@ class homeViewModel @Inject constructor(
                 Fecha = fechaActual,
                 Categoria = _budgetCategory.value,
                 Naturaleza = "Ingreso",
-                Monto = _bufgetMountNum.value ?: 0.0
+                MontoBs = _bufgetBsMount.value.toDouble() ?: 0.0
             )
 
             val userCurrent = authService.getCurrentUser()
@@ -232,25 +313,13 @@ class homeViewModel @Inject constructor(
         _bufgetMount.value = ""
         _bufgetMountNum.value = 0.0
         _budgetCategory.value = ""
+        _bufgetBsMount.value = ""
     }
 
     //mostrar dialogo de presupuesto
     fun mostrarDialogBudget() {
         _showBudget.value = true
         Log.i("presupuesto", "Mostrar dialogo presionado")
-    }
-
-    //ocultar dialogo de presupuesto
-    fun ocultarDialogBudget() {
-        _showBudget.value = false
-    }
-
-    fun onBudgetChange(monto: String) {
-        _bufgetMount.value = monto
-        val montoNum = monto.toDoubleOrNull()
-        if (montoNum != null) {
-            _bufgetMountNum.value = montoNum
-        }
     }
 
     fun onNaturalezaChange(naturaleza: String) {
@@ -271,12 +340,14 @@ class homeViewModel @Inject constructor(
     fun mostrarDialog() {
         _showDialog.value = true
         _ingrsosPressed.value = true
+        _naturaleza.value = "Ingreso"
     }
 
     //mostrar dialogo de editar movimientos
     fun showMovementsEdit(movimiento: Movimiento) {
         _showMovementsEdit.value = true
         selectedMovement(movimiento)
+
 
     }
 
@@ -302,6 +373,8 @@ class homeViewModel @Inject constructor(
         _montoString.value = ""
         _categoria.value = ""
         _montoDouble.value = 0.0
+        _montoBsString.value = ""
+        _montoBsDouble.value = 0.0
         _nameEdit.value = ""
         _categoriaEdit.value = ""
         _naturalezaEdit.value = ""
@@ -309,15 +382,98 @@ class homeViewModel @Inject constructor(
         _montoDoubleEdit.value = 0.0
         _egresosIsPressed.value = false
         _ingrsosPressed.value = false
+        _montoBsStringEdit.value = ""
+        _montoBsDoubleEdit.value = 0.0
+        _showMovementsEdit.value = false
+
     }
 
-    fun onMontoChange(monto: String) {
+    fun formatAmount(amount: Double): String {
+        return String.format("%.2f", amount)
+
+    }
+
+    fun onMontoChange(monto: String, precioBs: Double?) {
         _montoString.value = monto
         val montoNum = monto.toDoubleOrNull()
-
-        if (montoNum != null) {
-            _montoDouble.value = montoNum
+        if (montoNum != null && precioBs != null) {
+            val montobs = montoNum * precioBs
+            _montoBsString.value = formatAmount(montobs)
+        } else if (monto.isBlank()) {
+            _montoBsString.value = ""
         }
+    }
+
+    fun onMontoChangeEdit(monto: String, precioBs: Double?) {
+        _montoStringEdit.value = monto
+        val montoNum = monto.toDoubleOrNull()
+        if (montoNum != null && precioBs != null) {
+            val montoBs = montoNum * precioBs
+            _montoBsStringEdit.value = formatAmount(montoBs)
+            _montoBsDoubleEdit.value = montoBs
+        } else if (monto.isBlank()) {
+            _montoDoubleEdit.value = 0.0
+            _montoBsStringEdit.value = ""
+            _montoBsDoubleEdit.value = 0.0
+        }
+
+    }
+
+    fun onMontoBsChangeEdit(montoBs: String, promedio: Double?) {
+        _montoBsStringEdit.value = montoBs
+        val montoBsNum = montoBs.toDoubleOrNull()
+        if (montoBsNum != null && promedio != null) {
+            _montoBsDoubleEdit.value = montoBsNum
+            val montoUSD = montoBsNum / promedio
+            _montoStringEdit.value = formatAmount(montoUSD)
+            _montoDoubleEdit.value = montoUSD
+        } else if (montoBs.isBlank()) {
+            _montoBsDoubleEdit.value = 0.0
+            _montoStringEdit.value = ""
+            _montoDoubleEdit.value = 0.0
+        }
+    }
+
+    fun onMontoBsChange(montUSD: String, precioBs: Double?) {
+        _montoBsString.value = montUSD
+        val montoBsNum = montUSD.toDoubleOrNull()
+        if (montoBsNum != null && precioBs != null) {
+            val montoUSD = montoBsNum / precioBs
+            _montoString.value = formatAmount(montoUSD)
+        } else if (montUSD.isBlank()) {
+            _montoString.value = ""
+        }
+    }
+
+    //ocultar dialogo de presupuesto
+    fun ocultarDialogBudget() {
+        _showBudget.value = false
+    }
+
+    //funcion para calcular dolares en el dialogo
+    fun onBudgetChange(monto: String, promedio: Double?) {
+        _bufgetMount.value = monto
+        val montNum = monto.toDoubleOrNull()
+        if (montNum != null && promedio != null) {
+            val montUSD = montNum * promedio
+            _bufgetBsMount.value = formatAmount(montUSD)
+        } else if (monto.isBlank()) {
+            _bufgetBsMount.value = ""
+        }
+    }
+
+    //funcion para calcular bolivares en el dialogo
+    fun onBudgetBsChange(montBs: String, promedio: Double?) {
+        _bufgetBsMount.value = montBs
+        val montNum = montBs.toDoubleOrNull()
+        if (montNum != null && promedio != null) {
+            val montUSD = montNum / promedio
+            _bufgetMount.value = formatAmount(montUSD)
+        } else if (montBs.isBlank()) {
+            _bufgetMount.value = ""
+        }
+
+
     }
 
     companion object {
@@ -448,11 +604,28 @@ class homeViewModel @Inject constructor(
     //Guarda Movimientos
     fun guardarMovimiento() {
         viewModelScope.launch {
+
+            val montoValue = _montoBsString.value ?: ""
+            val montoDouble = montoValue.toDoubleOrNull() ?: 0.0
+
+
+            Log.i("guardarMovimiento", "Monto String: $montoValue")
+            Log.i("guardarMovimiento", "Monto Double: $montoDouble")
+
+            if (montoDouble <= 0.0) {
+                _Error.value = "El monto debe ser mayor a cero"
+                return@launch
+            }
+            if (presupuestoLibre.value <= montoDouble && _naturaleza.value == "Gasto") {
+                _Error.value = "Error al guardar el movimiento, no hay suficiente dinero disponible"
+                return@launch
+
+            }
             val movimientos = MovementsItemSave(
                 Fecha = fechaActual,
                 Categoria = _categoria.value ?: "",
                 Naturaleza = _naturaleza.value,
-                Monto = _montoDouble.value ?: 0.0
+                MontoBs = montoDouble
             )
 
             val userCurrent = authService.getCurrentUser()
@@ -463,6 +636,7 @@ class homeViewModel @Inject constructor(
             if (resultado) {
                 Log.i("movimientos", "Movimiento guardado")
                 ocultarDialog()
+                clearfields()
             }
 
         }
@@ -479,7 +653,7 @@ class homeViewModel @Inject constructor(
                     Movimiento(
                         id = it.Id,
                         fecha = it.Fecha,
-                        monto = it.Monto.toString(),
+                        montoBs = it.MontoBs.toString(),
                         categoria = it.Categoria,
                         naturaleza = it.Naturaleza
                     )
@@ -512,7 +686,7 @@ class homeViewModel @Inject constructor(
                     Movimiento(
                         id = it.Id,
                         fecha = it.Fecha,
-                        monto = it.Monto.toString(),
+                        montoBs = it.MontoBs.toString(),
                         categoria = it.Categoria,
                         naturaleza = it.Naturaleza
                     )
@@ -544,14 +718,6 @@ class homeViewModel @Inject constructor(
         _ErrorAllMovements.value = null
     }
 
-    fun onMontoChangeEdit(monto: String) {
-        _montoStringEdit.value = monto
-        val montoNum = monto.toDoubleOrNull()
-        if (montoNum != null) {
-            _montoDoubleEdit.value = montoNum
-        }
-
-    }
 
     fun onCategoriaChangeEdit(category: String) {
         _categoriaEdit.value = category
@@ -563,8 +729,8 @@ class homeViewModel @Inject constructor(
             val user = authService.getCurrentUser()
             val userId = user?.uid ?: ""
             val movementID = _selectedMovimiento?.id ?: ""
-            val oldAmount = _selectedMovimiento?.monto?.toDoubleOrNull() ?: 0.0
-            val newAmount = _montoDoubleEdit.value ?: 0.0
+            val oldAmount = _selectedMovimiento?.montoBs?.toDoubleOrNull() ?: 0.0
+            val newAmount = _montoBsDoubleEdit.value ?: 0.0
             val oldNature = _selectedMovimiento?.naturaleza ?: ""
             val newNature = _naturalezaEdit.value
             val difference = newAmount - oldAmount
@@ -580,7 +746,7 @@ class homeViewModel @Inject constructor(
                     _Error.value = "La naturaleza del movimiento es requerida"
                     return@launch
                 }
-                if (_montoStringEdit.value.isBlank()) {
+                if (_montoBsStringEdit.value.isBlank()) {
                     _Error.value = "El monto del movimiento es requerido"
                     return@launch
                 }
@@ -595,7 +761,7 @@ class homeViewModel @Inject constructor(
                     Fecha = fechaActual,
                     Categoria = _categoriaEdit.value,
                     Naturaleza = _naturalezaEdit.value,
-                    Monto = _montoDoubleEdit.value ?: 0.0
+                    MontoBs = _montoBsDoubleEdit.value ?: 0.0
                 )
 
                 val result = authService.updateMovements(

@@ -1,4 +1,4 @@
-package com.example.myprojectfinancia.Index.Plans.Domain
+package com.example.myprojectfinancia.Domain
 
 import android.util.Log
 import com.example.myprojectfinancia.Data.BD.AuthService
@@ -46,9 +46,9 @@ class budgetRepository @Inject constructor(private val authService: AuthService)
 
         movements.forEach { movement ->
             when (movement.Naturaleza) {
-                "Ingreso" -> ingresos += movement.Monto
-                "Gasto" -> gasto += movement.Monto
-                "Asignacion" -> asignacion += movement.Monto
+                "Ingreso" -> ingresos += movement.MontoBs
+                "Gasto" -> gasto += movement.MontoBs
+                "Asignacion" -> asignacion += movement.MontoBs
             }
         }
         _TotalIngresos.value = ingresos

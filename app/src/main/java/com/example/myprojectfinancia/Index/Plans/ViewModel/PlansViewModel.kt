@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.myprojectfinancia.Data.BD.AuthService
+import com.example.myprojectfinancia.Domain.budgetRepository
 import com.example.myprojectfinancia.Index.Data.UserFinancia
-import com.example.myprojectfinancia.Index.Plans.Domain.budgetRepository
 import com.example.myprojectfinancia.Index.Plans.ModelsPlans.DataPlans
 import com.example.myprojectfinancia.Index.Plans.ModelsPlans.planItem
 import com.example.myprojectfinancia.Index.home.Models.Movements.MovementsItemSave
@@ -185,7 +185,7 @@ class PlansViewModel @Inject constructor(
                 Fecha = fecha(),
                 Categoria = selectedPlan.Name,
                 Naturaleza = "Asignacion",
-                Monto = aporte.toDoubleOrNull() ?: 0.0
+                MontoBs = aporte.toDoubleOrNull() ?: 0.0
             )
 
             val userCurrent = authService.getCurrentUser()
@@ -484,7 +484,7 @@ class PlansViewModel @Inject constructor(
                                     Fecha = fecha(),
                                     Categoria = "Liberación de ${_namePlanEdit.value}",
                                     Naturaleza = "Asignacion",
-                                    Monto = amountToReturn
+                                    MontoBs = amountToReturn
                                 )
                                 val userForMovement =
                                     UserFinancia(uid = user?.uid ?: "", name = user?.displayName ?: "")

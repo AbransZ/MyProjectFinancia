@@ -55,13 +55,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.myprojectfinancia.Data.API.StateUI.UiStateDolar
+import com.example.myprojectfinancia.Data.API.network.DolarOficial
 import com.example.myprojectfinancia.Index.Plans.ModelsPlans.planItem
 import com.example.myprojectfinancia.Index.Plans.ViewModel.PlansViewModel
 import com.example.myprojectfinancia.Index.home.Models.Movements.Movimiento
@@ -80,6 +81,7 @@ fun HomeScreen(
     val isPressedGastos by homeViewModel.egresosIsPressed.collectAsState()
     val showDialog by homeViewModel.showDialog.observeAsState(false)
     val monto by homeViewModel.monto.observeAsState("")
+    val montoBs by homeViewModel.montoBsstring.collectAsState("")
     val categoria by homeViewModel.category.observeAsState("")
     val fecha = homeViewModel.fechaActual
     val name: String by homeViewModel.name.collectAsState("")
@@ -91,6 +93,8 @@ fun HomeScreen(
     val missing by plansViewModel.missing.collectAsState()
     val totalSaved by plansViewModel.totalSaved.collectAsState()
     val budgetFree by plansViewModel.budgetfree.collectAsState()
+    val UIDolar by homeViewModel.UIDolar.collectAsState()
+    val DolarObject by homeViewModel.DolarObject.collectAsState()
 
     LaunchedEffect(error) {
         error?.let {
@@ -104,6 +108,7 @@ fun HomeScreen(
         homeViewModel.initializeNewUser()
         kotlinx.coroutines.delay(50)
         plansViewModel.initializePlansUser()
+        homeViewModel.getDolarBCV()
     }
     //Caja que contiene toda la Screen
     Box(
@@ -117,19 +122,21 @@ fun HomeScreen(
 
 
             Greeteng(name)
-            Presupuesto(presupuesto, homeViewModel)
-            PlanDeAhorro(plans, plansViewModel, missing, totalSaved, budgetFree)
-            Movimientos(homeViewModel, isLoading, selectedTab)
+            PresupuestoCard(presupuesto, homeViewModel, UIDolar, DolarObject)
+            PlanDeAhorro(plans, plansViewModel, missing, totalSaved, budgetFree, UIDolar, DolarObject, homeViewModel)
+            Movimientos(homeViewModel, isLoading)
             AggCuenta(
                 showDialog,
                 monto,
+                montoBs,
                 categoria,
                 homeViewModel,
                 isPressedIngresos,
                 isPressedGastos,
-                fecha
+                fecha,
+                DolarObject
             )
-            PreupuestoDialog(homeViewModel = homeViewModel)
+            PreupuestoDialog(Modifier, homeViewModel, DolarObject)
 
 
         }
@@ -171,11 +178,13 @@ fun FAB(homeViewModel: homeViewModel, modifier: Modifier) {
 fun AggCuenta(
     showDialog: Boolean,
     monto: String,
+    montoBs: String,
     categoria: String,
     homeViewModel: homeViewModel,
     isPressedIngresos: Boolean,
     isPressedGastos: Boolean,
-    fecha: String
+    fecha: String,
+    DolarObject: DolarOficial?
 ) {
     if (showDialog) {
         Dialog(onDismissRequest = { homeViewModel.ocultarDialog() }) {
@@ -199,7 +208,7 @@ fun AggCuenta(
                     )
                     Spacer(Modifier.padding(10.dp))
                     BodyDialog(
-                        homeViewModel, isPressedIngresos, isPressedGastos, monto, categoria, fecha
+                        homeViewModel, isPressedIngresos, isPressedGastos, monto, montoBs, categoria, fecha, DolarObject
                     )
                     ButtonsDialog(homeViewModel, isPressedIngresos)
 
@@ -250,9 +259,13 @@ fun BodyDialog(
     isPressedIngresos: Boolean,
     isPressedGastos: Boolean,
     monto: String,
+    montoBs: String,
     categoria: String,
-    fecha: String
+    fecha: String,
+    dolarObject: DolarOficial?
 ) {
+
+
     Box(
         Modifier
             .fillMaxWidth()
@@ -291,9 +304,27 @@ fun BodyDialog(
             Spacer(Modifier.padding(6.dp))
             OutlinedTextField(
                 value = monto,
-                onValueChange = { homeViewModel.onMontoChange(it) },
+                onValueChange = {
+                    homeViewModel.onMontoChange(it, dolarObject?.promedio)
+                },
                 placeholder = { Text("Ingresar monto.") },
                 prefix = { Text("$") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier.height(56.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                )
+            )
+            Spacer(Modifier.padding(6.dp))
+            OutlinedTextField(
+                value = montoBs,
+                onValueChange = {
+                    homeViewModel.onMontoBsChange(it, dolarObject?.promedio)
+                },
+                placeholder = { Text("Ingresar monto.") },
+                prefix = { Text("Bs.") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier.height(56.dp),
@@ -324,16 +355,20 @@ fun BodyDialog(
         }
     }
 
+
 }
 
 
 // seleccionador de movimientos
 @Composable
-fun Movimientos(HomeViewModel: homeViewModel, isLoading: Boolean, selectedTab: Int) {
+fun Movimientos(
+    HomeViewModel: homeViewModel,
+    isLoading: Boolean
+) {
     val tabs = listOf("Ingresos", "Gastos")
     var selectedTab by rememberSaveable() { mutableStateOf(0) }
     val movements by HomeViewModel.Movements.collectAsState()
-    val error by HomeViewModel.Error.collectAsState()
+
 
     // carga de pestanas de movimientos
     LaunchedEffect(selectedTab) {
@@ -419,7 +454,7 @@ fun Movimientos(HomeViewModel: homeViewModel, isLoading: Boolean, selectedTab: I
                             .fillMaxHeight()
                     ) {
                         items(movements) { items ->
-                            ListMount(items)
+                            ListMount(items, HomeViewModel)
 
                         }
                     }
@@ -434,14 +469,28 @@ fun Movimientos(HomeViewModel: homeViewModel, isLoading: Boolean, selectedTab: I
 //item de la lista de movimientos
 @Composable
 fun ListMount(
-    movimiento: Movimiento
+    movimiento: Movimiento,
+    HomeViewModel: homeViewModel
 ) {
+    val montoBs = movimiento.montoBs.toDouble()
+    val precioUSD = HomeViewModel.convertBsToUSD(montoBs)
     Card(
         modifier = Modifier
             .padding(10.dp)
     ) {
+
         ListItem(
-            headlineContent = { Text(movimiento.monto) },
+            headlineContent = {
+                Row {
+                    Text("$${precioUSD}/ ", fontSize = 18.sp)
+                    if (montoBs != null) {
+                        Text("Bs.${String.format("%.2f", montoBs)}", fontSize = 12.sp)
+                    } else {
+                        Text("Bs.---", fontSize = 10.sp)
+                    }
+                }
+
+            },
             overlineContent = { Text(movimiento.categoria) },
             supportingContent = { Text(movimiento.fecha) },
             leadingContent = {
@@ -464,7 +513,10 @@ fun PlanDeAhorro(
     plansViewModel: PlansViewModel,
     missing: Double,
     totalSaved: Double,
-    budgetFree: Double
+    budgetFree: Double,
+    UIDolar: UiStateDolar,
+    DolarObject: DolarOficial?,
+    homeViewModel: homeViewModel
 ) {
     Row(
         Modifier
@@ -488,7 +540,7 @@ fun PlanDeAhorro(
             if (plans.isEmpty()) {
                 Text(
                     "Aqui se veran sus metas cuando comience a ahorrar",
-                    fontSize = 20.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Light,
                     modifier = Modifier.padding(16.dp)
                 )
@@ -499,29 +551,97 @@ fun PlanDeAhorro(
                         .fillMaxSize()
                         .padding(8.dp), contentAlignment = Alignment.Center
                 ) {
-                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceAround) {
+                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Ahorrado", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                            Text(
-                                "$${totalSaved}", fontSize = 20.sp, fontWeight = FontWeight.Bold, color =
-                                MaterialTheme.colorScheme.onSecondary
-                            )
+                            val precioBs = homeViewModel.calculateDolar(totalSaved)
+
+
+                            Text("Ahorrado", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                            Column {
+                                Text(
+                                    "$${totalSaved}", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
+                                    MaterialTheme.colorScheme.onSecondary
+                                )
+                                if (precioBs != null) {
+
+
+                                    Text(
+                                        "Bs.${String.format("%.2f", precioBs.toDouble())}",
+                                        fontSize = 15.sp,
+                                        fontWeight =
+                                        FontWeight.Bold,
+                                        color =
+                                        MaterialTheme.colorScheme.onSecondary
+                                    )
+
+                                } else {
+                                    Text(
+                                        "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
+                                        MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+                            }
+
                         }
                         // Spacer(modifier = Modifier.height(30.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Faltante", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                            Text(
-                                "$${missing}", fontSize = 20.sp, fontWeight = FontWeight.Bold, color =
-                                MaterialTheme.colorScheme.tertiary
-                            )
+                            val precioBs = homeViewModel.calculateDolar(missing)
+
+                            Text("Faltante", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                            Column {
+                                Text(
+                                    "$${missing}", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
+                                    MaterialTheme.colorScheme.tertiary
+                                )
+                                if (precioBs != null) {
+
+                                    Text(
+                                        "Bs.${String.format("%.2f", precioBs.toDouble())}",
+                                        fontSize = 15.sp,
+                                        fontWeight =
+                                        FontWeight.Bold,
+                                        color =
+                                        MaterialTheme.colorScheme.onSecondary
+                                    )
+
+                                } else {
+                                    Text(
+                                        "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
+                                        MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+                            }
+
                         }
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text("Disponible", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                            Text(
-                                "$${plansViewModel.formatTotal(budgetFree)}",
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            val precioBs = homeViewModel.calculateDolar(budgetFree)
+
+                            Text("Disponible", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                            Column {
+                                Text(
+                                    "$${plansViewModel.formatTotal(budgetFree)}",
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                if (precioBs != null) {
+
+                                    Text(
+                                        "Bs.${String.format("%.2f", precioBs.toDouble())}",
+                                        fontSize = 15.sp,
+                                        fontWeight =
+                                        FontWeight.Bold,
+                                        color =
+                                        MaterialTheme.colorScheme.onSecondary
+                                    )
+
+                                } else {
+                                    Text(
+                                        "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
+                                        MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+                            }
+
                         }
                     }
                 }
@@ -569,16 +689,16 @@ fun ItemPlangrafic(modifier: Modifier = Modifier, plans: List<planItem>, plansVi
         Color(0xFF9C27B0)
     )
 
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
 
         if (plans.isEmpty()) {
             Text(
                 text = "No hay planes de ahorro",
-                fontSize = 20.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Light,
-                fontFamily = FontFamily.Cursive,
-                textAlign = TextAlign.Center
-            )
+                textAlign = TextAlign.Center,
+
+                )
         }
 
         LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
@@ -621,14 +741,13 @@ fun ResumePlan(modifier: Modifier = Modifier, colorElegido: Color, plan: planIte
 
 //Presupuesto pantalla principal
 @Composable
-fun Presupuesto(presupuesto: Double, homeViewModel: homeViewModel) {
-
-    PresupuestoCard(presupuesto, homeViewModel)
-
-}
-
-@Composable
-fun PresupuestoCard(presupuesto: Double, homeViewModel: homeViewModel) {
+fun PresupuestoCard(
+    presupuesto: Double,
+    homeViewModel: homeViewModel,
+    UIDolar: UiStateDolar,
+    DolarObject: DolarOficial?
+) {
+    val PrecioUsd = homeViewModel.convertBsToUSD(presupuesto)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -664,15 +783,45 @@ fun PresupuestoCard(presupuesto: Double, homeViewModel: homeViewModel) {
 
                     Row() {
                         Text(
-                            "$${presupuesto}/ ", fontSize = 35.sp,
+                            "$${PrecioUsd}/ ", fontSize = 35.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.primary
                         )
-                        Text(
-                            "Bs.${presupuesto * 125.0}",
-                            fontSize = 20.sp,
-                            color = MaterialTheme.colorScheme.onSecondary
-                        )
+                        when (UIDolar) {
+                            is UiStateDolar.neutral -> {
+                                Text("Cargando...")
+
+                            }
+
+                            is UiStateDolar.error -> {
+                                Text("Error al cargar precio del dolar")
+                            }
+
+                            UiStateDolar.isLoading -> {
+                                Column(verticalArrangement = Arrangement.Center) {
+                                    CircularProgressIndicator()
+                                    Text("Cargando...")
+                                }
+                            }
+
+                            is UiStateDolar.success -> {
+
+
+                                if (presupuesto != null) {
+                                    Text(
+                                        "Bs.${presupuesto}",
+                                        fontSize = 20.sp,
+                                        color = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                } else {
+                                    Text(
+                                        "Bs. ---",
+                                        fontSize = 20.sp,
+                                        color = MaterialTheme.colorScheme.onSecondary
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
                 Icon(
@@ -681,15 +830,12 @@ fun PresupuestoCard(presupuesto: Double, homeViewModel: homeViewModel) {
                     Modifier
                         .size(50.dp)
                         .clickable { homeViewModel.mostrarDialogBudget() },
-                    tint = MaterialTheme.colorScheme.tertiary
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
 
         }
-
-
     }
-
 }
 
 //Saludo pantalla principal
