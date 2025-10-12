@@ -3,6 +3,9 @@ package com.example.myprojectfinancia.Index.Plans.ViewModel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.myprojectfinancia.Data.API.StateUI.UiStateDolar
+import com.example.myprojectfinancia.Data.API.network.DolarOficial
+import com.example.myprojectfinancia.Data.API.repository.DolarOficialRepository
 import com.example.myprojectfinancia.Data.BD.AuthService
 import com.example.myprojectfinancia.Domain.budgetRepository
 import com.example.myprojectfinancia.Index.Data.UserFinancia
@@ -12,6 +15,7 @@ import com.example.myprojectfinancia.Index.home.Models.Movements.MovementsItemSa
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -22,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class PlansViewModel @Inject constructor(
     private val authService: AuthService,
-    private val budgetRepository: budgetRepository
+    private val budgetRepository: budgetRepository,
+    private val dolarRepository: DolarOficialRepository
 
 ) : ViewModel() {
 
@@ -117,18 +122,84 @@ class PlansViewModel @Inject constructor(
     private val _missing = MutableStateFlow<Double>(0.0)
     val missing: StateFlow<Double> = _missing
 
+    //***********VARIABLES PARA USAR EN EL CALCULO DEL DOLAR**************
+    //estado de la peticion
+    private val _UIDolar = MutableStateFlow<UiStateDolar>(UiStateDolar.neutral)
+    val UIDolar: StateFlow<UiStateDolar> = _UIDolar.asStateFlow()
+
+    //variaable que contiene el objeto de la peticion del dolar
+    private val _DolarObject = MutableStateFlow<DolarOficial?>(null)
+    val DolarObject: StateFlow<DolarOficial?> = _DolarObject.asStateFlow()
+
+    //variable para ingresar monto en bs
+    private val _montoBsString = MutableStateFlow<String>("")
+    val montoBsstring: StateFlow<String> = _montoBsString.asStateFlow()
+
+    private val _montoBsDouble = MutableStateFlow<Double>(0.0)
+    val montoBsDouble: StateFlow<Double> = _montoBsDouble.asStateFlow()
+
+    private val _aporteBs = MutableStateFlow<String>("")
+    val aporteBs: StateFlow<String> = _aporteBs
+
+    private val _mountActuallyBsEdit = MutableStateFlow<String>("")
+    val mountActuallyBsEdit: StateFlow<String> = _mountActuallyBsEdit
+
+    private val _targetBsEdit = MutableStateFlow<String>("")
+    val targetBsEdit: StateFlow<String> = _targetBsEdit
+
+    private val _targetBs = MutableStateFlow<String>("")
+    val targetBs: StateFlow<String> = _targetBs
+
 
     val budgetfree: StateFlow<Double> = budgetRepository.budgetFree
-
-    //Tasa de cambio a BCV
-    private val _exchangeRate = 140.0
 
 
     //Funciones
 
+
     //Formatear Presupuesto
     fun formatTotal(budget: Double): String {
         return String.format("%.2f", budget)
+    }
+
+    //funcion para obtener el precio del dolar
+    fun getDolarBCV() {
+        viewModelScope.launch {
+            _UIDolar.value = UiStateDolar.isLoading
+
+            val result = dolarRepository.getDolarPrice()
+
+            result.onSuccess { dolar ->
+                _DolarObject.value = dolar
+                _UIDolar.value = UiStateDolar.success(dolar)
+
+            }
+                .onFailure { error ->
+                    _UIDolar.value = UiStateDolar.error(
+                        error.message ?: "Error desconocido"
+                    )
+                }
+        }
+    }
+
+    //funcion para convertir dolares a bs
+    fun calculateDolar(montoUSD: Double): String? {
+        return _DolarObject.value?.promedio?.let { BS ->
+            String.format("%.2f", montoUSD * BS)
+        }
+    }
+
+    //funcion para convertir bs a dolares
+    fun convertBsToUSD(montoBs: Double): String? {
+        return _DolarObject.value?.promedio?.let { precioDolar ->
+            if (precioDolar > 0) {
+                String.format("%.2f", montoBs / precioDolar)
+            } else {
+                _error.value = "Error al convertir Bs a USD"
+                null
+
+            }
+        }
     }
 
     //Funcion Para cargar datos generales
@@ -150,6 +221,7 @@ class PlansViewModel @Inject constructor(
     fun initializePlansUser() {
         viewModelScope.launch {
             _isLoading.value = true
+            getDolarBCV()
             clearPlans()
             initializePlans()
             getAllMovementsForBudget()
@@ -215,10 +287,12 @@ class PlansViewModel @Inject constructor(
         _showDialogEdit.value = true
 
         _namePlanEdit.value = plan.Name
-        _targetEdit.value = plan.Objective
+        _targetBsEdit.value = plan.Objective
         _categoryEdit.value = plan.Category
-        _mountActuallyEdit.value = plan.Actualy
+        _mountActuallyBsEdit.value = plan.Actualy
         _descriptionEdit.value = plan.Description
+        _targetEdit.value = convertBsToUSD(plan.Objective.toDouble()).toString()
+        _mountActuallyEdit.value = convertBsToUSD(plan.Actualy.toDouble()).toString()
     }
 
     //funcion para cargar movimientos
@@ -295,7 +369,7 @@ class PlansViewModel @Inject constructor(
     fun savePlans() {
         viewModelScope.launch {
 
-            val amount = _mountActually.value.toDoubleOrNull() ?: 0.0
+            val amount = _montoBsString.value.toDoubleOrNull() ?: 0.0
             val adviceAmount = budgetRepository.budgetFree.value
 
             try {
@@ -305,7 +379,7 @@ class PlansViewModel @Inject constructor(
                     return@launch
                 }
 
-                if (_target.value.isBlank()) {
+                if (_targetBs.value.isBlank()) {
                     _error.value = "El objetivo es requerido"
                     return@launch
                 }
@@ -315,22 +389,23 @@ class PlansViewModel @Inject constructor(
                     return@launch
                 }
 
-                if (_mountActually.value.isBlank()) {
+                if (_montoBsString.value.isBlank()) {
                     _error.value = "El monto inicial es requerido"
                     return@launch
                 }
 
                 if (!budgetRepository.validateBudget(amount)) {
                     _error.value =
-                        "No hay suficiente dinero en el presupuesto, ud posee $${budgetRepository.budgetFree.value}"
+                        "No hay suficiente dinero en el presupuesto, ud posee Bs.${budgetRepository.budgetFree.value}" +
+                                " o $${calculateDolar(amount)}"
                     _isLoading.value = false
                     return@launch
                 }
 
                 val nameLocal = _namePlan.value
-                val targetLocal = _target.value
+                val targetLocal = _targetBs.value
                 val categoryLocal = _category.value
-                val mountActuallyLocal = _mountActually.value
+                val mountActuallyLocal = _montoBsString.value
 
 
                 val plan = DataPlans(
@@ -339,7 +414,7 @@ class PlansViewModel @Inject constructor(
                     Description = _description.value ?: "",
                     Objective = targetLocal ?: "",
                     Actualy = mountActuallyLocal ?: "",
-                    Advice = "se recomienda ahorrar $${0.00}",
+                    Advice = "se recomienda ahorrar Bs.${0.00}",
                     Date = fecha()
                 )
 
@@ -364,7 +439,8 @@ class PlansViewModel @Inject constructor(
                             Description = _description.value ?: "",
                             Objective = targetLocal ?: "",
                             Actualy = mountActuallyLocal ?: "",
-                            Advice = "se recomienda ahorrar $${mountActuallyLocal.toDouble() * 50 / 100}",
+                            Advice = "se recomienda ahorrar $${mountActuallyLocal.toDouble() * 50 / 100} o Bs" +
+                                    ".${calculateDolar(mountActuallyLocal.toDouble())}",
                             Date = fecha()
                         )
                         savePlansMovements(planItem, mountActuallyLocal)
@@ -391,7 +467,7 @@ class PlansViewModel @Inject constructor(
             val selectedPlan = _selecctedPlanItem.value
             val user = authService.getCurrentUser()
             val oldAmount = selectedPlan?.Actualy?.toDoubleOrNull() ?: 0.0
-            val newAmount = _mountActuallyEdit.value.toDoubleOrNull() ?: 0.0
+            val newAmount = _mountActuallyBsEdit.value.toDoubleOrNull() ?: 0.0
             val difference = newAmount - oldAmount
             _isLoading.value = true
 
@@ -403,7 +479,7 @@ class PlansViewModel @Inject constructor(
                     return@launch
                 }
 
-                if (_targetEdit.value.isBlank()) {
+                if (_targetBsEdit.value.isBlank()) {
                     _error.value = "El objetivo es requerido"
                     _isLoading.value = false
                     return@launch
@@ -415,7 +491,7 @@ class PlansViewModel @Inject constructor(
                     return@launch
                 }
 
-                if (_mountActuallyEdit.value.isBlank()) {
+                if (_mountActuallyBsEdit.value.isBlank()) {
                     _error.value = "El monto inicial es requerido"
                     _isLoading.value = false
                     return@launch
@@ -438,9 +514,9 @@ class PlansViewModel @Inject constructor(
                     Name = _namePlanEdit.value ?: "",
                     Category = _categoryEdit.value ?: "",
                     Description = _descriptionEdit.value ?: "",
-                    Objective = _targetEdit.value ?: "",
+                    Objective = _targetBsEdit.value ?: "",
                     Actualy = newAmount.toString() ?: "",
-                    Advice = "se recomienda ahorrar $${(newAmount ?: 0.00) * 50 / 100}",
+                    Advice = "se recomienda ahorrar Bs.${(newAmount ?: 0.00) * 50 / 100} o $${convertBsToUSD(newAmount ?: 0.00)}",
                     Date = fecha()
                 )
 
@@ -533,7 +609,7 @@ class PlansViewModel @Inject constructor(
                 val proporcion = deficit / deficitTotal
                 val recomProp = budgetFree * proporcion
                 val advice = minOf(recomProp, deficit)
-                "se recomienda ahorrar $${formatTotal(advice)}"
+                "se recomienda ahorrar Bs.${formatTotal(advice)} o $${convertBsToUSD(advice)}"
             }
         }
     }
@@ -569,7 +645,9 @@ class PlansViewModel @Inject constructor(
                 }
                 if (!budgetRepository.validateBudget(aporteDouble)) {
                     _error.value =
-                        "No hay suficiente dinero en el presupuesto, ud posee $${budgetRepository.budgetFree.value}"
+                        "No hay suficiente dinero en el presupuesto, ud posee Bs.${budgetRepository.budgetFree.value}" +
+                                " " +
+                                "o $ ${convertBsToUSD(budgetRepository.budgetFree.value)}"
                     _isLoading.value = false
                     return@launch
                 }
@@ -585,6 +663,8 @@ class PlansViewModel @Inject constructor(
                         _isLoading.value = false  //
                     }
                 )
+                Log.i("aporte", "resultado del guardado correcto: $aporteDouble")
+
 
                 if (result) {
 
@@ -631,6 +711,9 @@ class PlansViewModel @Inject constructor(
         _targetEdit.value = ""
         _categoryEdit.value = ""
         _mountActuallyEdit.value = ""
+        _montoBsString.value = ""
+        _targetBsEdit.value = ""
+        _aporteBs.value = ""
     }
 
     //funcion para obtener fecha actual
@@ -675,11 +758,27 @@ class PlansViewModel @Inject constructor(
     }
 
     //Funciones para ingresar datos
-    fun onAportePlanChange(aporte: String) {
+    fun onAportePlanChange(aporte: String, dolarOficial: Double?) {
         _aporte.value = aporte
-
+        val montoNum = aporte.toDoubleOrNull()
+        if (montoNum != null && dolarOficial != null) {
+            val montobs = montoNum * dolarOficial
+            _aporteBs.value = formatTotal(montobs)
+        } else if (aporte.isBlank()) {
+            _aporteBs.value = ""
+        }
         clearError()
+    }
 
+    fun onAporteBsPlanChange(aporte: String, dolarOficial: Double?) {
+        _aporteBs.value = aporte
+        val montoBsNum = aporte.toDoubleOrNull()
+        if (montoBsNum != null && dolarOficial != null) {
+            val montoUSD = montoBsNum / dolarOficial
+            _aporte.value = formatTotal(montoUSD)
+        } else if (aporte.isBlank()) {
+            _aporte.value = ""
+        }
     }
 
     fun clearError() {
@@ -691,21 +790,61 @@ class PlansViewModel @Inject constructor(
         _namePlan.value = name
     }
 
-    fun onTargetChange(target: String) {
+    fun onTargetChange(target: String, precioBs: Double?) {
         _target.value = target
+        Log.i("testCalculate", "cantidad: ${target}")
+        val montoUSDNum = target.toDoubleOrNull()
+        if (montoUSDNum != null && precioBs != null) {
+            val montoUSD = montoUSDNum * precioBs
+            Log.i("testCalculate", "cantidad calculada: ${montoUSD}")
+            _targetBs.value = formatTotal(montoUSD)
+            Log.i("testCalculate", "cantidad en BS: ${_targetBs.value}")
+        } else if (target.isBlank()) {
+            _targetBs.value = ""
+        }
+    }
+
+    fun onTargetBsChange(target: String, precioUSD: Double?) {
+        _targetBs.value = target
+        Log.i("testCalculate", "cantidad: ${target}")
+        val montoBsNum = target.toDoubleOrNull()
+        if (montoBsNum != null && precioUSD != null) {
+            val montoBS = montoBsNum / precioUSD
+            Log.i("testCalculate", "cantidad calculada: ${montoBS}")
+            _target.value = formatTotal(montoBS)
+            Log.i("testCalculate", "cantidad con formato USD: ${_target.value}")
+        } else if (target.isBlank()) {
+            _target.value = ""
+        }
+
     }
 
     fun onCategoryChange(category: String) {
         _category.value = category
     }
 
-    fun onMountActuallyChange(mountActually: String) {
+    fun onMountActuallyChange(mountActually: String, precioBs: Double?) {
         _mountActually.value = mountActually
+        val montoNum = mountActually.toDoubleOrNull()
+        if (montoNum != null && precioBs != null) {
+            val montobs = montoNum * precioBs
+            _montoBsString.value = formatTotal(montobs)
+        } else if (mountActually.isBlank()) {
+            _montoBsString.value = ""
+        }
     }
 
-    fun onDateTargetChange(dateTarget: String) {
-        _dateTarget.value = dateTarget
+    fun onMountActuallyBsChange(mountActually: String, precioBs: Double?) {
+        _montoBsString.value = mountActually
+        val montoBsNum = mountActually.toDoubleOrNull()
+        if (montoBsNum != null && precioBs != null) {
+            val montoUSD = montoBsNum / precioBs
+            _mountActually.value = formatTotal(montoUSD)
+        } else if (mountActually.isBlank()) {
+            _mountActually.value = ""
+        }
     }
+
 
     fun onDescriptionChange(description: String) {
         _description.value = description
@@ -716,16 +855,58 @@ class PlansViewModel @Inject constructor(
         _namePlanEdit.value = name
     }
 
-    fun onTargetChangeEdit(target: String) {
+    fun onTargetChangeEdit(target: String, precioDlar: Double?) {
         _targetEdit.value = target
+        val montoUSD = target.toDoubleOrNull()
+        if (montoUSD != null) {
+            val precioDolar = _DolarObject.value?.promedio
+            if (precioDolar != null) {
+                val montoBs = montoUSD * precioDolar
+                _targetBsEdit.value = formatTotal(montoBs)
+            }
+        } else if (target.isBlank()) {
+            _targetBsEdit.value = ""
+        }
+    }
+
+    fun onTargetBsChangeEdit(target: String, precioBs: Double?) {
+        _targetBsEdit.value = target
+        val montoBs = target.toDoubleOrNull()
+        if (montoBs != null && precioBs != null) {
+            val montoUSD = montoBs / precioBs
+            _targetEdit.value = formatTotal(montoUSD)
+        } else if (target.isBlank()) {
+            _targetEdit.value = ""
+        }
     }
 
     fun onCategoryChangeEdit(category: String) {
         _categoryEdit.value = category
     }
 
-    fun onMountActuallyChangeEdit(mountActually: String) {
+    fun onMountActuallyChangeEdit(mountActually: String, precioDolar: Double?) {
         _mountActuallyEdit.value = mountActually
+        val montoUSD = mountActually.toDoubleOrNull()
+        if (montoUSD != null) {
+            val precioDolar = _DolarObject.value?.promedio
+            if (precioDolar != null) {
+                val montoBs = montoUSD * precioDolar
+                _mountActuallyBsEdit.value = formatTotal(montoBs)
+            }
+        } else if (mountActually.isBlank()) {
+            _mountActuallyBsEdit.value = ""
+        }
+    }
+
+    fun onMountActuallyBsChangeEdit(mountActually: String, precioBs: Double?) {
+        _mountActuallyBsEdit.value = mountActually
+        val montoBs = mountActually.toDoubleOrNull()
+        if (montoBs != null && precioBs != null) {
+            val montoUSD = montoBs / precioBs
+            _mountActuallyEdit.value = formatTotal(montoUSD)
+        } else if (mountActually.isBlank()) {
+            _mountActuallyEdit.value = ""
+        }
     }
 
     fun onDescriptionChangeEdit(description: String) {

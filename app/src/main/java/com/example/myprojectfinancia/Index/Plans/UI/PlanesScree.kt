@@ -53,6 +53,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.myprojectfinancia.Data.API.network.DolarOficial
 import com.example.myprojectfinancia.Index.Plans.ModelsPlans.planItem
 import com.example.myprojectfinancia.Index.Plans.ViewModel.PlansViewModel
 import com.example.myprojectfinancia.R
@@ -82,6 +83,13 @@ fun SavingScreen(padding: PaddingValues, plansViewModel: PlansViewModel, modifie
     val missing by plansViewModel.missing.collectAsState()
     val totalSaved by plansViewModel.totalSaved.collectAsState()
     val budgetTarget by plansViewModel.budgetTarget.collectAsState()
+    val UIDolar by plansViewModel.UIDolar.collectAsState()
+    val dolarObject by plansViewModel.DolarObject.collectAsState()
+    val montoBs by plansViewModel.montoBsstring.collectAsState("")
+    val aportBs by plansViewModel.aporteBs.collectAsState("")
+    val targetBs by plansViewModel.targetBs.collectAsState("")
+    val targetBsEdit by plansViewModel.targetBsEdit.collectAsState(targetBs)
+    val montoBsEdit by plansViewModel.mountActuallyBsEdit.collectAsState(montoBs)
 
 
     LaunchedEffect(error) {
@@ -93,7 +101,9 @@ fun SavingScreen(padding: PaddingValues, plansViewModel: PlansViewModel, modifie
     }
 
     LaunchedEffect(Unit) {
+        plansViewModel.getDolarBCV()
         plansViewModel.initializePlansUser()
+
     }
 
 
@@ -117,9 +127,12 @@ fun SavingScreen(padding: PaddingValues, plansViewModel: PlansViewModel, modifie
                         target = target,
                         date = date,
                         category = category,
-                        mountActually = mountActually
+                        mountActually = mountActually,
+                        dolarBs = dolarObject,
+                        montoBs = montoBs,
+                        targetBs = targetBs
                     )
-                    AddmoneyToPlans(Modifier, plansViewModel, aporte, plansList)
+                    AddmoneyToPlans(Modifier, plansViewModel, aporte, plansList, aportBs, dolarObject)
                     EditPlansDialog(
                         Modifier,
                         plansViewModel,
@@ -128,7 +141,10 @@ fun SavingScreen(padding: PaddingValues, plansViewModel: PlansViewModel, modifie
                         targetEdit,
                         date,
                         categoryEdit,
-                        mountActuallyEdit
+                        mountActuallyEdit,
+                        targetBsEdit,
+                        montoBsEdit,
+                        dolarObject
                     )
 
                 }
@@ -152,7 +168,10 @@ fun EditPlansDialog(
     target: String,
     date: String,
     category: String,
-    mountActually: String
+    mountActually: String,
+    targetBsEdit: String,
+    montoBsEdit: String,
+    dolarObject: DolarOficial?
 ) {
     val showDialogEdit by plansViewModel.showDialogEdit.collectAsState()
 
@@ -175,8 +194,8 @@ fun EditPlansDialog(
                     item {
                         Box(contentAlignment = Alignment.Center) {
                             Text(
-                                "Editar nuevo plan de ahorro",
-                                fontSize = 25.sp,
+                                "Editar plan de ahorro",
+                                fontSize = 30.sp,
                                 fontWeight = FontWeight.Bold,
                                 modifier = modifier.padding(bottom = 10.dp)
                             )
@@ -189,10 +208,13 @@ fun EditPlansDialog(
                             namePlan = namePlan,
                             description = description,
                             target = target,
+                            targetBs = targetBsEdit,
                             date = date,
                             category = category,
                             mountActually = mountActually,
-                            plansViewModel = plansViewModel
+                            mountActuallyBs = montoBsEdit,
+                            plansViewModel = plansViewModel,
+                            dolarObject
                         )
                     }
                     //item para botones
@@ -211,7 +233,7 @@ fun ButtonsDialogEditPlans(plansViewModel: PlansViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(6.dp), horizontalArrangement = Arrangement.End
+            .padding(6.dp), horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = {
@@ -220,8 +242,8 @@ fun ButtonsDialogEditPlans(plansViewModel: PlansViewModel) {
 
             }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) { Text("Guardar") }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Guardar", fontSize = 12.sp) }
         Spacer(Modifier.width(10.dp))
         Button(
             onClick = { plansViewModel.hideDialogEdit() },
@@ -229,8 +251,8 @@ fun ButtonsDialogEditPlans(plansViewModel: PlansViewModel) {
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary
-            )
-        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary) }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onPrimary, fontSize = 12.sp) }
     }
 }
 
@@ -239,10 +261,13 @@ fun BodyDialogEditPlans(
     namePlan: String,
     description: String,
     target: String,
+    targetBs: String,
     date: String,
     category: String,
     mountActually: String,
-    plansViewModel: PlansViewModel
+    mountActuallyBs: String,
+    plansViewModel: PlansViewModel,
+    dolarObject: DolarOficial?
 ) {
     Box(
         Modifier
@@ -259,13 +284,13 @@ fun BodyDialogEditPlans(
             Spacer(Modifier.padding(5.dp))
             CategoryPlanEdit(category, plansViewModel)
             Spacer(Modifier.height(20.dp))
-            Text("Objetivos Financieros", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+            Text("Objetivos Financieros", fontSize = 18.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Spacer(Modifier.height(20.dp))
-            TargetPlanEdit(target, plansViewModel)
+            TargetPlanEdit(target, plansViewModel, targetBs, dolarObject)
             Spacer(Modifier.padding(5.dp))
-            MountActuallyPlanEdit(mountActually, plansViewModel)
+            MountActuallyPlanEdit(mountActually, plansViewModel, mountActuallyBs, dolarObject)
             Spacer(Modifier.padding(5.dp))
-            Text("Fecha $date", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text("Fecha $date", fontSize = 12.sp, fontWeight = FontWeight.Bold)
 
         }
     }
@@ -274,19 +299,50 @@ fun BodyDialogEditPlans(
 
 //Datos del dialogo para editar Planes
 @Composable
-fun MountActuallyPlanEdit(mountActually: String, plansViewModel: PlansViewModel) {
+fun MountActuallyPlanEdit(
+    mountActually: String,
+    plansViewModel: PlansViewModel,
+    mountActuallyBs: String,
+    dolarObject: DolarOficial?
+) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Monto actual", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Monto actual", fontSize = 15.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = mountActually,
-            onValueChange = { plansViewModel.onMountActuallyChangeEdit(it) },
-            placeholder = { Text("Monto al iniciar el plan.") },
+            onValueChange = { plansViewModel.onMountActuallyChangeEdit(it, dolarObject?.promedio) },
+            placeholder = { Text("Monto al iniciar el plan.", fontSize = 10.sp) },
+            prefix = { Text("$", fontSize = 10.sp) },
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 10.sp,  // ← Tamaño del texto que escribe el usuario
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
 
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = MaterialTheme.shapes.medium,
             maxLines = 1,
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        )
+        Spacer(Modifier.padding(6.dp))
+        OutlinedTextField(
+            value = mountActuallyBs,
+            onValueChange = { plansViewModel.onMountActuallyBsChangeEdit(it, dolarObject?.promedio) },
+            placeholder = { Text("Monto al iniciar el plan.", fontSize = 10.sp) },
+            prefix = { Text("Bs", fontSize = 10.sp) },
+
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            shape = MaterialTheme.shapes.medium,
+            maxLines = 1,
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -296,20 +352,46 @@ fun MountActuallyPlanEdit(mountActually: String, plansViewModel: PlansViewModel)
 }
 
 @Composable
-fun TargetPlanEdit(target: String, plansViewModel: PlansViewModel) {
+fun TargetPlanEdit(target: String, plansViewModel: PlansViewModel, targetBs: String, dolarObject: DolarOficial?) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Monto objetivo a alcanzar", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Monto objetivo a alcanzar", fontSize = 15.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = target,
-            onValueChange = { plansViewModel.onTargetChangeEdit(it) },
-            placeholder = { Text("Monto objetivo.") },
+            onValueChange = { plansViewModel.onTargetChangeEdit(it, dolarObject?.promedio) },
+            placeholder = { Text("Monto objetivo.", fontSize = 10.sp) },
+            prefix = { Text("$", fontSize = 10.sp) },
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 10.sp,  // ← Tamaño del texto que escribe el usuario
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
 
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = MaterialTheme.shapes.medium,
             maxLines = 1,
             singleLine = true,
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        )
+        Spacer(Modifier.padding(6.dp))
+        OutlinedTextField(
+            value = targetBs,
+            onValueChange = { plansViewModel.onTargetBsChangeEdit(it, dolarObject?.promedio) },
+            placeholder = { Text("Monto objetivo.", fontSize = 10.sp) },
+            prefix = { Text("Bs", fontSize = 10.sp) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            shape = MaterialTheme.shapes.medium,
+            maxLines = 1,
+            singleLine = true,
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -321,17 +403,24 @@ fun TargetPlanEdit(target: String, plansViewModel: PlansViewModel) {
 @Composable
 fun CategoryPlanEdit(category: String, plansViewModel: PlansViewModel) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Categoria ", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Categoria ", fontSize = 15.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = category,
             onValueChange = { plansViewModel.onCategoryChangeEdit(it) },
-            placeholder = { Text("Ej. Viajes, Carro nuevo, etc") },
+            placeholder = { Text("Ej. Viajes, Carro nuevo, etc", fontSize = 10.sp) },
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 10.sp,  // ← Tamaño del texto que escribe el usuario
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
 
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             shape = MaterialTheme.shapes.medium,
             maxLines = 1,
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -343,17 +432,23 @@ fun CategoryPlanEdit(category: String, plansViewModel: PlansViewModel) {
 @Composable
 fun DescriptionPlanEdit(description: String, plansViewModel: PlansViewModel) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Descripcion", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Descripcion", fontSize = 15.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = description,
             onValueChange = { plansViewModel.onDescriptionChangeEdit(it) },
-            placeholder = { Text("Descripcion de la finalidad del plan.") },
-
+            placeholder = { Text("Descripcion de la finalidad del plan.", fontSize = 10.sp) },
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 10.sp,  // ← Tamaño del texto que escribe el usuario
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             shape = MaterialTheme.shapes.medium,
             maxLines = 3,
-            modifier = Modifier.height(100.dp),
+            modifier = Modifier
+                .height(100.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -366,17 +461,25 @@ fun DescriptionPlanEdit(description: String, plansViewModel: PlansViewModel) {
 @Composable
 fun NamePlanEdit(namePlan: String, plansViewModel: PlansViewModel) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Nombre", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Nombre", fontSize = 15.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = namePlan,
             onValueChange = { plansViewModel.onNameChangeEdit(it) },
-            placeholder = { Text("Ingresar nombre del plan.") },
+            placeholder = { Text("Ingresar nombre del plan.", fontSize = 10.sp) },
+
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize = 10.sp,  // ← Tamaño del texto que escribe el usuario
+                fontWeight = FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             shape = MaterialTheme.shapes.medium,
             maxLines = 1,
             singleLine = true,
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier
+                .height(60.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -388,7 +491,14 @@ fun NamePlanEdit(namePlan: String, plansViewModel: PlansViewModel) {
 
 //dialogo para agregar dinero al plan
 @Composable
-fun AddmoneyToPlans(modifier: Modifier, plansViewModel: PlansViewModel, aporte: String, plansList: List<planItem>) {
+fun AddmoneyToPlans(
+    modifier: Modifier,
+    plansViewModel: PlansViewModel,
+    aporte: String,
+    plansList: List<planItem>,
+    aportBs: String,
+    dolarObject: DolarOficial?
+) {
     val showDialogMoney by plansViewModel.showDialogAddMoney.collectAsState()
     val selectedPlan by plansViewModel.selectePlanItem.collectAsState()
 
@@ -405,9 +515,9 @@ fun AddmoneyToPlans(modifier: Modifier, plansViewModel: PlansViewModel, aporte: 
                         .padding(16.dp)
                 ) {
 
-                    BodyDialogMoney(modifier, plansViewModel, aporte, selectedPlan)
+                    BodyDialogMoney(modifier, plansViewModel, aporte, selectedPlan, aportBs, dolarObject)
                     Spacer(modifier.height(5.dp))
-                    ButtonsDialogMoney(modifier, plansViewModel, aporte)
+                    ButtonsDialogMoney(modifier, plansViewModel, aportBs)
                 }
 
             }
@@ -416,21 +526,21 @@ fun AddmoneyToPlans(modifier: Modifier, plansViewModel: PlansViewModel, aporte: 
 }
 
 @Composable
-fun ButtonsDialogMoney(modifier: Modifier, plansViewModel: PlansViewModel, aporte: String) {
+fun ButtonsDialogMoney(modifier: Modifier, plansViewModel: PlansViewModel, aportBs: String) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(6.dp), horizontalArrangement = Arrangement.End
+            .padding(6.dp), horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = {
 
-                plansViewModel.addMoneyToPlan(aporte)
+                plansViewModel.addMoneyToPlan(aportBs)
 
             }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) { Text("Guardar") }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Guardar", fontSize = 12.sp) }
         Spacer(Modifier.width(10.dp))
         Button(
             onClick = { plansViewModel.hideDialogMoney() },
@@ -438,20 +548,27 @@ fun ButtonsDialogMoney(modifier: Modifier, plansViewModel: PlansViewModel, aport
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary
-            )
-        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary) }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Cancelar", fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimary) }
     }
 }
 
 @Composable
-fun BodyDialogMoney(modifier: Modifier, plansViewModel: PlansViewModel, aporte: String, plan: planItem?) {
+fun BodyDialogMoney(
+    modifier: Modifier,
+    plansViewModel: PlansViewModel,
+    aporte: String,
+    plan: planItem?,
+    aportBs: String,
+    dolarObject: DolarOficial?
+) {
 
 
     Column(modifier.fillMaxWidth()) {
         Box(modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    plan?.Name.toString(), fontSize = 30.sp, fontWeight = FontWeight.Bold
+                    plan?.Name.toString(), fontSize = 20.sp, fontWeight = FontWeight.Bold
                 )
                 Spacer(modifier.height(10.dp))
                 plan?.let { plan ->
@@ -462,34 +579,61 @@ fun BodyDialogMoney(modifier: Modifier, plansViewModel: PlansViewModel, aporte: 
                             modifier = Modifier.padding(12.dp)
                         ) {
                             Text(
-                                text = plan.Name, fontSize = 16.sp, fontWeight = FontWeight.Bold
+                                text = "Actual: $${plansViewModel.convertBsToUSD(plan.Actualy.toDouble())}",
+                                fontSize = 10.sp,
                             )
                             Text(
-                                text = "Actual: $${plan.Actualy}", fontSize = 14.sp
+                                text = "Actual: Bs${plan.Actualy}", fontSize = 10.sp
                             )
                             Text(
-                                text = "Meta: $${plan.Objective}", fontSize = 14.sp
+                                text = "Meta: $${plansViewModel.convertBsToUSD(plan.Objective.toDouble())}", fontSize =
+                                10.sp
+                            )
+                            Text(
+                                text = "Meta: $${plan.Objective.toDouble()}", fontSize = 10.sp
                             )
                         }
                     }
                 }
+                Spacer(Modifier.padding(8.dp))
                 Text("Agregar aporte al plan", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.padding(6.dp))
-
-
+                Spacer(Modifier.padding(8.dp))
                 OutlinedTextField(
                     value = aporte,
                     onValueChange = {
-                        plansViewModel.onAportePlanChange(it)
+                        plansViewModel.onAportePlanChange(it, dolarObject?.promedio)
                         plansViewModel.clearError()
                     },
-                    placeholder = { Text("00.0") },
-                    prefix = { Text("$") },
+                    placeholder = { Text("00.0", fontSize = 10.sp) },
+                    prefix = { Text("$", fontSize = 10.sp) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     shape = MaterialTheme.shapes.medium,
                     maxLines = 1,
                     singleLine = true,
-                    modifier = Modifier.height(56.dp),
+                    modifier = Modifier
+                        .height(56.dp)
+                        .width(230.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                )
+                Spacer(Modifier.padding(10.dp))
+                OutlinedTextField(
+                    value = aportBs,
+                    onValueChange = {
+                        plansViewModel.onAporteBsPlanChange(it, dolarObject?.promedio)
+                        plansViewModel.clearError()
+                    },
+                    placeholder = { Text("00.0", fontSize = 10.sp) },
+                    prefix = { Text("Bs.", fontSize = 10.sp) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    shape = MaterialTheme.shapes.medium,
+                    maxLines = 1,
+                    singleLine = true,
+                    modifier = Modifier
+                        .height(56.dp)
+                        .width(230.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -515,7 +659,7 @@ fun FABP(plansViewModel: PlansViewModel, modifier: Modifier = Modifier) {
         Icon(
             painter = painterResource(R.drawable.ic_plans_add),
             contentDescription = "add Plans",
-            modifier = Modifier.size(45.dp)
+            modifier = Modifier.size(35.dp)
         )
     }
 }
@@ -530,7 +674,10 @@ fun AddPlansDialog(
     target: String,
     date: String,
     category: String,
-    mountActually: String
+    mountActually: String,
+    dolarBs: DolarOficial?,
+    montoBs: String,
+    targetBs: String
 ) {
     val showDialogPlans by plansViewModel.showDialogAdd.collectAsState()
 
@@ -571,6 +718,9 @@ fun AddPlansDialog(
                             category = category,
                             mountActually = mountActually,
                             plansViewModel = plansViewModel,
+                            dolarBs,
+                            montoBs,
+                            targetBs
                         )
                     }
                     //item para botones
@@ -589,7 +739,7 @@ fun ButtonsDialogPlans(plansViewModel: PlansViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(6.dp), horizontalArrangement = Arrangement.End
+            .padding(6.dp), horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = {
@@ -598,8 +748,8 @@ fun ButtonsDialogPlans(plansViewModel: PlansViewModel) {
 
             }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) { Text("Guardar") }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Guardar", fontSize = 15.sp) }
         Spacer(Modifier.width(10.dp))
         Button(
             onClick = { plansViewModel.hideDialog() },
@@ -607,8 +757,8 @@ fun ButtonsDialogPlans(plansViewModel: PlansViewModel) {
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary
-            )
-        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary) }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onPrimary, fontSize = 15.sp) }
     }
 }
 
@@ -621,7 +771,10 @@ fun BodyDialogPlans(
     date: String,
     category: String,
     mountActually: String,
-    plansViewModel: PlansViewModel
+    plansViewModel: PlansViewModel,
+    dolarBs: DolarOficial?,
+    montoBs: String,
+    targetBs: String
 ) {
     Box(
         Modifier
@@ -638,33 +791,55 @@ fun BodyDialogPlans(
             Spacer(Modifier.padding(5.dp))
             CategoryPlan(category, plansViewModel)
             Spacer(Modifier.height(20.dp))
-            Text("Objetivos Financieros", fontSize = 30.sp, fontWeight = FontWeight.Bold)
+            Text("Objetivos Financieros", fontSize = 30.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
             Spacer(Modifier.height(20.dp))
-            TargetPlan(target, plansViewModel)
+            TargetPlan(target, plansViewModel, dolarBs, targetBs)
             Spacer(Modifier.padding(5.dp))
-            MountActuallyPlan(mountActually, plansViewModel)
+            MountActuallyPlan(mountActually, plansViewModel, dolarBs, montoBs)
             Spacer(Modifier.padding(5.dp))
-            Text("Fecha $date", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text("Fecha $date", fontSize = 15.sp, fontWeight = FontWeight.Bold)
 
         }
     }
 }
 
 @Composable
-fun TargetPlan(target: String, plansViewModel: PlansViewModel) {
+fun TargetPlan(target: String, plansViewModel: PlansViewModel, dolarBs: DolarOficial?, targetBs: String) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Monto objetivo a alcanzar", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(
+            "Monto objetivo a alcanzar", fontSize = 20.sp, fontWeight = FontWeight.Bold
+        )
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = target,
-            onValueChange = { plansViewModel.onTargetChange(it) },
-            placeholder = { Text("Monto objetivo.") },
-
+            onValueChange = { plansViewModel.onTargetChange(it, dolarBs?.promedio) },
+            placeholder = { Text("Monto objetivo USD.", fontSize = 10.sp) },
+            prefix = { Text("$", fontSize = 10.sp) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = MaterialTheme.shapes.medium,
             maxLines = 1,
             singleLine = true,
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        )
+        Spacer(Modifier.padding(6.dp))
+        OutlinedTextField(
+            value = targetBs,
+            onValueChange = { plansViewModel.onTargetBsChange(it, dolarBs?.promedio) },
+            placeholder = { Text("Monto objetivo", fontSize = 10.sp) },
+            prefix = { Text("Bs", fontSize = 10.sp) },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            shape = MaterialTheme.shapes.medium,
+            maxLines = 1,
+            singleLine = true,
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -674,19 +849,40 @@ fun TargetPlan(target: String, plansViewModel: PlansViewModel) {
 }
 
 @Composable
-fun MountActuallyPlan(mountActually: String, plansViewModel: PlansViewModel) {
+fun MountActuallyPlan(mountActually: String, plansViewModel: PlansViewModel, dolarBs: DolarOficial?, montoBs: String) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Monto actual", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Monto actual", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = mountActually,
-            onValueChange = { plansViewModel.onMountActuallyChange(it) },
-            placeholder = { Text("Monto al iniciar el plan.") },
+            onValueChange = { plansViewModel.onMountActuallyChange(it, dolarBs?.promedio) },
+            placeholder = { Text("Monto al iniciar el plan.", fontSize = 10.sp) },
+            prefix = { Text("$", fontSize = 10.sp) },
 
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             shape = MaterialTheme.shapes.medium,
             maxLines = 1,
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            )
+        )
+        Spacer(Modifier.padding(6.dp))
+        OutlinedTextField(
+            value = montoBs,
+            onValueChange = { plansViewModel.onMountActuallyBsChange(it, dolarBs?.promedio) },
+            placeholder = { Text("Monto al iniciar el plan.", fontSize = 10.sp) },
+            prefix = { Text("Bs", fontSize = 10.sp) },
+
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            shape = MaterialTheme.shapes.medium,
+            maxLines = 1,
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -699,17 +895,19 @@ fun MountActuallyPlan(mountActually: String, plansViewModel: PlansViewModel) {
 @Composable
 fun CategoryPlan(category: String, plansViewModel: PlansViewModel) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Categoria ", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Categoria ", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = category,
             onValueChange = { plansViewModel.onCategoryChange(it) },
-            placeholder = { Text("Ej. Viajes, Carro nuevo, etc") },
+            placeholder = { Text("Ej. Viajes, Carro nuevo, etc", fontSize = 10.sp) },
 
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             shape = MaterialTheme.shapes.medium,
             maxLines = 1,
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -722,17 +920,18 @@ fun CategoryPlan(category: String, plansViewModel: PlansViewModel) {
 @Composable
 fun DescriptionPlan(description: String, plansViewModel: PlansViewModel) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Descripcion", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Descripcion", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = description,
             onValueChange = { plansViewModel.onDescriptionChange(it) },
-            placeholder = { Text("Descripcion de la finalidad del plan.") },
-
+            placeholder = { Text("Descripcion de la finalidad del plan.", fontSize = 10.sp) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             shape = MaterialTheme.shapes.medium,
             maxLines = 3,
-            modifier = Modifier.height(100.dp),
+            modifier = Modifier
+                .height(60.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -746,17 +945,19 @@ fun DescriptionPlan(description: String, plansViewModel: PlansViewModel) {
 @Composable
 fun NamePlan(namePlan: String, plansViewModel: PlansViewModel) {
     Column(Modifier.fillMaxWidth()) {
-        Text("Nombre", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text("Nombre", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         Spacer(Modifier.padding(6.dp))
         OutlinedTextField(
             value = namePlan,
             onValueChange = { plansViewModel.onNameChange(it) },
-            placeholder = { Text("Ingresar nombre del plan.") },
+            placeholder = { Text("Ingresar nombre del plan.", fontSize = 10.sp) },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
             shape = MaterialTheme.shapes.medium,
             maxLines = 1,
             singleLine = true,
-            modifier = Modifier.height(56.dp),
+            modifier = Modifier
+                .height(56.dp)
+                .width(230.dp),
             colors = OutlinedTextFieldDefaults.colors(
                 focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -774,7 +975,7 @@ fun Greetings(modifier: Modifier = Modifier) {
             .fillMaxWidth()
     ) {
         Text(
-            "Planes Financieros", modifier = modifier.padding(16.dp), fontSize = 40.sp, fontWeight = FontWeight.Bold
+            "Planes Financieros", modifier = modifier.padding(16.dp), fontSize = 30.sp, fontWeight = FontWeight.Bold
         )
     }
 }
@@ -807,7 +1008,7 @@ fun PlanTotal(
                     Column {
                         Text(
                             "Progreso de ahorro",
-                            fontSize = 30.sp,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
@@ -815,31 +1016,31 @@ fun PlanTotal(
                         Row(
                             modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Ahorrado")
-                            Text("Meta")
+                            Text("Ahorrado", fontSize = 14.sp)
+                            Text("Meta", fontSize = 14.sp)
                         }
 
                         Row(
                             modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                "USD $${totalSaved}",
-                                fontSize = 20.sp,
+                                "USD $${plansViewModel.convertBsToUSD(totalSaved)}",
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Text(
-                                "USD $${budgetTarget}",
-                                fontSize = 20.sp,
+                                "USD $${plansViewModel.convertBsToUSD(budgetTarget)}",
+                                fontSize = 18.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                         Row(
                             modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text("Bs.${totalSaved * 140} ")
-                            Text("Bs.${budgetTarget * 140} ")
+                            Text("Bs.${plansViewModel.formatTotal(totalSaved)}", fontSize = 12.sp)
+                            Text("Bs.${plansViewModel.formatTotal(budgetTarget)}", fontSize = 12.sp)
                         }
 
                         Row(
@@ -854,13 +1055,19 @@ fun PlanTotal(
 
                                 )
 
-                            Text("${plansViewModel.formatTotal(progres)}%")
+                            Text(
+                                "${
+                                    plansViewModel.formatTotal(progres * 100)
+                                        .toDouble()
+                                }%", fontSize = 15.sp
+                            )
 
                         }
                         Spacer(modifier.padding(10.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                             Text(
-                                "Faltan $${missing} o Bs.${missing * 140} para alcanzar su meta",
+                                "Faltan $${plansViewModel.convertBsToUSD(missing)} o Bs.${missing} para alcanzar su " +
+                                        "meta",
                                 fontSize = 12.sp,
                             )
                         }
@@ -906,7 +1113,7 @@ fun PlanesList(
                     ) {
                         Text(
                             "No hay planes registrados aun",
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Light,
                             textAlign = TextAlign.Center
                         )
@@ -938,10 +1145,8 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
     val percentge = planItem.Actualy.toDouble() / planItem.Objective.toDouble() * 100
     val percentegeFormated = plansViewModel.formatTotal(percentge)
     Card(
-
-
         modifier = Modifier
-            .height(200.dp)
+            .height(250.dp)
             .width(400.dp)
             .padding(10.dp)
             .combinedClickable(
@@ -973,15 +1178,15 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                 }
                 Spacer(modifier.padding(2.dp))
                 AssistChip(
-                    modifier = modifier.height(18.dp),
+                    modifier = modifier.height(20.dp),
                     onClick = {},
-                    label = { Text(planItem.Category, fontSize = 10.sp) },
+                    label = { Text(planItem.Category, fontSize = 14.sp) },
                     colors = AssistChipDefaults.assistChipColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
                         labelColor = MaterialTheme.colorScheme.onPrimary
                     )
                 )
-                Spacer(modifier.padding(5.dp))
+                Spacer(modifier.padding(3.dp))
                 Box(Modifier.fillMaxWidth()) {
                     Text(
                         planItem.Description, fontSize = 12.sp, textAlign = TextAlign.Center, lineHeight = 12.sp
@@ -1008,31 +1213,31 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                 ) {
                     Column {
                         Text(
-                            "$${planItem.Actualy}",
+                            "$${plansViewModel.convertBsToUSD(planItem.Actualy.toDouble())}",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                         Text(
-                            "Bs ${planItem.Actualy.toDouble() * 140}",
+                            "Bs ${plansViewModel.formatTotal(planItem.Actualy.toDouble())}",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Light,
                             color = MaterialTheme.colorScheme.onBackground
                         )
                     }
 
-                    Text("De", fontSize = 10.sp, fontWeight = FontWeight.Light)
+                    Text("De", fontSize = 12.sp, fontWeight = FontWeight.Light)
 
                     Column {
                         Text(
-                            "$${planItem.Objective}",
-                            fontSize = 12.sp,
+                            "$${plansViewModel.convertBsToUSD(planItem.Objective.toDouble())}",
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                         Text(
-                            "Bs ${planItem.Objective.toDouble() * 140}",
-                            fontSize = 10.sp,
+                            "Bs ${plansViewModel.formatTotal(planItem.Objective.toDouble())}",
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.Normal,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -1040,7 +1245,7 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                 }
                 Spacer(modifier.padding(6.dp))
                 Text(
-                    planItem.Advice, fontSize = 15.sp, lineHeight = 12.sp
+                    planItem.Advice, fontSize = 12.sp, lineHeight = 12.sp
                 )
             }
 
@@ -1048,4 +1253,3 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
     }
 
 }
-

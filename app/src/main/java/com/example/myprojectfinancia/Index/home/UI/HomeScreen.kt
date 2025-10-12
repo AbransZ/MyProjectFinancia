@@ -122,7 +122,7 @@ fun HomeScreen(
 
 
             Greeteng(name)
-            PresupuestoCard(presupuesto, homeViewModel, UIDolar, DolarObject)
+            PresupuestoCard(presupuesto, homeViewModel, UIDolar, DolarObject, Modifier.weight(1f))
             PlanDeAhorro(plans, plansViewModel, missing, totalSaved, budgetFree, UIDolar, DolarObject, homeViewModel)
             Movimientos(homeViewModel, isLoading)
             AggCuenta(
@@ -167,7 +167,7 @@ fun FAB(homeViewModel: homeViewModel, modifier: Modifier) {
         Icon(
             painter = painterResource(R.drawable.ic_add),
             contentDescription = "add Bill",
-            modifier = Modifier.size(45.dp)
+            modifier = Modifier.size(35.dp)
         )
     }
 }
@@ -225,7 +225,7 @@ fun ButtonsDialog(homeViewModel: homeViewModel, isPressedIngresos: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(6.dp), horizontalArrangement = Arrangement.End
+            .padding(6.dp), horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = {
@@ -238,8 +238,8 @@ fun ButtonsDialog(homeViewModel: homeViewModel, isPressedIngresos: Boolean) {
             }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) { Text("Guardar") }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Guardar", fontSize = 12.sp) }
         Spacer(Modifier.width(10.dp))
         Button(
             onClick = { homeViewModel.ocultarDialog() },
@@ -247,8 +247,8 @@ fun ButtonsDialog(homeViewModel: homeViewModel, isPressedIngresos: Boolean) {
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary
-            )
-        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary) }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Cancelar", fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimary) }
     }
 }
 
@@ -282,75 +282,96 @@ fun BodyDialog(
                         homeViewModel.ingresosIsPressed()
                     }, shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
-                        if (isPressedIngresos) Color(0x8B024910) else Color(0xC105E32F)
+                        if (isPressedIngresos) Color(0x8B024910) else Color(0xC147F1C6)
 
-                    )
-                ) { Text("Ingreso") }
+                    ),
+                    modifier = Modifier
+
+                        .weight(1f)
+                ) { Text("Ingreso", fontSize = 12.sp) }
                 Spacer(Modifier.width(10.dp))
                 Button(
                     onClick = {
                         homeViewModel.gastosIsPressed()
                     }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
-                        if (isPressedGastos) Color(0x90530A0A) else Color(0xDFFC2323)
-                    )
+                        if (isPressedGastos) Color(0x90530A0A) else Color(0xA9EF7352)
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
                 ) {
-                    Text("Gasto")
+                    Text("Gasto", fontSize = 12.sp)
                 }
             }
 
             //Campos de texto para ingresar monto y categoria
             Spacer(Modifier.padding(8.dp))
-            Text("Monto", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.padding(6.dp))
+            Text("Monto", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 40.dp))
+            Spacer(Modifier.padding(4.dp))
             OutlinedTextField(
                 value = monto,
                 onValueChange = {
                     homeViewModel.onMontoChange(it, dolarObject?.promedio)
                 },
-                placeholder = { Text("Ingresar monto.") },
-                prefix = { Text("$") },
+                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
+                prefix = { Text("$", fontSize = 10.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(56.dp)
+                    .width(210.dp)
+                    .align(Alignment.CenterHorizontally),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             )
-            Spacer(Modifier.padding(6.dp))
+            Spacer(Modifier.padding(10.dp))
             OutlinedTextField(
                 value = montoBs,
                 onValueChange = {
                     homeViewModel.onMontoBsChange(it, dolarObject?.promedio)
                 },
-                placeholder = { Text("Ingresar monto.") },
-                prefix = { Text("Bs.") },
+                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
+                prefix = { Text("Bs.", fontSize = 10.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(58.dp)
+                    .width(210.dp)
+                    .align(Alignment.CenterHorizontally),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             )
-            Spacer(Modifier.padding(5.dp))
-            Text("Categoria", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.padding(6.dp))
+            Spacer(Modifier.padding(8.dp))
+            Text(
+                "Categoria", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 40.dp)
+            )
+            Spacer(Modifier.padding(4.dp))
             OutlinedTextField(
                 value = categoria,
                 onValueChange = { homeViewModel.onCategoriaChange(it) },
-                placeholder = { Text("Ej. Salario, Comida, Salario.") },
-
+                placeholder = { Text("Ej. Salario, Comida, Mercado.", fontSize = 10.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(60.dp)
+                    .width(210.dp)
+                    .align(Alignment.CenterHorizontally),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             )
             Spacer(Modifier.padding(5.dp))
-            Text("Fecha $fecha", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Box(Modifier.fillMaxWidth()) {
+                Text(
+                    "Fecha $fecha", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding
+                        (start = 40.dp)
+                )
+            }
+
 
         }
     }
@@ -392,7 +413,9 @@ fun Movimientos(
 
         TabRow(
             modifier = Modifier
-                .height(30.dp)
+                .height(40.dp)
+                .width(340.dp)
+                .align(Alignment.CenterHorizontally)
                 .clip(RoundedCornerShape(5.dp)),
             selectedTabIndex = selectedTab,
             containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -476,28 +499,35 @@ fun ListMount(
     val precioUSD = HomeViewModel.convertBsToUSD(montoBs)
     Card(
         modifier = Modifier
-            .padding(10.dp)
+            .padding(4.dp)
     ) {
 
         ListItem(
             headlineContent = {
                 Row {
-                    Text("$${precioUSD}/ ", fontSize = 18.sp)
+                    Text("$${precioUSD}/ ", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                     if (montoBs != null) {
-                        Text("Bs.${String.format("%.2f", montoBs)}", fontSize = 12.sp)
+                        Text(
+                            "Bs.${String.format("%.2f", montoBs)}", fontSize = 12.sp, fontWeight = FontWeight
+                                .ExtraLight
+                        )
                     } else {
                         Text("Bs.---", fontSize = 10.sp)
                     }
                 }
 
             },
-            overlineContent = { Text(movimiento.categoria) },
-            supportingContent = { Text(movimiento.fecha) },
+            overlineContent = { Text(movimiento.categoria, fontSize = 20.sp, fontWeight = FontWeight.ExtraLight) },
+            supportingContent = { Text(movimiento.fecha, fontSize = 15.sp) },
             leadingContent = {
-                Icon(painter = painterResource(R.drawable.ic_money), contentDescription = "Money")
+                Icon(
+                    painter = painterResource(R.drawable.ic_money), contentDescription = "Money", modifier =
+                    Modifier
+                        .size(30.dp)
+                )
             },
             trailingContent = {
-                Text(movimiento.naturaleza)
+                Text(movimiento.naturaleza, fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary)
             }
         )
     }
@@ -518,6 +548,7 @@ fun PlanDeAhorro(
     DolarObject: DolarOficial?,
     homeViewModel: homeViewModel
 ) {
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -526,16 +557,20 @@ fun PlanDeAhorro(
     ) {
 
         ElevatedCard(
-            modifier = Modifier.size(width = 150.dp, height = 220.dp),
+            modifier = Modifier
+                .weight(1f)
+                .height(260.dp),
             shape = CardDefaults.elevatedShape,
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 10.dp),
 
             ) {
             Text(
                 "Plan de Ahorro",
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(16.dp)
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Normal,
+                lineHeight = 14.sp,
+                maxLines = 2,
+                modifier = Modifier.padding(10.dp)
             )
             if (plans.isEmpty()) {
                 Text(
@@ -548,28 +583,32 @@ fun PlanDeAhorro(
 
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(8.dp), contentAlignment = Alignment.Center
+                        .fillMaxWidth()
+                        .padding(2.dp), contentAlignment = Alignment.Center
                 ) {
-                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceAround) {
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            val precioBs = homeViewModel.calculateDolar(totalSaved)
 
 
-                            Text("Ahorrado", fontSize = 17.sp, fontWeight = FontWeight.Bold)
-                            Column {
-                                Text(
-                                    "$${totalSaved}", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
-                                    MaterialTheme.colorScheme.onSecondary
-                                )
-                                if (precioBs != null) {
+                            Text("Ahorrado", fontSize = 15.sp, fontWeight = FontWeight.Bold)
 
+                            Column() {
+                                if (totalSaved != null) {
+                                    Text(
+                                        "$${homeViewModel.convertBsToUSD(totalSaved)}",
+                                        fontSize = 14.sp,
+                                        lineHeight = 5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color =
+                                        MaterialTheme.colorScheme.onPrimary
+                                    )
 
                                     Text(
-                                        "Bs.${String.format("%.2f", precioBs.toDouble())}",
-                                        fontSize = 15.sp,
+                                        "Bs.${homeViewModel.formatAmount(totalSaved.toDouble())}",
+                                        fontSize = 12.sp,
+
                                         fontWeight =
-                                        FontWeight.Bold,
+                                        FontWeight.ExtraLight,
                                         color =
                                         MaterialTheme.colorScheme.onSecondary
                                     )
@@ -585,21 +624,25 @@ fun PlanDeAhorro(
                         }
                         // Spacer(modifier = Modifier.height(30.dp))
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            val precioBs = homeViewModel.calculateDolar(missing)
 
-                            Text("Faltante", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+
+                            Text("Faltante", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                             Column {
                                 Text(
-                                    "$${missing}", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
-                                    MaterialTheme.colorScheme.tertiary
+                                    "$${homeViewModel.convertBsToUSD(missing)}",
+                                    fontSize = 15.sp,
+                                    lineHeight = 5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color =
+                                    MaterialTheme.colorScheme.onPrimary
                                 )
-                                if (precioBs != null) {
+                                if (missing != null) {
 
                                     Text(
-                                        "Bs.${String.format("%.2f", precioBs.toDouble())}",
-                                        fontSize = 15.sp,
+                                        "Bs.${homeViewModel.formatAmount(missing.toDouble())}",
+                                        fontSize = 12.sp,
                                         fontWeight =
-                                        FontWeight.Bold,
+                                        FontWeight.ExtraLight,
                                         color =
                                         MaterialTheme.colorScheme.onSecondary
                                     )
@@ -614,22 +657,22 @@ fun PlanDeAhorro(
 
                         }
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                            val precioBs = homeViewModel.calculateDolar(budgetFree)
 
-                            Text("Disponible", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+                            Text("Disponible", fontSize = 15.sp, fontWeight = FontWeight.Bold)
                             Column {
                                 Text(
-                                    "$${plansViewModel.formatTotal(budgetFree)}",
-                                    fontSize = 17.sp,
+                                    "$${homeViewModel.convertBsToUSD(budgetFree)}",
+                                    fontSize = 15.sp,
                                     fontWeight = FontWeight.Bold
                                 )
-                                if (precioBs != null) {
+                                if (budgetFree != null) {
 
                                     Text(
-                                        "Bs.${String.format("%.2f", precioBs.toDouble())}",
-                                        fontSize = 15.sp,
+                                        "Bs.${homeViewModel.formatAmount(budgetFree.toDouble())}",
+                                        fontSize = 12.sp,
+                                        lineHeight = 5.sp,
                                         fontWeight =
-                                        FontWeight.Bold,
+                                        FontWeight.ExtraLight,
                                         color =
                                         MaterialTheme.colorScheme.onSecondary
                                     )
@@ -649,25 +692,27 @@ fun PlanDeAhorro(
             }
 
         }
-        Spacer(Modifier.padding(10.dp))
+        Spacer(Modifier.padding(2.dp))
         ElevatedCard(
-            modifier = Modifier.size(width = 280.dp, height = 220.dp),
+            modifier = Modifier
+                .weight(1f)
+                .height(260.dp),
             shape = CardDefaults.elevatedShape,
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 10.dp),
 
             ) {
             Text(
                 "Grafico de planes",
-                fontSize = 27.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(16.dp)
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.padding(10.dp)
             )
             Box(
                 Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .padding(4.dp)
             ) {
-                ItemPlangrafic(Modifier, plans, plansViewModel)
+                ItemPlangrafic(Modifier, plans = plans, plansViewModel = plansViewModel)
             }
 
         }
@@ -689,7 +734,7 @@ fun ItemPlangrafic(modifier: Modifier = Modifier, plans: List<planItem>, plansVi
         Color(0xFF9C27B0)
     )
 
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    Box(modifier = modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
 
         if (plans.isEmpty()) {
             Text(
@@ -701,7 +746,7 @@ fun ItemPlangrafic(modifier: Modifier = Modifier, plans: List<planItem>, plansVi
                 )
         }
 
-        LazyColumn(Modifier.fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween) {
+        LazyColumn(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.SpaceAround) {
             itemsIndexed(plans) { Index, plan ->
                 val colorElegido = coloresRandom[Index % coloresRandom.size]
                 ResumePlan(Modifier, colorElegido, plan, plansViewModel)
@@ -717,24 +762,37 @@ fun ResumePlan(modifier: Modifier = Modifier, colorElegido: Color, plan: planIte
     val percentge = (progres * 100)
     val percentgeformtat = plansViewModel.formatTotal(percentge.toDouble())
     Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
             .fillMaxWidth()
             .padding(5.dp)
     ) {
-        Text(plan.Name, fontSize = 20.sp)
+        Column(Modifier.weight(0.4f), horizontalAlignment = Alignment.Start) {
+            Text(
+                plan.Name, fontSize = 14.sp,
+                lineHeight = 12.sp
+            )
+        }
 
-        LinearProgressIndicator(
-            progress = { progres },
-            modifier = modifier
-                .height(8.dp)
-                .width(60.dp),
-            color = colorElegido,
-            trackColor = colorElegido.copy(alpha = 0.3f),
-            strokeCap = StrokeCap.Round,
-        )
-        Text("${percentgeformtat}%", fontSize = 20.sp)
+        Column(Modifier.weight(0.5f), horizontalAlignment = Alignment.CenterHorizontally) {
+            LinearProgressIndicator(
+                progress = { progres },
+                modifier = modifier
+                    .height(8.dp)
+                    .fillMaxWidth(),
+                color = colorElegido,
+                trackColor = colorElegido.copy(alpha = 0.3f),
+                strokeCap = StrokeCap.Round,
+            )
+        }
+
+        Column(Modifier.weight(0.45f), horizontalAlignment = Alignment.End) {
+            Text(
+                "${percentgeformtat}%",
+                fontSize = 15.sp
+            )
+        }
 
     }
 }
@@ -745,9 +803,12 @@ fun PresupuestoCard(
     presupuesto: Double,
     homeViewModel: homeViewModel,
     UIDolar: UiStateDolar,
-    DolarObject: DolarOficial?
+    DolarObject: DolarOficial?,
+    modifier: Modifier = Modifier
 ) {
     val PrecioUsd = homeViewModel.convertBsToUSD(presupuesto)
+    val tasa = DolarObject?.promedio
+    val fecha = DolarObject?.fechaActualizacion
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -774,64 +835,110 @@ fun PresupuestoCard(
             ) {
                 Column(
                     modifier = Modifier
+                        .weight(1f)
                         .padding(16.dp)
                 ) {
+                    Row(
+                        Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(Modifier.fillMaxWidth()) {
+                            Text(
+                                "Presupuesto",
+                                //style = MaterialTheme.typography.titleMedium,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Normal,
+                                textAlign =
+                                TextAlign.Start
+                            )
+                            Column(Modifier.fillMaxWidth()) {
+                                Text(
+                                    "$${PrecioUsd} ", fontSize = 18.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary
+                                )
+                                when (UIDolar) {
+                                    is UiStateDolar.neutral -> {
+                                        Text("Cargando...")
 
-                    Text("Presupuesto", fontSize = 35.sp, fontWeight = FontWeight.Bold)
+                                    }
 
-                    Spacer(Modifier.padding(5.dp))
+                                    is UiStateDolar.error -> {
+                                        Text("Error al cargar precio del dolar")
+                                    }
 
-                    Row() {
-                        Text(
-                            "$${PrecioUsd}/ ", fontSize = 35.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        when (UIDolar) {
-                            is UiStateDolar.neutral -> {
-                                Text("Cargando...")
+                                    UiStateDolar.isLoading -> {
+                                        Column(verticalArrangement = Arrangement.Center) {
+                                            CircularProgressIndicator()
+                                            Text("Cargando...")
+                                        }
+                                    }
 
-                            }
-
-                            is UiStateDolar.error -> {
-                                Text("Error al cargar precio del dolar")
-                            }
-
-                            UiStateDolar.isLoading -> {
-                                Column(verticalArrangement = Arrangement.Center) {
-                                    CircularProgressIndicator()
-                                    Text("Cargando...")
-                                }
-                            }
-
-                            is UiStateDolar.success -> {
+                                    is UiStateDolar.success -> {
 
 
-                                if (presupuesto != null) {
-                                    Text(
-                                        "Bs.${presupuesto}",
-                                        fontSize = 20.sp,
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
-                                } else {
-                                    Text(
-                                        "Bs. ---",
-                                        fontSize = 20.sp,
-                                        color = MaterialTheme.colorScheme.onSecondary
-                                    )
+                                        if (presupuesto != null) {
+                                            Text(
+                                                "Bs.${presupuesto}",
+                                                fontSize = 15.sp,
+                                                color = MaterialTheme.colorScheme.onSecondary
+                                            )
+                                        } else {
+                                            Text(
+                                                "Bs. ---",
+                                                fontSize = 20.sp,
+                                                color = MaterialTheme.colorScheme.onSecondary
+                                            )
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                Icon(
-                    painter = painterResource(R.drawable.add_ic),
-                    contentDescription = "presupuesto",
-                    Modifier
-                        .size(50.dp)
-                        .clickable { homeViewModel.mostrarDialogBudget() },
-                    tint = MaterialTheme.colorScheme.onBackground
-                )
+                if (tasa != null && fecha != null) {
+                    Column(
+                        Modifier.weight(0.7f), verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        Text(
+                            "Tasa del dia: Bs.${homeViewModel.formatAmount(tasa)}",
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Start,
+                            lineHeight = 12.sp,
+                            maxLines = 2
+                        )
+                        Text(
+                            "Fecha:${homeViewModel.fechaActualtasa(fecha)}",
+                            fontSize = 15.sp,
+                            textAlign = TextAlign.Start,
+                            maxLines = 2,
+                            lineHeight = 12.sp
+                        )
+                    }
+
+                }
+
+                Column(
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .padding(2.dp),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.End
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.add_ic),
+                        contentDescription = "presupuesto",
+                        Modifier
+                            .size(40.dp)
+                            .clickable { homeViewModel.mostrarDialogBudget() },
+                        tint = MaterialTheme.colorScheme.onBackground
+                    )
+
+                }
+
             }
 
         }
@@ -842,10 +949,10 @@ fun PresupuestoCard(
 @Composable
 fun Greeteng(name: String) {
 
-    Box(Modifier.padding(10.dp)) {
+    Box(Modifier.padding(horizontal = 10.dp, vertical = 8.dp)) {
         Text(
             "Bienvenido ${name}",
-            fontSize = 40.sp,
+            style = MaterialTheme.typography.headlineLarge,
             fontWeight = FontWeight.Bold,
         )
         Log.i("user", "Usuario posee el nombre de ${name}")

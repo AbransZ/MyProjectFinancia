@@ -52,16 +52,16 @@ fun PreupuestoDialog(
                     .background(MaterialTheme.colorScheme.surface)
 
             ) {
-                Column {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
                     DialogBudget(homeViewModel, monto, montoBs, nombreAporte, DolarObject)
                     ButtonBudget(homeViewModel)
                 }
-
             }
-
-
         }
-
     }
 }
 
@@ -70,7 +70,7 @@ fun ButtonBudget(homeViewModel: homeViewModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(6.dp), horizontalArrangement = Arrangement.End
+            .padding(12.dp), horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = {
@@ -81,8 +81,8 @@ fun ButtonBudget(homeViewModel: homeViewModel) {
             }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        ) { Text("Guardar") }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Guardar", fontSize = 12.sp) }
         Spacer(Modifier.width(10.dp))
         Button(
             onClick = { homeViewModel.ocultarDialogBudget() },
@@ -90,8 +90,8 @@ fun ButtonBudget(homeViewModel: homeViewModel) {
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary
-            )
-        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary) }
+            ), modifier = Modifier.weight(1f)
+        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onPrimary, fontSize = 12.sp) }
     }
 }
 
@@ -114,60 +114,72 @@ fun DialogBudget(
             ) {
             Text(
                 "Ingresar Presupuesto",
-                fontSize = 30.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.align(Alignment.CenterHorizontally)
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+
             )
+
 
             //Campos de texto para ingresar monto y categoria
             Spacer(Modifier.padding(8.dp))
-            Text("Monto", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text("Monto", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 48.dp))
             Spacer(Modifier.padding(6.dp))
             OutlinedTextField(
                 value = monto,
                 onValueChange = { homeViewModel.onBudgetChange(it, dolarObject?.promedio) },
-                placeholder = { Text("Ingresar monto.") },
-                prefix = { Text("$") },
+                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
+                prefix = { Text("$", fontSize = 10.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(56.dp)
+                    .width(230.dp)
+                    .align(Alignment.CenterHorizontally),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             )
-            Spacer(Modifier.padding(6.dp))
+            Spacer(Modifier.padding(10.dp))
             OutlinedTextField(
                 value = montoBs,
                 onValueChange = { homeViewModel.onBudgetBsChange(it, dolarObject?.promedio) },
-                placeholder = { Text("Ingresar monto.") },
-                prefix = { Text("Bs.") },
+                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
+                prefix = { Text("Bs.", fontSize = 10.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(56.dp)
+                    .width(230.dp)
+                    .align(Alignment.CenterHorizontally),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             )
             Spacer(Modifier.padding(5.dp))
-            Text("Nombre del Aporte", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(
+                "Nombre del Aporte", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding
+                    (start = 48.dp)
+            )
             Spacer(Modifier.padding(6.dp))
             OutlinedTextField(
                 value = nombreAporte,
                 onValueChange = { homeViewModel.onBudgetCategoryChange(it) },
-                placeholder = { Text("Ej. Salario, Comida, Salario.") },
-
+                placeholder = { Text("Ej. Salario, Comida, Salario.", fontSize = 10.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(60.dp)
+                    .width(230.dp)
+                    .align(Alignment.CenterHorizontally),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             )
-
-
         }
     }
 }

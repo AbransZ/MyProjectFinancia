@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -137,7 +138,7 @@ fun Greeting(modifier: Modifier) {
         modifier = modifier
             .fillMaxWidth()
     ) {
-        Text("Movimientos", fontSize = 40.sp, fontWeight = FontWeight.Bold)
+        Text("Movimientos", fontSize = 25.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -215,7 +216,7 @@ fun ListMountMovements(
         ListItem(
             headlineContent = {
                 Row {
-                    Text("$${precioUSD}/ ", fontSize = 18.sp)
+                    Text("$${precioUSD}/ ", fontSize = 15.sp)
                     if (montoBs != null) {
                         Text("Bs.${String.format("%.2f", montoBs)}", fontSize = 12.sp)
                     } else {
@@ -223,13 +224,17 @@ fun ListMountMovements(
                     }
                 }
             },
-            overlineContent = { Text(movimiento.categoria) },
-            supportingContent = { Text(movimiento.fecha) },
+            overlineContent = { Text(movimiento.categoria, fontSize = 20.sp, fontWeight = FontWeight.ExtraLight) },
+            supportingContent = { Text(movimiento.fecha, fontSize = 15.sp) },
             leadingContent = {
-                Icon(painter = painterResource(R.drawable.ic_money), contentDescription = "Money")
+                Icon(
+                    painter = painterResource(R.drawable.ic_money), contentDescription = "Money", modifier =
+                    Modifier
+                        .size(30.dp)
+                )
             },
             trailingContent = {
-                Text(movimiento.naturaleza)
+                Text(movimiento.naturaleza, fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary)
             }
         )
     }
@@ -241,7 +246,7 @@ fun ButtonsDialogEdit(homeViewModel: homeViewModel, isPressedIngresosEdit: Boole
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(6.dp), horizontalArrangement = Arrangement.End
+            .padding(6.dp), horizontalArrangement = Arrangement.Center
     ) {
         Button(
             onClick = {
@@ -255,7 +260,7 @@ fun ButtonsDialogEdit(homeViewModel: homeViewModel, isPressedIngresosEdit: Boole
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
-        ) { Text("Guardar") }
+        ) { Text("Guardar", fontSize = 15.sp) }
         Spacer(Modifier.width(10.dp))
         Button(
             onClick = { homeViewModel.ocultarDialogEdit() },
@@ -264,7 +269,7 @@ fun ButtonsDialogEdit(homeViewModel: homeViewModel, isPressedIngresosEdit: Boole
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary
             )
-        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onSecondary) }
+        ) { Text("Cancelar", fontSize = 15.sp, color = MaterialTheme.colorScheme.onSecondary) }
     }
 }
 
@@ -300,21 +305,21 @@ fun BodyDialogEdit(
                     },
                     shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.buttonColors(
-                        if (isPressedIngresosEdit) Color(0x8B024910) else Color(0xC105E32F)
+                        if (isPressedIngresosEdit) Color(0x8B024910) else Color(0xC147F1C6)
                     ),
                     enabled = if (naturalezaEdit == "Asignacion") false else true
-                ) { Text("Ingreso") }
+                ) { Text("Ingreso", fontSize = 15.sp) }
                 Spacer(Modifier.width(10.dp))
                 Button(
                     onClick = {
                         homeViewModel.gastosIsPressedEdit()
                     },
                     shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
-                        if (isPressedGastosEdit) Color(0x90530A0A) else Color(0xDFFC2323)
+                        if (isPressedGastosEdit) Color(0x90530A0A) else Color(0xA9EF7352)
                     ),
                     enabled = if (naturalezaEdit == "Asignacion") false else true
                 ) {
-                    Text("Gasto")
+                    Text("Gasto", fontSize = 15.sp)
                 }
             }
 
@@ -325,11 +330,13 @@ fun BodyDialogEdit(
             OutlinedTextField(
                 value = montoEdit,
                 onValueChange = { homeViewModel.onMontoChangeEdit(it, DolarObject?.promedio) },
-                placeholder = { Text("Ingresar monto.") },
-                prefix = { Text("$") },
+                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
+                prefix = { Text("$", fontSize = 10.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(56.dp)
+                    .width(210.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -339,11 +346,13 @@ fun BodyDialogEdit(
             OutlinedTextField(
                 value = montoBs,
                 onValueChange = { homeViewModel.onMontoBsChangeEdit(it, DolarObject?.promedio) },
-                placeholder = { Text("Ingresar monto.") },
-                prefix = { Text("Bs") },
+                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
+                prefix = { Text("Bs", fontSize = 10.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(56.dp)
+                    .width(210.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -355,18 +364,20 @@ fun BodyDialogEdit(
             OutlinedTextField(
                 value = categoriaEdit,
                 onValueChange = { homeViewModel.onCategoriaChangeEdit(it) },
-                placeholder = { Text("Ej. Salario, Comida, Salario.") },
+                placeholder = { Text("Ej. Salario, Comida, Salario.", fontSize = 10.sp) },
 
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 shape = MaterialTheme.shapes.medium,
-                modifier = Modifier.height(56.dp),
+                modifier = Modifier
+                    .height(58.dp)
+                    .width(210.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                     unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                 )
             )
             Spacer(Modifier.padding(5.dp))
-            Text("Fecha $fecha", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text("Fecha $fecha", fontSize = 15.sp, fontWeight = FontWeight.Bold)
 
         }
     }

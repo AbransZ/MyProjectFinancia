@@ -195,6 +195,8 @@ class homeViewModel @Inject constructor(
             result.onSuccess { dolar ->
                 _DolarObject.value = dolar
                 _UIDolar.value = UiStateDolar.success(dolar)
+                Log.i("Dolar", "Dolar: ${dolar.promedio}")
+                Log.i("Dolar", "fecha: ${dolar.fechaActualizacion}")
 
             }
                 .onFailure { error ->
@@ -203,6 +205,20 @@ class homeViewModel @Inject constructor(
                     )
                 }
         }
+    }
+
+    fun fechaActualtasa(fecha: String): String {
+        if (fecha.isNullOrBlank()) return "No disponible"
+
+        val partes = fecha.split("T")
+        val fecha = partes[0].split("-")
+        val hora = partes[1].split(":")
+
+        val horaInt = hora[0].toInt()
+        val periodo = if (horaInt >= 12) "PM" else "AM"
+        val hora12 = if (horaInt > 12) horaInt - 12 else if (horaInt == 0) 12 else horaInt
+
+        return "${fecha[2]}/${fecha[1]}/${fecha[0]} $hora12:${hora[1]} $periodo"
     }
 
     //funcion para convertir dolares a bs
@@ -419,6 +435,17 @@ class homeViewModel @Inject constructor(
 
     }
 
+    fun onMontoBsChange(montUSD: String, precioBs: Double?) {
+        _montoBsString.value = montUSD
+        val montoBsNum = montUSD.toDoubleOrNull()
+        if (montoBsNum != null && precioBs != null) {
+            val montoUSD = montoBsNum / precioBs
+            _montoString.value = formatAmount(montoUSD)
+        } else if (montUSD.isBlank()) {
+            _montoString.value = ""
+        }
+    }
+
     fun onMontoBsChangeEdit(montoBs: String, promedio: Double?) {
         _montoBsStringEdit.value = montoBs
         val montoBsNum = montoBs.toDoubleOrNull()
@@ -434,16 +461,6 @@ class homeViewModel @Inject constructor(
         }
     }
 
-    fun onMontoBsChange(montUSD: String, precioBs: Double?) {
-        _montoBsString.value = montUSD
-        val montoBsNum = montUSD.toDoubleOrNull()
-        if (montoBsNum != null && precioBs != null) {
-            val montoUSD = montoBsNum / precioBs
-            _montoString.value = formatAmount(montoUSD)
-        } else if (montUSD.isBlank()) {
-            _montoString.value = ""
-        }
-    }
 
     //ocultar dialogo de presupuesto
     fun ocultarDialogBudget() {

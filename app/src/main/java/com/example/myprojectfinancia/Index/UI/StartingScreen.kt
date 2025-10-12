@@ -36,7 +36,7 @@ fun InitialView(
     val Navigation = RememberNavStateScreen()
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Financia", fontWeight = FontWeight.Bold, fontSize = 30.sp) },
+        TopAppBar(title = { Text("Financia", fontWeight = FontWeight.Bold, fontSize = 40.sp) },
             actions = {
                 Button(onClick = {
                     val route = homeViewModel.logout()

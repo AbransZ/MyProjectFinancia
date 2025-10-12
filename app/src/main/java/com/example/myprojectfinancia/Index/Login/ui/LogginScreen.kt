@@ -207,7 +207,11 @@ fun Greetings(modifier: Modifier) {
 
 @Composable
 fun Footer(modifier: Modifier, navigationControler: NavHostController) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(50.dp)
+    ) {
 
         SignIn(navigationControler)
     }
@@ -259,7 +263,11 @@ fun Googlebuttons(loginViewModel: LoginViewModel) {
             }
         }
     }
-    Box(Modifier.fillMaxWidth()) {
+    Box(
+        Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+    ) {
         OutlinedButton(
             onClick = {
                 val signInIntent = loginViewModel.getGoogleSignInClient().signInIntent
@@ -268,7 +276,7 @@ fun Googlebuttons(loginViewModel: LoginViewModel) {
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .height(56.dp)
 
         ) {
             Icon(
