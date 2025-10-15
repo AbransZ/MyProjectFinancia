@@ -239,7 +239,7 @@ fun ButtonsDialog(homeViewModel: homeViewModel, isPressedIngresos: Boolean) {
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ), modifier = Modifier.weight(1f)
-        ) { Text("Guardar", fontSize = 12.sp) }
+        ) { Text("Guardar", fontSize = 20.sp) }
         Spacer(Modifier.width(10.dp))
         Button(
             onClick = { homeViewModel.ocultarDialog() },
@@ -248,7 +248,7 @@ fun ButtonsDialog(homeViewModel: homeViewModel, isPressedIngresos: Boolean) {
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary
             ), modifier = Modifier.weight(1f)
-        ) { Text("Cancelar", fontSize = 12.sp, color = MaterialTheme.colorScheme.onPrimary) }
+        ) { Text("Cancelar", fontSize = 20.sp, color = MaterialTheme.colorScheme.onPrimary) }
     }
 }
 
@@ -288,7 +288,7 @@ fun BodyDialog(
                     modifier = Modifier
 
                         .weight(1f)
-                ) { Text("Ingreso", fontSize = 12.sp) }
+                ) { Text("Ingreso", fontSize = 18.sp) }
                 Spacer(Modifier.width(10.dp))
                 Button(
                     onClick = {
@@ -299,21 +299,21 @@ fun BodyDialog(
                     modifier = Modifier
                         .weight(1f)
                 ) {
-                    Text("Gasto", fontSize = 12.sp)
+                    Text("Gasto", fontSize = 18.sp)
                 }
             }
 
             //Campos de texto para ingresar monto y categoria
             Spacer(Modifier.padding(8.dp))
-            Text("Monto", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 40.dp))
+            Text("Monto", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 40.dp))
             Spacer(Modifier.padding(4.dp))
             OutlinedTextField(
                 value = monto,
                 onValueChange = {
                     homeViewModel.onMontoChange(it, dolarObject?.promedio)
                 },
-                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
-                prefix = { Text("$", fontSize = 10.sp) },
+                placeholder = { Text("Ingresar monto.", fontSize = 15.sp) },
+                prefix = { Text("$", fontSize = 15.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
@@ -331,8 +331,8 @@ fun BodyDialog(
                 onValueChange = {
                     homeViewModel.onMontoBsChange(it, dolarObject?.promedio)
                 },
-                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
-                prefix = { Text("Bs.", fontSize = 10.sp) },
+                placeholder = { Text("Ingresar monto.", fontSize = 15.sp) },
+                prefix = { Text("Bs.", fontSize = 15.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
@@ -346,13 +346,13 @@ fun BodyDialog(
             )
             Spacer(Modifier.padding(8.dp))
             Text(
-                "Categoria", fontSize = 15.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 40.dp)
+                "Categoria", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 40.dp)
             )
             Spacer(Modifier.padding(4.dp))
             OutlinedTextField(
                 value = categoria,
                 onValueChange = { homeViewModel.onCategoriaChange(it) },
-                placeholder = { Text("Ej. Salario, Comida, Mercado.", fontSize = 10.sp) },
+                placeholder = { Text("Ej. Salario, Comida, Mercado.", fontSize = 15.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
@@ -367,7 +367,7 @@ fun BodyDialog(
             Spacer(Modifier.padding(5.dp))
             Box(Modifier.fillMaxWidth()) {
                 Text(
-                    "Fecha $fecha", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding
+                    "Fecha $fecha", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding
                         (start = 40.dp)
                 )
             }
@@ -787,7 +787,7 @@ fun ResumePlan(modifier: Modifier = Modifier, colorElegido: Color, plan: planIte
             )
         }
 
-        Column(Modifier.weight(0.45f), horizontalAlignment = Alignment.End) {
+        Column(Modifier.weight(0.5f), horizontalAlignment = Alignment.End) {
             Text(
                 "${percentgeformtat}%",
                 fontSize = 15.sp

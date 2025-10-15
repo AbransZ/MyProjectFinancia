@@ -15,6 +15,7 @@ import com.example.myprojectfinancia.Index.Login.ui.Spalsh
 import com.example.myprojectfinancia.Index.Plans.ViewModel.PlansViewModel
 import com.example.myprojectfinancia.Index.UI.InitialView
 import com.example.myprojectfinancia.Index.home.ViewModels.homeViewModel
+import com.example.myprojectfinancia.Index.settings.viewModel.settingsViewmodel
 
 sealed class Routes(val routes: String) {
     object SplashScreen : Routes("Splash")
@@ -30,7 +31,8 @@ fun Navhost(
     loginViewModel: LoginViewModel,
     splashViewModel: SpalshViewModel,
     homeViewModel: homeViewModel,
-    plansViewModel: PlansViewModel
+    plansViewModel: PlansViewModel,
+    settingsViewmodel: settingsViewmodel
 ) {
     val navigationControler = rememberNavController()
     NavHost(
@@ -53,7 +55,7 @@ fun Navhost(
             ForgotPassWord(modifier = Modifier, navigationControler, loginViewModel)
         }
         composable(Routes.StartingScreen.routes) {
-            InitialView(navigationControler, homeViewModel, loginViewModel, plansViewModel)
+            InitialView(navigationControler, homeViewModel, loginViewModel, plansViewModel, settingsViewmodel)
         }
 
     }

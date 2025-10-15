@@ -82,7 +82,7 @@ fun ButtonBudget(homeViewModel: homeViewModel) {
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ), modifier = Modifier.weight(1f)
-        ) { Text("Guardar", fontSize = 12.sp) }
+        ) { Text("Guardar", fontSize = 20.sp) }
         Spacer(Modifier.width(10.dp))
         Button(
             onClick = { homeViewModel.ocultarDialogBudget() },
@@ -91,7 +91,7 @@ fun ButtonBudget(homeViewModel: homeViewModel) {
                 containerColor = MaterialTheme.colorScheme.secondary,
                 contentColor = MaterialTheme.colorScheme.onSecondary
             ), modifier = Modifier.weight(1f)
-        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onPrimary, fontSize = 12.sp) }
+        ) { Text("Cancelar", color = MaterialTheme.colorScheme.onPrimary, fontSize = 20.sp) }
     }
 }
 
@@ -114,7 +114,7 @@ fun DialogBudget(
             ) {
             Text(
                 "Ingresar Presupuesto",
-                fontSize = 20.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
@@ -124,13 +124,13 @@ fun DialogBudget(
 
             //Campos de texto para ingresar monto y categoria
             Spacer(Modifier.padding(8.dp))
-            Text("Monto", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 48.dp))
+            Text("Monto", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 48.dp))
             Spacer(Modifier.padding(6.dp))
             OutlinedTextField(
                 value = monto,
                 onValueChange = { homeViewModel.onBudgetChange(it, dolarObject?.promedio) },
-                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
-                prefix = { Text("$", fontSize = 10.sp) },
+                placeholder = { Text("Ingresar monto.", fontSize = 15.sp) },
+                prefix = { Text("$", fontSize = 15.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
@@ -146,8 +146,8 @@ fun DialogBudget(
             OutlinedTextField(
                 value = montoBs,
                 onValueChange = { homeViewModel.onBudgetBsChange(it, dolarObject?.promedio) },
-                placeholder = { Text("Ingresar monto.", fontSize = 10.sp) },
-                prefix = { Text("Bs.", fontSize = 10.sp) },
+                placeholder = { Text("Ingresar monto.", fontSize = 15.sp) },
+                prefix = { Text("Bs.", fontSize = 15.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier
@@ -161,14 +161,14 @@ fun DialogBudget(
             )
             Spacer(Modifier.padding(5.dp))
             Text(
-                "Nombre del Aporte", fontSize = 12.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding
+                "Nombre del Aporte", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding
                     (start = 48.dp)
             )
             Spacer(Modifier.padding(6.dp))
             OutlinedTextField(
                 value = nombreAporte,
                 onValueChange = { homeViewModel.onBudgetCategoryChange(it) },
-                placeholder = { Text("Ej. Salario, Comida, Salario.", fontSize = 10.sp) },
+                placeholder = { Text("Ej. Salario, Comida, Salario.", fontSize = 15.sp) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                 shape = MaterialTheme.shapes.medium,
                 modifier = Modifier

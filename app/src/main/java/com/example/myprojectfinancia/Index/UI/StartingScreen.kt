@@ -2,7 +2,6 @@ package com.example.myprojectfinancia.Index.UI
 
 
 import androidx.compose.foundation.background
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -22,6 +21,7 @@ import com.example.myprojectfinancia.Index.home.Models.NavScreensModel
 import com.example.myprojectfinancia.Index.home.Models.RememberNavStateScreen
 import com.example.myprojectfinancia.Index.home.ViewModels.homeViewModel
 import com.example.myprojectfinancia.Index.settings.SettingsScreen
+import com.example.myprojectfinancia.Index.settings.viewModel.settingsViewmodel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,26 +30,28 @@ fun InitialView(
     navController: NavHostController,
     homeViewModel: homeViewModel,
     loginViewModel: LoginViewModel,
-    plansViewModel: PlansViewModel
+    plansViewModel: PlansViewModel,
+    settingsViewModel: settingsViewmodel
 ) {
 
     val Navigation = RememberNavStateScreen()
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text("Financia", fontWeight = FontWeight.Bold, fontSize = 40.sp) },
-            actions = {
-                Button(onClick = {
-                    val route = homeViewModel.logout()
-                    navController.navigate(route) {
-                        popUpTo(0) { inclusive = true }
-                        loginViewModel.clearFields()
-                    }
-                }
-                )
-                {
-                    Text("Salir", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                }
-            }
+        TopAppBar(
+            title = { Text("Financia", fontWeight = FontWeight.Bold, fontSize = 40.sp) },
+//            actions = {
+//                Button(onClick = {
+//                    val route = homeViewModel.logout()
+//                    navController.navigate(route) {
+//                        popUpTo(0) { inclusive = true }
+//                        loginViewModel.clearFields()
+//                    }
+//                }
+//                )
+//                {
+//                    Text("Salir", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+//                }
+//            }
         )
     },
 
@@ -81,7 +83,13 @@ fun InitialView(
 
             NavScreensModel.Settings -> {
                 SettingsScreen(
-                    paddingContent
+                    paddingContent,
+                    Modifier,
+                    homeViewModel,
+                    plansViewModel,
+                    navController,
+                    loginViewModel,
+                    settingsViewModel
                 )
             }
         }

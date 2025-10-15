@@ -108,7 +108,9 @@ class AuthService @Inject constructor(
                 .document(uid)
                 .get()
                 .await()
+
             if (document.exists()) {
+
                 val usuario = UserFinancia(
                     uid = document.getString("uid") ?: "",
                     name = document.getString("name") ?: "deberia decir un nombre aqui"
@@ -121,6 +123,7 @@ class AuthService @Inject constructor(
             Result.failure(ex)
         }
     }
+    
 
     //Metodo para guardar movimientos
     suspend fun saveMovements(movement: MovementsItemSave, user: UserFinancia): Boolean {
