@@ -76,6 +76,13 @@ fun SettingsScreen(
     val montoBs by settingsViewmodel.montoBs.collectAsState("")
     val context = LocalContext.current
     val error = settingsViewmodel.error.collectAsState("")
+    val CMovements by settingsViewmodel.CMovements.collectAsState(0)
+    val CPlans by settingsViewmodel.Cplanes.collectAsState(0)
+    val Aplanes by settingsViewmodel.Aplanes.collectAsState(0)
+    val name by homeViewModel.nameS.collectAsState("")
+    val email by homeViewModel.email.collectAsState("")
+    val dateCration by homeViewModel.dateSingIn.collectAsState()
+
 
 
     Box(
@@ -86,6 +93,8 @@ fun SettingsScreen(
     ) {
         LaunchedEffect(Unit) {
             homeViewModel.getDolarBCV()
+            settingsViewmodel.initialize()
+            homeViewModel.initializeNewUser()
 
         }
 
@@ -100,8 +109,9 @@ fun SettingsScreen(
         }
 
 
+        AboutFinanciaDialog(showAbout, settingsViewmodel)
         LazyColumn(modifier = modifier.fillMaxSize()) {
-            item { UserItem(modifier) }
+            item { UserItem(modifier, name, email, dateCration) }
             item { Spacer(modifier.padding(18.dp)) }
             item { Text("Conversor de moneda", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
             item { ConversorMoneda(modifier, settingsViewmodel, monto, montoBs, dolarObject) }
@@ -125,11 +135,10 @@ fun SettingsScreen(
 
             }
             item { Spacer(modifier.padding(18.dp)) }
-            item { AboutFinancia(modifier) }
+            item { AboutFinancia(modifier, CMovements, CPlans, Aplanes) }
             item { Spacer(modifier.padding(18.dp)) }
             item { ButtonClose(modifier, homeViewModel, navController, loginViewModel) }
             item { ConfigurationUser() }
-            item { AboutFinanciaDialog(showAbout, settingsViewmodel) }
 
         }
 
@@ -378,7 +387,7 @@ fun ButtonClose(
 }
 
 @Composable
-fun AboutFinancia(modifier: Modifier) {
+fun AboutFinancia(modifier: Modifier, CMovements: Int, CPlans: Int, Aplanes: Int) {
     Card(
         modifier = Modifier
             .fillMaxWidth(),
@@ -403,7 +412,7 @@ fun AboutFinancia(modifier: Modifier) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "10",
+                        CMovements.toString(),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
@@ -422,7 +431,7 @@ fun AboutFinancia(modifier: Modifier) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "3",
+                        Aplanes.toString(),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xC6E79504)
@@ -439,7 +448,7 @@ fun AboutFinancia(modifier: Modifier) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        "5",
+                        CPlans.toString(),
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xA901D758),
@@ -466,6 +475,7 @@ fun ConversorMoneda(
     montoBs: String,
     dolarObject: DolarOficial?
 ) {
+    val Bcv = dolarObject?.promedio
     Card(
         modifier = Modifier
             .fillMaxWidth(),
@@ -487,9 +497,16 @@ fun ConversorMoneda(
             Spacer(modifier.padding(2.dp))
             OutlinedTextField(
                 value = monto,
-                onValueChange = { settingsViewmodel.convertUSDToBs(it) },
+                onValueChange = {
+                    if (Bcv != null) {
+                        settingsViewmodel.convertUSDToBs(it, Bcv)
+                    } else {
+                        error(message = "Error al hacer la conversion porque no hay tasa de BCV")
+                    }
+                },
                 modifier = modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                prefix = { Text("$", textAlign = TextAlign.Center) },
                 shape = RoundedCornerShape(10.dp),
                 singleLine = true,
                 maxLines = 1,
@@ -518,9 +535,16 @@ fun ConversorMoneda(
             Spacer(modifier.padding(2.dp))
             OutlinedTextField(
                 value = montoBs,
-                onValueChange = { settingsViewmodel.convertBstoUSD(it) },
+                onValueChange = {
+                    if (Bcv != null) {
+                        settingsViewmodel.convertBstoUSD(it, Bcv)
+                    } else {
+                        error(message = "Error al hacer conversion porque no hay tas de BCV")
+                    }
+                },
                 modifier = modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                prefix = { Text("Bs.", textAlign = TextAlign.Center) },
                 shape = RoundedCornerShape(10.dp),
                 singleLine = true,
                 maxLines = 1,
@@ -544,7 +568,7 @@ fun ConversorMoneda(
 }
 
 @Composable
-fun UserItem(modifier: Modifier) {
+fun UserItem(modifier: Modifier, name: String, email: String, dateCration: Long) {
     Card(
         modifier = Modifier
             .height(100.dp)
@@ -564,7 +588,7 @@ fun UserItem(modifier: Modifier) {
             )
             Column(verticalArrangement = Arrangement.Center) {
                 Text(
-                    "Usurario",
+                    name,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimary
@@ -573,14 +597,14 @@ fun UserItem(modifier: Modifier) {
                 Spacer(modifier.padding(3.dp))
 
                 Text(
-                    "Correodel usuario@gmail.com",
+                    "Correo: ${email}",
                     fontSize = 12.sp
                 )
 
                 Spacer(modifier.padding(3.dp))
 
                 Text(
-                    "fecha de Ingreso",
+                    "fecha de Ingreso ${dateCration.toString()}",
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary

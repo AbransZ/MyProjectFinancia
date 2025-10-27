@@ -43,6 +43,18 @@ class homeViewModel @Inject constructor(
     private val _name = MutableStateFlow<String>("")
     val name: StateFlow<String> = _name
 
+    //variable para el nombre settings
+    private val _nameS = MutableStateFlow<String>("")
+    val nameS: StateFlow<String> = _nameS
+
+    //variable para el email settings
+    private val _email = MutableStateFlow<String>("")
+    val email: StateFlow<String> = _email
+
+    //variable para el email settings
+    private val _dateSingIn = MutableStateFlow<Long>(0)
+    val dateSingIn: StateFlow<Long> = _dateSingIn
+
     private val _categoria = MutableLiveData<String>("")
     val category: LiveData<String> = _categoria
 
@@ -570,6 +582,7 @@ class homeViewModel @Inject constructor(
     fun mostrarNombre() {
         viewModelScope.launch {
             val userCurrent = authService.getCurrentUser()
+            val emailCurren = authService.getCurrentUser()?.email ?: ""
             Log.i("user", "user para SALUDO: $userCurrent")
             try {
                 _isLoading.value = true
@@ -579,17 +592,22 @@ class homeViewModel @Inject constructor(
 
                     val userName = user.getOrNull()?.name ?: ""
                     _name.value = userName
+                    _nameS.value = userName
+                    _email.value = userCurrent?.email ?: ""
+                    _dateSingIn.value = userCurrent?.metadata?.creationTimestamp ?: 0
                     _isLoading.value = false
 
-                    Log.i("user", "user para SALUDO: $userName")
+                    Log.i("nombre", "user para SALUDO: $userName")
+                    Log.i("email", "email para SALUDO: ${_email.value}")
 
                 } else {
-                    Log.i("user", " error user para SALUDO: ${user.exceptionOrNull()}")
+                    Log.i("erroruser", " error user para SALUDO: ${user.exceptionOrNull()}")
                     _name.value = ""
+                    _nameS.value = ""
                     _isLoading.value = false
                 }
             } catch (ex: Exception) {
-                Log.i("user", " error user para SALUDO: ${ex.message}")
+                Log.i("errorcatchuser", " error user para SALUDO: ${ex.message}")
                 _isLoading.value = false
 
             }

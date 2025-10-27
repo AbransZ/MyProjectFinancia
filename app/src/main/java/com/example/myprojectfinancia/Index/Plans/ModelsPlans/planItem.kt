@@ -9,4 +9,12 @@ data class planItem(
     val Actualy: String,
     val Advice: String,
     val Date: String
-)
+) {
+    fun countPlansCompleted(): Int {
+        var amountPlansCompleted = 0
+        if (Actualy.toDoubleOrNull() == Objective.toDoubleOrNull()) {
+            amountPlansCompleted = +1
+        }
+        return amountPlansCompleted
+    }
+}
