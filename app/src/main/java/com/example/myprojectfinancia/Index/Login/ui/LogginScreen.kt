@@ -145,16 +145,16 @@ fun Body(
         Spacer(modifier = modifier.size(16.dp))
 
         Password(Pass) { loginViewModel.onLoginChange(email = email, password = it) }
-        Spacer(modifier = modifier.size(16.dp))
+        Spacer(modifier = modifier.size(10.dp))
 
         ForgotButton(navigationControler, loginViewModel)
-        Spacer(modifier = modifier.size(24.dp))
+        Spacer(modifier = modifier.size(10.dp))
 
         Buttons(isEnable, loginViewModel, email, Pass)
-        Spacer(modifier = modifier.size(32.dp))
+        Spacer(modifier = modifier.size(20.dp))
 
         Divider()
-        Spacer(modifier = modifier.size(20.dp))
+        Spacer(modifier = modifier.size(10.dp))
         Googlebuttons(loginViewModel)
 
         if (isLoading) {
@@ -177,15 +177,15 @@ fun Greetings(modifier: Modifier) {
     Column(modifier = modifier) {
         Text(
             text = "Hola, Bienvenido!",
-            fontSize = 45.sp,
+            fontSize = 40.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 6.dp)
         )
         Text(
             text = "Estamos Felices de tenerte acá",
-            fontSize = 25.sp,
-            fontWeight = FontWeight.SemiBold,
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Normal,
             color = Color.LightGray
         )
         Box(
@@ -211,6 +211,7 @@ fun Footer(modifier: Modifier, navigationControler: NavHostController) {
         modifier = modifier
             .fillMaxWidth()
             .height(50.dp)
+            .padding(4.dp)
     ) {
 
         SignIn(navigationControler)
@@ -221,7 +222,8 @@ fun Footer(modifier: Modifier, navigationControler: NavHostController) {
 fun SignIn(navigationControler: NavHostController) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.Center,
+        modifier = Modifier.padding(4.dp)
     ) {
         Text(
             text = "Aun no tienes una cuenta?",
@@ -267,6 +269,7 @@ fun Googlebuttons(loginViewModel: LoginViewModel) {
         Modifier
             .fillMaxWidth()
             .height(50.dp)
+            .padding(bottom = 10.dp)
     ) {
         OutlinedButton(
             onClick = {
@@ -304,13 +307,13 @@ fun Divider() {
         HorizontalDivider(
             modifier = Modifier
                 .weight(1f)
-                .padding(end = 8.dp), color = Color.LightGray
+                .padding(end = 4.dp), color = Color.LightGray
         )
         Text("O", color = Color.LightGray, fontSize = 14.sp)
         HorizontalDivider(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 8.dp), color = Color.LightGray
+                .padding(start = 4.dp), color = Color.LightGray
         )
     }
 
@@ -394,7 +397,7 @@ fun Password(pass: String, onTextChange: (String) -> Unit) {
             visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(55.dp),
+                .height(58.dp),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -440,7 +443,7 @@ fun Email(email: String, onTextChange: (String) -> Unit) {
             label = { Text("Ingresar email", color = MaterialTheme.colorScheme.onBackground) },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(55.dp),
+                .height(58.dp),
             maxLines = 1,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),

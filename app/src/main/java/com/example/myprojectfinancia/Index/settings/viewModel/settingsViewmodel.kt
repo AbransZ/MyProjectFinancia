@@ -113,13 +113,15 @@ class settingsViewmodel @Inject constructor(
                         )
                     }
                     val completed = _planes.value.count { plans ->
-                        plans.Actualy.toDoubleOrNull() == plans.Objective.toDoubleOrNull() && plans.Objective
+
+
+                        plans.Actualy.toDouble() >= plans.Objective.toDouble() && plans.Objective
                             .toDoubleOrNull() != 0.0
                     }
                     _Cplanes.value = completed
 
                     val active = _planes.value.count { plans ->
-                        plans.Actualy.toDoubleOrNull() != plans.Objective.toDoubleOrNull() && plans.Objective
+                        plans.Actualy.toDouble() < plans.Objective.toDouble() && plans.Objective
                             .toDoubleOrNull() != 0.0
                     }
                     _Aplanes.value = active

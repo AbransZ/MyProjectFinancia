@@ -594,24 +594,35 @@ fun PlanDeAhorro(
 
                             Column() {
                                 if (totalSaved != null) {
-                                    Text(
-                                        "$${homeViewModel.convertBsToUSD(totalSaved)}",
-                                        fontSize = 14.sp,
-                                        lineHeight = 5.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color =
-                                        MaterialTheme.colorScheme.onPrimary
-                                    )
+                                    Card(
+                                        Modifier
+                                            .clip(shape = RoundedCornerShape(5.dp)),
+                                        colors = CardDefaults.cardColors(Color(0xC335783F))
 
-                                    Text(
-                                        "Bs.${homeViewModel.formatAmount(totalSaved.toDouble())}",
-                                        fontSize = 12.sp,
+                                    ) {
+                                        Column(Modifier.padding(4.dp)) {
+                                            Text(
+                                                "$${homeViewModel.convertBsToUSD(totalSaved)}",
+                                                fontSize = 14.sp,
+                                                lineHeight = 5.sp,
+                                                fontWeight = FontWeight.Bold,
+                                                color =
+                                                MaterialTheme.colorScheme.onPrimary
+                                            )
 
-                                        fontWeight =
-                                        FontWeight.ExtraLight,
-                                        color =
-                                        MaterialTheme.colorScheme.onSecondary
-                                    )
+                                            Text(
+                                                "Bs.${homeViewModel.formatAmount(totalSaved.toDouble())}",
+                                                fontSize = 12.sp,
+
+                                                fontWeight =
+                                                FontWeight.ExtraLight,
+                                                color =
+                                                MaterialTheme.colorScheme.onSecondary
+                                            )
+                                        }
+
+                                    }
+
 
                                 } else {
                                     Text(
@@ -627,63 +638,78 @@ fun PlanDeAhorro(
 
 
                             Text("Faltante", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                            Column {
-                                Text(
-                                    "$${homeViewModel.convertBsToUSD(missing)}",
-                                    fontSize = 15.sp,
-                                    lineHeight = 5.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color =
-                                    MaterialTheme.colorScheme.onPrimary
-                                )
-                                if (missing != null) {
-
+                            Card(
+                                Modifier
+                                    .clip(shape = RoundedCornerShape(5.dp)),
+                                colors = CardDefaults.cardColors(Color(0x95A80606))
+                            ) {
+                                Column(Modifier.padding(4.dp)) {
                                     Text(
-                                        "Bs.${homeViewModel.formatAmount(missing.toDouble())}",
-                                        fontSize = 12.sp,
-                                        fontWeight =
-                                        FontWeight.ExtraLight,
+                                        "$${homeViewModel.convertBsToUSD(missing)}",
+                                        fontSize = 15.sp,
+                                        lineHeight = 5.sp,
+                                        fontWeight = FontWeight.Bold,
                                         color =
-                                        MaterialTheme.colorScheme.onSecondary
+                                        MaterialTheme.colorScheme.onPrimary
                                     )
+                                    if (missing != null) {
 
-                                } else {
-                                    Text(
-                                        "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
-                                        MaterialTheme.colorScheme.onSecondary
-                                    )
+                                        Text(
+                                            "Bs.${homeViewModel.formatAmount(missing.toDouble())}",
+                                            fontSize = 12.sp,
+                                            fontWeight =
+                                            FontWeight.ExtraLight,
+                                            color =
+                                            MaterialTheme.colorScheme.onSecondary
+                                        )
+
+                                    } else {
+                                        Text(
+                                            "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
+                                            MaterialTheme.colorScheme.onSecondary
+                                        )
+                                    }
                                 }
                             }
+
 
                         }
                         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
 
                             Text("Disponible", fontSize = 15.sp, fontWeight = FontWeight.Bold)
-                            Column {
-                                Text(
-                                    "$${homeViewModel.convertBsToUSD(budgetFree)}",
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                if (budgetFree != null) {
 
+                            Card(
+                                Modifier
+                                    .clip(shape = RoundedCornerShape(5.dp)),
+                                colors = CardDefaults.cardColors(Color(0xC35F98F6))
+                            ) {
+                                Column(Modifier.padding(4.dp)) {
                                     Text(
-                                        "Bs.${homeViewModel.formatAmount(budgetFree.toDouble())}",
-                                        fontSize = 12.sp,
-                                        lineHeight = 5.sp,
-                                        fontWeight =
-                                        FontWeight.ExtraLight,
-                                        color =
-                                        MaterialTheme.colorScheme.onSecondary
+                                        "$${homeViewModel.convertBsToUSD(budgetFree)}",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.Bold
                                     )
+                                    if (budgetFree != null) {
 
-                                } else {
-                                    Text(
-                                        "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
-                                        MaterialTheme.colorScheme.onSecondary
-                                    )
+                                        Text(
+                                            "Bs.${homeViewModel.formatAmount(budgetFree.toDouble())}",
+                                            fontSize = 12.sp,
+                                            lineHeight = 5.sp,
+                                            fontWeight =
+                                            FontWeight.ExtraLight,
+                                            color =
+                                            MaterialTheme.colorScheme.onSecondary
+                                        )
+
+                                    } else {
+                                        Text(
+                                            "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
+                                            MaterialTheme.colorScheme.onSecondary
+                                        )
+                                    }
                                 }
                             }
+
 
                         }
                     }

@@ -102,7 +102,7 @@ fun BodyForgot(
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(60.dp),
+                .height(40.dp),
             shape = RoundedCornerShape(16.dp),
         ) {
             Text(text = "Recuperar", color = MaterialTheme.colorScheme.onPrimary, fontSize = 20.sp)
@@ -233,18 +233,18 @@ fun HeaderScreen(modifier: Modifier, navigationControler: NavHostController) {
         Column(modifier.padding(20.dp)) {
             Text(
                 text = "Recuperar  contraseña",
-                fontSize = 40.sp,
+                fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Text(
-                text = "Coloca tu email para que \n" +
-                        "puedas recibir un correo \n" +
+                text = "Coloca tu email para que " +
+                        "puedas recibir un correo " +
                         "con tu contraseña",
-                fontSize = 25.sp,
+                fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = Color.LightGray
             )
         }
     }
