@@ -14,18 +14,31 @@ import com.example.myprojectfinancia.R
 import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-class MessaguingToken @Inject constructor() : FirebaseMessagingService() {
+
+@AndroidEntryPoint
+class MessaguingToken : FirebaseMessagingService() {
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
+        Log.d("Notif", "Mi token es: ${token}")
     }
 
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        Log.d("FCM", "¡Mensaje recibido!")
+        Log.d("Notif", "¡Mensaje recibido!")
+
+        if (remoteMessage.data.isNotEmpty()){
+            Log.d("Notif", "Datos recibidos ${remoteMessage.data}")
+
+            val titulo = remoteMessage.data["titulo"]
+            val cuerpo = remoteMessage.data["mensaje"]
+
+            mostrarNotificacion( titulo, cuerpo)
+        }
 
         // Mostrar notificación (tanto en primer plano como en segundo plano)
         remoteMessage.notification?.let {
@@ -43,7 +56,8 @@ class MessaguingToken @Inject constructor() : FirebaseMessagingService() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
 
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(
             System.currentTimeMillis()
                 .toInt(), notificationBuilder.build()
@@ -61,13 +75,24 @@ fun SetupFirebaseNotifications() {
         if (isGranted) {
             FirebaseMessaging.getInstance()
                 .subscribeToTopic("novedades")
-                .addOnCompleteListener { Log.d("FCM", "Permiso concedido, obteniendo token... parte 1") }
+                .addOnCompleteListener {
+                    Log.d("FCM", "Permiso concedido, obteniendo token... parte 1")
+                }
+
             Log.d("FCM", "Permiso concedido, obteniendo token...")
+
             FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d("FCM", "TOKEN: ${task.result}")
                 }
             }
+
+            FirebaseMessaging.getInstance().subscribeToTopic("precios_dolar")
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("Suscripcion", "Suscrito exitosamente al canal del dólar")
+                    }
+                }
         }
     }
 
@@ -81,6 +106,13 @@ fun SetupFirebaseNotifications() {
                     Log.d("FCM", "TOKEN: ${task.result}")
                 }
             }
+
+            FirebaseMessaging.getInstance().subscribeToTopic("precios_dolar")
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.d("Suscripcion", "Suscrito exitosamente al canal del dólar")
+                    }
+                }
         }
     }
 }
