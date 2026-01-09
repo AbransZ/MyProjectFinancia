@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
     private fun programarAlarmaDolar() {
         val workManager= WorkManager.getInstance(this)
 
-        /*val now = Calendar.getInstance()
+        val now = Calendar.getInstance()
         val target = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY,12)
             set(Calendar.MINUTE,47)
@@ -91,16 +91,9 @@ class MainActivity : ComponentActivity() {
             "Monitoreo_Dolar",
             ExistingPeriodicWorkPolicy.KEEP,
             request
-        )*/
+        )
 
-        val request = androidx.work.OneTimeWorkRequestBuilder<WorkerNotification>()
-            //.setInitialDelay(10, TimeUnit.SECONDS) // <--- TRUCO: Espera 10 seg y dispara
-            .addTag("precio_dolar")
-            .build()
 
-        // 2. CAMBIA LA POLÍTICA A "REPLACE"
-        // REPLACE = "Borra cualquier trabajo viejo y pon este nuevo AHORA"
-        workManager.enqueue(request)
     }
 }
 
