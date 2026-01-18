@@ -52,8 +52,8 @@ class homeViewModel @Inject constructor(
     val email: StateFlow<String> = _email
 
     //variable para el email settings
-    private val _dateSingIn = MutableStateFlow<Long>(0)
-    val dateSingIn: StateFlow<Long> = _dateSingIn
+    private val _dateSingIn = MutableStateFlow<String>("")
+    val dateSingIn: StateFlow<String> = _dateSingIn
 
     private val _categoria = MutableLiveData<String>("")
     val category: LiveData<String> = _categoria
@@ -393,6 +393,14 @@ class homeViewModel @Inject constructor(
         _Error.value = null
         _ErrorAllMovements.value = null
         _isLoading.value = false
+        _categoriaEdit.value = ""
+        _nameS.value = ""
+        _email.value = ""
+        _dateSingIn.value = ""
+        _montoBsString.value = ""
+        _montoBsStringEdit.value = ""
+        _montoBsDoubleEdit.value = 0.0
+        _montoBsDouble.value = 0.0
         clearfields()
     }
 
@@ -594,7 +602,9 @@ class homeViewModel @Inject constructor(
                     _name.value = userName
                     _nameS.value = userName
                     _email.value = userCurrent?.email ?: ""
-                    _dateSingIn.value = userCurrent?.metadata?.creationTimestamp ?: 0
+                    val timestamp = userCurrent?.metadata?.creationTimestamp ?: 0
+                    val fecha = SimpleDateFormat("dd/MM/yy", Locale.getDefault()).format(Date(timestamp))
+                    _dateSingIn.value = fecha
                     _isLoading.value = false
 
                     Log.i("nombre", "user para SALUDO: $userName")

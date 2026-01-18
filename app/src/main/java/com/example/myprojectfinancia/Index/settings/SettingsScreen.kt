@@ -3,7 +3,6 @@ package com.example.myprojectfinancia.Index.settings
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,7 +20,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Logout
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -180,14 +178,41 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                     item { Spacer(Modifier.padding(6.dp)) }
                     item {
                         Text(
-                            "• Visualiza tu presupuesto actual en USD/VES\n\n" +
-                                    "• Revisa el resumen de tus ahorros\n\n" +
-                                    "• Ve grafico de resumen de todos tus planes de ahorros\n\n" +
-                                    "• Consulta tus transacciones filtradas por gasto o ingreso\n\n" +
-                                    "• Presiona el botón \"+\" para agregar movimientos\n"
+                            text = "• Visualiza tu presupuesto actual en USD y VES.\n\n" +
+                                    "• Revisa el resumen de tus ahorros totales.\n\n" +
+                                    "• Ve un gráfico resumen de todos tus planes de ahorro.\n\n" +
+                                    "• Consulta tus últimas transacciones.\n\n" +
+                                    "• Para agregar un nuevo movimiento, presiona el icono de factura [🧾] en la barra de navegación.",
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     }
                     item { Spacer(Modifier.padding(10.dp)) }
+
+                    item {
+                        Text(
+                            "\uD83D\uDCCA Cómo Registrar una Transacción",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    item { Spacer(Modifier.padding(6.dp)) }
+                    item {
+                        Text(
+                            text = "1. Presiona el icono de factura [🧾] en la parte inferior derecha de la pantalla" +
+                                    ".\n\n" +
+                                    "2. En la ventana que aparece, debes elegir si es un \"Gasto\" o un \"Ingreso\" " +
+                                    "aunque predefinido esta \"Ingreso\"." +
+                                    ".\n\n" +
+                                    "3. Ingresa el monto. Puedes escribirlo en Bolívares o Dólares; la app calculará la conversión automáticamente.\n\n" +
+                                    "4. En el campo \"Categoría\", escribe la categoría que desees (Ej: \"Comida\", \"Salario\", \"Transporte\"). Puedes crear las que necesites.\n\n",
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        )
+                    }
+                    item { Spacer(Modifier.padding(10.dp)) }
+
                     item { Text("\uD83D\uDCB0 Planes Financieros", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
                     item { Spacer(Modifier.padding(6.dp)) }
                     item {
@@ -201,20 +226,26 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                     item { Text("\uD83D\uDCCA Transacciones\n", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
                     item {
                         Text(
-                            "• Registra ingresos y gastos fácilmente desde la pantalla principal \n\n" +
-                                    "• Categoriza tus movimientos agregando tus propias categorias\n\n" +
-                                    "• Agrega descripciones detalladas\n\n" +
-                                    "• Visualiza conversión automática USD/VES en cada uno de los apartados\n\n"
+                            text = "Para crear un nuevo Plan:\n" +
+                                    "1. Ve a la pestaña \"Planes\" en la barra inferior (el icono [📝]).\n" +
+                                    "2. Se abrirá una ventana para que ingreses los detalles de tu meta: nombre, monto objetivo, etc.\n" +
+                                    "3. La app te dará una sugerencia de aporte basada en tu presupuesto total y tu dinero \"flotante\" (dinero no comprometido).\n\n" +
+                                    "Para gestionar tus Planes:\n" +
+                                    "• Añadir Aporte: Simplemente toca (tap) sobre el plan.\n" +
+                                    "• Editar un Plan: Mantén presionado el plan que quieres modificar.",
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     }
                     item { Text("⚙\uFE0F Herramientas\n", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
                     item {
                         Text(
-                            "• Actualiza tu información personal\n\n" +
-                                    "• Cambia tu contraseña de forma segura\n\n" +
-                                    "• Usa el conversor de moneda con tasa BCV actualizada\n\n" +
-                                    "• Consulta estadísticas de actividad\n\n" +
-                                    "• Accede a información de la aplicación\n\n"
+                            text = "1. Accede desde el icono de tuerca [⚙️] en la barra de navegación.\n\n" +
+                                    "2. Aquí encontrarás:\n" +
+                                    "• Conversor de Moneda: Para consultar la tasa BCV y hacer cálculos rápidos.\n" +
+                                    "• Estadísticas de Actividad: Un resumen de tus movimientos totales, planes activos y planes completados.",
+                            textAlign = TextAlign.Start,
+                            modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     }
                     item { Text("\uD83D\uDCA1 Consejos Útiles\n", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
@@ -568,7 +599,7 @@ fun ConversorMoneda(
 }
 
 @Composable
-fun UserItem(modifier: Modifier, name: String, email: String, dateCration: Long) {
+fun UserItem(modifier: Modifier, name: String, email: String, dateCration: String) {
     Card(
         modifier = Modifier
             .height(100.dp)
@@ -579,7 +610,7 @@ fun UserItem(modifier: Modifier, name: String, email: String, dateCration: Long)
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceAround
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_user),
@@ -611,16 +642,16 @@ fun UserItem(modifier: Modifier, name: String, email: String, dateCration: Long)
                 )
 
             }
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Settings",
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = modifier
-                    .align(Alignment.CenterVertically)
-                    .padding(6.dp)
-                    .size(30.dp)
-                    .clickable { }
-            )
+//            Icon(
+//                imageVector = Icons.Default.Settings,
+//                contentDescription = "Settings",
+//                tint = MaterialTheme.colorScheme.primary,
+//                modifier = modifier
+//                    .align(Alignment.CenterVertically)
+//                    .padding(6.dp)
+//                    .size(30.dp)
+//                    .clickable { }
+//            )
         }
 
     }

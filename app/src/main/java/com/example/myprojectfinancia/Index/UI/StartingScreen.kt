@@ -38,20 +38,7 @@ fun InitialView(
 
     Scaffold(topBar = {
         TopAppBar(
-            title = { Text("Financia", fontWeight = FontWeight.Bold, fontSize = 40.sp) },
-//            actions = {
-//                Button(onClick = {
-//                    val route = homeViewModel.logout()
-//                    navController.navigate(route) {
-//                        popUpTo(0) { inclusive = true }
-//                        loginViewModel.clearFields()
-//                    }
-//                }
-//                )
-//                {
-//                    Text("Salir", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-//                }
-//            }
+            title = { Text("Financia", fontWeight = FontWeight.Bold, fontSize = 40.sp) }
         )
     },
 
@@ -59,7 +46,8 @@ fun InitialView(
             BarraDeBotones(
                 currentScreen = Navigation.currentState,
                 onScreenSelected = { Navigation.onScreenSelected(it) })
-        }) { paddingContent ->
+        }
+    ) { paddingContent ->
         when (Navigation.currentState) {
             NavScreensModel.Home -> {
                 HomeScreen(paddingContent, homeViewModel, plansViewModel)

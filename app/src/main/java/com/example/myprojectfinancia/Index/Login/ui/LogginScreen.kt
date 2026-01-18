@@ -70,8 +70,9 @@ fun LogginScreen(
     Box(
         modifier
             .fillMaxSize()
-            .padding(top = 26.dp)
             .background(color = MaterialTheme.colorScheme.background)
+            .padding(top = 26.dp)
+
     ) {
         val context = LocalContext.current
 
@@ -96,26 +97,28 @@ fun LogginScreen(
                 }
             }
         }
+        Column(Modifier.fillMaxSize()) {
+            Header(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(10.dp)
+            )
+            Body(
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(horizontal = 8.dp),
+                loginViewModel,
+                navigationControler
+            )
 
-        Header(
-            Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-        )
-        Body(
-            Modifier
-                .align(Alignment.Center)
-                .padding(horizontal = 16.dp),
-            loginViewModel,
-            navigationControler
-        )
+            Footer(
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(8.dp),
+                navigationControler
+            )
+        }
 
-        Footer(
-            Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp),
-            navigationControler
-        )
 
     }
 
@@ -138,23 +141,23 @@ fun Body(
     Column(modifier = modifier) {
 
         Greetings(modifier)
-        Spacer(modifier = modifier.size(18.dp))
+        Spacer(modifier = modifier.size(10.dp))
 
 
         Email(email) { loginViewModel.onLoginChange(email = it, password = Pass) }
         Spacer(modifier = modifier.size(16.dp))
 
         Password(Pass) { loginViewModel.onLoginChange(email = email, password = it) }
-        Spacer(modifier = modifier.size(10.dp))
+        Spacer(modifier = modifier.height(5.dp))
 
         ForgotButton(navigationControler, loginViewModel)
-        Spacer(modifier = modifier.size(10.dp))
+        Spacer(modifier = modifier.height(15.dp))
 
         Buttons(isEnable, loginViewModel, email, Pass)
-        Spacer(modifier = modifier.size(20.dp))
+        Spacer(modifier = modifier.height(15.dp))
 
         Divider()
-        Spacer(modifier = modifier.size(10.dp))
+        Spacer(modifier = modifier.height(15.dp))
         Googlebuttons(loginViewModel)
 
         if (isLoading) {
@@ -177,7 +180,7 @@ fun Greetings(modifier: Modifier) {
     Column(modifier = modifier) {
         Text(
             text = "Hola, Bienvenido!",
-            fontSize = 40.sp,
+            fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
             modifier = Modifier.padding(bottom = 6.dp)

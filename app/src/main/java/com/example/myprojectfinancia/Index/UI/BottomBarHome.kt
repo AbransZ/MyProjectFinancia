@@ -5,6 +5,7 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
 import com.example.myprojectfinancia.Index.home.Models.NavScreensModel
 import com.example.myprojectfinancia.Index.home.Models.ScreenItem
@@ -26,7 +27,7 @@ fun BarraDeBotones(
                         contentDescription = item.title
                     )
                 },
-                label = { Text(text = item.title, fontSize = 12.sp) }
+                label = { Text(text = item.title, fontSize = 12.sp, modifier = Modifier.weight(1f)) }
             )
         }
     }

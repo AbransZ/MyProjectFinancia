@@ -88,7 +88,6 @@ fun HomeScreen(
     val presupuesto by homeViewModel.presupuesto.collectAsState()
     val isLoading by homeViewModel.isLoading.collectAsState()
     val error by homeViewModel.Error.collectAsState()
-    val selectedTab by homeViewModel.currentSelectedTab.collectAsState()
     val plans by plansViewModel.plans.collectAsState()
     val missing by plansViewModel.missing.collectAsState()
     val totalSaved by plansViewModel.totalSaved.collectAsState()
@@ -123,7 +122,7 @@ fun HomeScreen(
 
             Greeteng(name)
             PresupuestoCard(presupuesto, homeViewModel, UIDolar, DolarObject, Modifier.weight(1f))
-            PlanDeAhorro(plans, plansViewModel, missing, totalSaved, budgetFree, UIDolar, DolarObject, homeViewModel)
+            PlanDeAhorro(plans, plansViewModel, missing, totalSaved, budgetFree, homeViewModel)
             Movimientos(homeViewModel, isLoading)
             AggCuenta(
                 showDialog,
@@ -271,105 +270,136 @@ fun BodyDialog(
             .fillMaxWidth()
             .padding(8.dp)
     ) {
-        Column(Modifier.fillMaxWidth()) {
+        LazyColumn(Modifier.fillMaxWidth()) {
 
             //Botones de ingresos y gastos
-            Row(
-                Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
-            ) {
-                Button(
-                    onClick = {
-                        homeViewModel.ingresosIsPressed()
-                    }, shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.buttonColors(
-                        if (isPressedIngresos) Color(0x8B024910) else Color(0xC147F1C6)
-
-                    ),
-                    modifier = Modifier
-
-                        .weight(1f)
-                ) { Text("Ingreso", fontSize = 18.sp) }
-                Spacer(Modifier.width(10.dp))
-                Button(
-                    onClick = {
-                        homeViewModel.gastosIsPressed()
-                    }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
-                        if (isPressedGastos) Color(0x90530A0A) else Color(0xA9EF7352)
-                    ),
-                    modifier = Modifier
-                        .weight(1f)
+            item {
+                Row(
+                    Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center
                 ) {
-                    Text("Gasto", fontSize = 18.sp)
+                    Button(
+                        onClick = {
+                            homeViewModel.ingresosIsPressed()
+                        }, shape = MaterialTheme.shapes.small,
+                        colors = ButtonDefaults.buttonColors(
+                            if (isPressedIngresos) Color(0x8B024910) else Color(0xC147F1C6)
+
+                        ),
+                        modifier = Modifier
+
+                            .weight(1f)
+                    ) { Text("Ingreso", fontSize = 18.sp) }
+                    Spacer(Modifier.width(10.dp))
+                    Button(
+                        onClick = {
+                            homeViewModel.gastosIsPressed()
+                        }, shape = MaterialTheme.shapes.small, colors = ButtonDefaults.buttonColors(
+                            if (isPressedGastos) Color(0x90530A0A) else Color(0xA9EF7352)
+                        ),
+                        modifier = Modifier
+                            .weight(1f)
+                    ) {
+                        Text("Gasto", fontSize = 18.sp)
+                    }
                 }
             }
 
             //Campos de texto para ingresar monto y categoria
-            Spacer(Modifier.padding(8.dp))
-            Text("Monto", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 40.dp))
-            Spacer(Modifier.padding(4.dp))
-            OutlinedTextField(
-                value = monto,
-                onValueChange = {
-                    homeViewModel.onMontoChange(it, dolarObject?.promedio)
-                },
-                placeholder = { Text("Ingresar monto.", fontSize = 15.sp) },
-                prefix = { Text("$", fontSize = 15.sp) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier
-                    .height(56.dp)
-                    .width(210.dp)
-                    .align(Alignment.CenterHorizontally),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            )
-            Spacer(Modifier.padding(10.dp))
-            OutlinedTextField(
-                value = montoBs,
-                onValueChange = {
-                    homeViewModel.onMontoBsChange(it, dolarObject?.promedio)
-                },
-                placeholder = { Text("Ingresar monto.", fontSize = 15.sp) },
-                prefix = { Text("Bs.", fontSize = 15.sp) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier
-                    .height(58.dp)
-                    .width(210.dp)
-                    .align(Alignment.CenterHorizontally),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            )
-            Spacer(Modifier.padding(8.dp))
-            Text(
-                "Categoria", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 40.dp)
-            )
-            Spacer(Modifier.padding(4.dp))
-            OutlinedTextField(
-                value = categoria,
-                onValueChange = { homeViewModel.onCategoriaChange(it) },
-                placeholder = { Text("Ej. Salario, Comida, Mercado.", fontSize = 15.sp) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier
-                    .height(60.dp)
-                    .width(210.dp)
-                    .align(Alignment.CenterHorizontally),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-            )
-            Spacer(Modifier.padding(5.dp))
-            Box(Modifier.fillMaxWidth()) {
+            item { Spacer(Modifier.padding(8.dp)) }
+            item {
                 Text(
-                    "Fecha $fecha", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding
-                        (start = 40.dp)
+                    "Monto",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 40.dp)
                 )
+            }
+            item { Spacer(Modifier.padding(4.dp)) }
+            item {
+                Box(Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = monto,
+                        onValueChange = {
+                            homeViewModel.onMontoChange(it, dolarObject?.promedio)
+                        },
+                        placeholder = { Text("Ingresar monto.", fontSize = 15.sp) },
+                        prefix = { Text("$", fontSize = 15.sp) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier
+                            .height(56.dp)
+                            .width(210.dp)
+                            .align(Alignment.Center),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    )
+                }
+
+            }
+            item { Spacer(Modifier.padding(10.dp)) }
+            item {
+                Box(Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = montoBs,
+                        onValueChange = {
+                            homeViewModel.onMontoBsChange(it, dolarObject?.promedio)
+                        },
+                        placeholder = { Text("Ingresar monto.", fontSize = 15.sp) },
+                        prefix = { Text("Bs.", fontSize = 15.sp) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier
+                            .height(58.dp)
+                            .width(210.dp)
+                            .align(Alignment.Center),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    )
+                }
+
+            }
+            item { Spacer(Modifier.padding(8.dp)) }
+            item {
+                Text(
+                    "Categoria",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(start = 40.dp)
+                )
+            }
+            item { Spacer(Modifier.padding(4.dp)) }
+            item {
+                Box(Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = categoria,
+                        onValueChange = { homeViewModel.onCategoriaChange(it) },
+                        placeholder = { Text("Ej. Salario, Comida, Mercado.", fontSize = 15.sp) },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier
+                            .height(60.dp)
+                            .width(210.dp)
+                            .align(Alignment.Center),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    )
+                }
+
+            }
+            item { Spacer(Modifier.padding(5.dp)) }
+            item {
+                Box(Modifier.fillMaxWidth()) {
+                    Text(
+                        "Fecha $fecha", fontSize = 18.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding
+                            (start = 40.dp)
+                    )
+                }
             }
 
 
@@ -544,8 +574,6 @@ fun PlanDeAhorro(
     missing: Double,
     totalSaved: Double,
     budgetFree: Double,
-    UIDolar: UiStateDolar,
-    DolarObject: DolarOficial?,
     homeViewModel: homeViewModel
 ) {
 
@@ -559,7 +587,7 @@ fun PlanDeAhorro(
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
-                .height(260.dp),
+                .height(230.dp),
             shape = CardDefaults.elevatedShape,
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 10.dp),
 
@@ -722,7 +750,7 @@ fun PlanDeAhorro(
         ElevatedCard(
             modifier = Modifier
                 .weight(1f)
-                .height(260.dp),
+                .height(230.dp),
             shape = CardDefaults.elevatedShape,
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 10.dp),
 
@@ -794,7 +822,7 @@ fun ResumePlan(modifier: Modifier = Modifier, colorElegido: Color, plan: planIte
             .fillMaxWidth()
             .padding(5.dp)
     ) {
-        Column(Modifier.weight(0.4f), horizontalAlignment = Alignment.Start) {
+        Column(Modifier.weight(0.7f), horizontalAlignment = Alignment.Start) {
             Text(
                 plan.Name, fontSize = 14.sp,
                 lineHeight = 12.sp
@@ -805,7 +833,7 @@ fun ResumePlan(modifier: Modifier = Modifier, colorElegido: Color, plan: planIte
             LinearProgressIndicator(
                 progress = { progres },
                 modifier = modifier
-                    .height(8.dp)
+                    .height(6.dp)
                     .fillMaxWidth(),
                 color = colorElegido,
                 trackColor = colorElegido.copy(alpha = 0.3f),
@@ -813,7 +841,7 @@ fun ResumePlan(modifier: Modifier = Modifier, colorElegido: Color, plan: planIte
             )
         }
 
-        Column(Modifier.weight(0.5f), horizontalAlignment = Alignment.End) {
+        Column(Modifier.weight(0.7f), horizontalAlignment = Alignment.End) {
             Text(
                 "${percentgeformtat}%",
                 fontSize = 15.sp
@@ -933,15 +961,16 @@ fun PresupuestoCard(
                             "Tasa del dia: Bs.${homeViewModel.formatAmount(tasa)}",
                             fontSize = 15.sp,
                             textAlign = TextAlign.Start,
-                            lineHeight = 12.sp,
+                            lineHeight = 18.sp,
                             maxLines = 2
                         )
+                        Spacer(Modifier.height(10.dp))
                         Text(
                             "Fecha:${homeViewModel.fechaActualtasa(fecha)}",
                             fontSize = 15.sp,
                             textAlign = TextAlign.Start,
                             maxLines = 2,
-                            lineHeight = 12.sp
+                            lineHeight = 18.sp
                         )
                     }
 

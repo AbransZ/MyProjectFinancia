@@ -141,7 +141,7 @@ class settingsViewmodel @Inject constructor(
         _error.value = null
     }
 
-    //funcion para formatear
+    //funcion para formatear MONTOS
     fun format(monto: Double): String {
         return String.format("%.2f", monto)
     }
