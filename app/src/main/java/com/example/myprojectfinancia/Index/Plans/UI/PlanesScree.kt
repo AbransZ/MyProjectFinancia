@@ -991,7 +991,7 @@ fun PlanTotal(
             Card(
                 modifier = modifier
                     .height(230.dp)
-                    .width(400.dp)
+                    .fillMaxWidth()
                     .padding(16.dp),
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
@@ -1138,7 +1138,7 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
     Card(
         modifier = Modifier
             .height(250.dp)
-            .width(400.dp)
+            .fillMaxWidth()
             .padding(10.dp)
             .combinedClickable(
                 onClick = { plansViewModel.selectedPlan(planItem) },
@@ -1234,10 +1234,17 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                         )
                     }
                 }
-                Spacer(modifier.padding(6.dp))
-                Text(
-                    planItem.Advice, fontSize = 12.sp, lineHeight = 12.sp
-                )
+                Spacer(modifier.height(30.dp))
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Text(
+                        planItem.Advice,
+                        fontSize = 12.sp,
+                        lineHeight = 12.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
             }
 
         }
