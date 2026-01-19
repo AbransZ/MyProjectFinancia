@@ -151,9 +151,9 @@ class settingsViewmodel @Inject constructor(
         _monto.value = monto
         val montoNum = monto.toDoubleOrNull()
         if (montoNum != null && Bcv != null) {
-            val montoBs = montoNum * Bcv
+            val montoBs = format(montoNum * Bcv)
             _montoBs.value = montoBs.toString()
-            return format(_montoBs.value.toDouble())
+            return _montoBs.value
         } else if (monto.isBlank()) {
             _montoBs.value = ""
         } else {
@@ -167,9 +167,9 @@ class settingsViewmodel @Inject constructor(
         _montoBs.value = montobs
         val montoNum = montobs.toDoubleOrNull()
         if (montoNum != null && Bcv != null) {
-            val montoUSD = montoNum / Bcv
+            val montoUSD = format(montoNum / Bcv)
             _monto.value = montoUSD.toString()
-            return format(_monto.value.toDouble())
+            return _monto.value
         } else if (montobs.isBlank()) {
             _monto.value = ""
         } else {

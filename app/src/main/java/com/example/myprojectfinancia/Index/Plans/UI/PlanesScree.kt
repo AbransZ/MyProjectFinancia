@@ -1234,10 +1234,17 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                         )
                     }
                 }
-                Spacer(modifier.padding(6.dp))
-                Text(
-                    planItem.Advice, fontSize = 12.sp, lineHeight = 12.sp
-                )
+                Spacer(modifier.height(30.dp))
+
+                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                    Text(
+                        planItem.Advice,
+                        fontSize = 12.sp,
+                        lineHeight = 12.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+
             }
 
         }
