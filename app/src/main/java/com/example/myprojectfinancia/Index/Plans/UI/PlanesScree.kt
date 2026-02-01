@@ -26,7 +26,6 @@ import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -993,15 +992,15 @@ fun PlanTotal(
                     .height(230.dp)
                     .fillMaxWidth()
                     .padding(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
+
+                ) {
                 Box(modifier.padding(8.dp)) {
                     Column {
                         Text(
                             "Progreso de ahorro",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier.padding(8.dp))
                         Row(
@@ -1143,8 +1142,8 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
             .combinedClickable(
                 onClick = { plansViewModel.selectedPlan(planItem) },
                 onLongClick = { plansViewModel.selectedPlanEdit(planItem) }),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-    ) {
+
+        ) {
         Box(
             modifier
                 .fillMaxWidth()
@@ -1163,7 +1162,7 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                     Text(
                         "${percentegeFormated}%",
                         fontSize = 15.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
                 }
@@ -1174,7 +1173,7 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                     label = { Text(planItem.Category, fontSize = 14.sp) },
                     colors = AssistChipDefaults.assistChipColors(
                         containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        labelColor = MaterialTheme.colorScheme.onPrimary
+                        labelColor = MaterialTheme.colorScheme.secondary
                     )
                 )
                 Spacer(modifier.padding(3.dp))
@@ -1207,13 +1206,13 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                             "$${plansViewModel.convertBsToUSD(planItem.Actualy.toDouble())}",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             "Bs ${plansViewModel.formatTotal(planItem.Actualy.toDouble())}",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Light,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
 
@@ -1224,13 +1223,13 @@ fun PlanesCard(modifier: Modifier = Modifier, planItem: planItem, plansViewModel
                             "$${plansViewModel.convertBsToUSD(planItem.Objective.toDouble())}",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimary
+                            color = MaterialTheme.colorScheme.primary
                         )
                         Text(
                             "Bs ${plansViewModel.formatTotal(planItem.Objective.toDouble())}",
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Normal,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }

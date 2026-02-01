@@ -906,6 +906,7 @@ fun PresupuestoCard(
                                 fontWeight = FontWeight.Normal,
                                 textAlign =
                                 TextAlign.Start
+
                             )
                             Column(Modifier.fillMaxWidth()) {
                                 Text(
@@ -937,13 +938,13 @@ fun PresupuestoCard(
                                             Text(
                                                 "Bs.${presupuesto}",
                                                 fontSize = 15.sp,
-                                                color = MaterialTheme.colorScheme.onSecondary
+                                                color = MaterialTheme.colorScheme.primary
                                             )
                                         } else {
                                             Text(
                                                 "Bs. ---",
                                                 fontSize = 20.sp,
-                                                color = MaterialTheme.colorScheme.onSecondary
+                                                color = MaterialTheme.colorScheme.primary
                                             )
                                         }
                                     }
@@ -962,7 +963,8 @@ fun PresupuestoCard(
                             fontSize = 15.sp,
                             textAlign = TextAlign.Start,
                             lineHeight = 18.sp,
-                            maxLines = 2
+                            maxLines = 2,
+                            color = MaterialTheme.colorScheme.secondaryContainer
                         )
                         Spacer(Modifier.height(10.dp))
                         Text(
@@ -970,7 +972,8 @@ fun PresupuestoCard(
                             fontSize = 15.sp,
                             textAlign = TextAlign.Start,
                             maxLines = 2,
-                            lineHeight = 18.sp
+                            lineHeight = 18.sp,
+                            color = MaterialTheme.colorScheme.secondaryContainer
                         )
                     }
 
@@ -989,7 +992,7 @@ fun PresupuestoCard(
                         Modifier
                             .size(40.dp)
                             .clickable { homeViewModel.mostrarDialogBudget() },
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = MaterialTheme.colorScheme.secondaryContainer
                     )
 
                 }

@@ -202,7 +202,7 @@ fun EmailToRememberPass(modifier: Modifier, email: String, onTextChange: (String
         TextField(
             value = email,
             onValueChange = { onTextChange(it) },
-            label = { Text("Ingresar email", color = MaterialTheme.colorScheme.onPrimary) },
+            label = { Text("Ingresar email", color = MaterialTheme.colorScheme.secondary) },
             modifier = Modifier.fillMaxWidth(),
             maxLines = 1,
             singleLine = true,
@@ -235,7 +235,7 @@ fun HeaderScreen(modifier: Modifier, navigationControler: NavHostController) {
                 text = "Recuperar  contraseña",
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
             Text(
@@ -244,7 +244,7 @@ fun HeaderScreen(modifier: Modifier, navigationControler: NavHostController) {
                         "con tu contraseña",
                 fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color.LightGray
+                color = MaterialTheme.colorScheme.secondary
             )
         }
     }

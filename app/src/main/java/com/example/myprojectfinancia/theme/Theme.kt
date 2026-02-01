@@ -42,21 +42,46 @@ private val LightColorScheme = lightColorScheme(
 )*/
 
 private val LightColors = lightColorScheme(
+    // 1. EL COLOR PRINCIPAL (Botones grandes, Barras de navegación activas)
+    // Mantenemos tu azul oscuro elegante, pero el texto sobre él DEBE ser blanco.
     primary = Color(0xFF1D416C),
-    onPrimary = Color.Black,
-    secondary = Color(0xFF32455A),
-    onSecondary = Color(0xFF8B8B8B),
-    tertiary = Color(0xFF28335E),
-    background = Color(0xFFECECEC),
-    onBackground = Color.DarkGray,
-    surface = Color(0xFF7C7CF1),
-    onSurface = Color.LightGray,
-    primaryContainer = Color(0xAD8894F5),
-    onPrimaryContainer = Color(0xFF0276F5),
-    onErrorContainer = Color(0xF8E70A0A),
-    errorContainer = Color(0xFF30669E),
-    surfaceVariant = Color(0xFFB9B9E8),
-    secondaryContainer = Color(0xAD338AF5)
+    onPrimary = Color.White,
+
+    // 2. CONTENEDORES PRIMARIOS (Botones suaves, selecciones)
+    // Un azul muy clarito derivado del principal
+    primaryContainer = Color(0xFFD4E3FF),
+    onPrimaryContainer = Color(0xFF001C3A), // Texto oscuro sobre azul clarito
+
+    // 3. COLOR SECUNDARIO (Elementos de menor importancia)
+    secondary = Color(0xFF535F70),
+    onSecondary = Color.White,
+
+    secondaryContainer = Color(0xFFD7E3F7),
+    onSecondaryContainer = Color(0xFF101C2B),
+
+    // 4. TERCIARIO (Acentos, gráficos)
+    tertiary = Color(0xFF0276F5), // Tu azul brillante para destacar cosas pequeñas
+    onTertiary = Color.White,
+
+    // 5. FONDOS (La parte más importante del Light Mode)
+    // background: El fondo general de la pantalla (gris azulado muy pálido, no gris sucio)
+    background = Color(0xFFF8F9FF),
+    onBackground = Color(0xFF1A1C1E), // Texto casi negro (mejor que gris puro)
+
+    // surface: Las Tarjetas (Cards), BottomSheets, Dialogs
+    // En light mode, las tarjetas deben ser BLANCAS o casi blancas para resaltar sobre el fondo.
+    surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF1A1C1E), // El texto en las tarjetas debe ser oscuro
+
+    // 6. VARIANTES (Campos de texto, bordes)
+    surfaceVariant = Color(0xFFE0E2EC), // Gris suave para los inputs (OutlinedTextField)
+    onSurfaceVariant = Color(0xFF44474F), // Texto de placeholders/iconos
+
+    // 7. ERRORES
+    error = Color(0xFFBA1A1A),
+    onError = Color.White,
+    errorContainer = Color(0xFFFFDAD6),
+    onErrorContainer = Color(0xFF410002)
 )
 
 // Esquema de colores para el modo oscuro

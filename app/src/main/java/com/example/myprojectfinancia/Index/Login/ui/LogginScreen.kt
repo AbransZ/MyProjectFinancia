@@ -17,10 +17,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
@@ -97,30 +100,44 @@ fun LogginScreen(
                 }
             }
         }
-        Column(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .imePadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+
+
             Header(
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(10.dp)
             )
+
+
+
+
             Body(
                 Modifier
-                    .align(Alignment.CenterHorizontally)
+
                     .padding(horizontal = 8.dp),
                 loginViewModel,
                 navigationControler
             )
 
+
+
             Footer(
                 Modifier
-                    .align(Alignment.CenterHorizontally)
+
                     .padding(8.dp),
                 navigationControler
             )
         }
 
-
     }
+
 
 }
 
@@ -189,7 +206,7 @@ fun Greetings(modifier: Modifier) {
             text = "Estamos Felices de tenerte acá",
             fontSize = 20.sp,
             fontWeight = FontWeight.Normal,
-            color = Color.LightGray
+            color = MaterialTheme.colorScheme.secondary
         )
         Box(
             modifier = modifier
@@ -356,10 +373,10 @@ fun Buttons(isEnable: Boolean, loginViewModel: LoginViewModel, email: String, Pa
                 colors = ButtonDefaults.buttonColors(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     containerColor = MaterialTheme.colorScheme.primary,
-                    disabledContentColor = MaterialTheme.colorScheme.onErrorContainer,
-                    disabledContainerColor = MaterialTheme.colorScheme.errorContainer,
+                    disabledContentColor = MaterialTheme.colorScheme.onPrimary,
+                    //disabledContainerColor = MaterialTheme.colorScheme.onSecondaryContainer,
 
-                    ),
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(40.dp),
