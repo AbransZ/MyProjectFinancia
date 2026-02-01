@@ -242,7 +242,7 @@ fun ConfirmPassword(ConfirmPass: String, onConfirmChange: (String) -> Unit) {
         visualTransformation = if (passVisibleConfirm) VisualTransformation.None else PasswordVisualTransformation(),
         modifier = Modifier
             .fillMaxWidth()
-            .height(55.dp),
+            .height(58.dp),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -283,7 +283,7 @@ fun IngresarPassword(pass: String, onValuePass: (String) -> Unit) {
         visualTransformation = if (passVisible) VisualTransformation.None else PasswordVisualTransformation(),
         modifier = Modifier
             .fillMaxWidth()
-            .height(55.dp),
+            .height(58.dp),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -326,7 +326,7 @@ fun IngresarEmail(email: String, onValueEmail: (String) -> Unit) {
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
         modifier = Modifier
             .fillMaxWidth()
-            .height(55.dp),
+            .height(58.dp),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
@@ -352,7 +352,7 @@ fun IngresarNombre(name: String, onvalueName: (String) -> Unit) {
         label = { Text("Nombre", color = MaterialTheme.colorScheme.onBackground) },
         modifier = Modifier
             .fillMaxWidth()
-            .height(55.dp),
+            .height(58.dp),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = MaterialTheme.colorScheme.surface,
             unfocusedContainerColor = MaterialTheme.colorScheme.surface,
