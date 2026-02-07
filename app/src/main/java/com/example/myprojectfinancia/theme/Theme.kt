@@ -45,7 +45,7 @@ private val LightColors = lightColorScheme(
     // 1. EL COLOR PRINCIPAL (Botones grandes, Barras de navegación activas)
     // Mantenemos tu azul oscuro elegante, pero el texto sobre él DEBE ser blanco.
     primary = Color(0xFF1D416C),
-    onPrimary = Color.White,
+    onPrimary = Color.Black,
 
     // 2. CONTENEDORES PRIMARIOS (Botones suaves, selecciones)
     // Un azul muy clarito derivado del principal

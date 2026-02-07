@@ -448,7 +448,7 @@ fun Movimientos(
                 .align(Alignment.CenterHorizontally)
                 .clip(RoundedCornerShape(5.dp)),
             selectedTabIndex = selectedTab,
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = MaterialTheme.colorScheme.secondaryContainer
         ) {
             tabs.forEachIndexed { index, title ->
                 Tab(

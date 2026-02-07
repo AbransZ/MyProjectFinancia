@@ -607,7 +607,7 @@ class PlansViewModel @Inject constructor(
             budgetFree <= 0 -> "Presupuesto insuficiente para este plan"
             else -> {
                 val proporcion = deficit / deficitTotal
-                val recomProp = budgetFree * proporcion
+                val recomProp = (budgetFree * 0.5) * proporcion
                 val advice = minOf(recomProp, deficit)
                 "se recomienda ahorrar Bs.${formatTotal(advice)} o $${convertBsToUSD(advice)}"
             }
