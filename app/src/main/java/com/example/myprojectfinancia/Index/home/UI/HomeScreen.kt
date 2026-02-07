@@ -557,7 +557,7 @@ fun ListMount(
                 )
             },
             trailingContent = {
-                Text(movimiento.naturaleza, fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary)
+                Text(movimiento.naturaleza, fontSize = 14.sp, color = MaterialTheme.colorScheme.secondary)
             }
         )
     }
@@ -645,7 +645,7 @@ fun PlanDeAhorro(
                                                 fontWeight =
                                                 FontWeight.ExtraLight,
                                                 color =
-                                                MaterialTheme.colorScheme.onSecondary
+                                                MaterialTheme.colorScheme.onPrimary
                                             )
                                         }
 
@@ -655,7 +655,7 @@ fun PlanDeAhorro(
                                 } else {
                                     Text(
                                         "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
-                                        MaterialTheme.colorScheme.onSecondary
+                                        MaterialTheme.colorScheme.onPrimary
                                     )
                                 }
                             }
@@ -688,13 +688,13 @@ fun PlanDeAhorro(
                                             fontWeight =
                                             FontWeight.ExtraLight,
                                             color =
-                                            MaterialTheme.colorScheme.onSecondary
+                                            MaterialTheme.colorScheme.onPrimary
                                         )
 
                                     } else {
                                         Text(
                                             "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
-                                            MaterialTheme.colorScheme.onSecondary
+                                            MaterialTheme.colorScheme.onPrimary
                                         )
                                     }
                                 }
@@ -715,7 +715,8 @@ fun PlanDeAhorro(
                                     Text(
                                         "$${homeViewModel.convertBsToUSD(budgetFree)}",
                                         fontSize = 15.sp,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimary
                                     )
                                     if (budgetFree != null) {
 
@@ -726,13 +727,13 @@ fun PlanDeAhorro(
                                             fontWeight =
                                             FontWeight.ExtraLight,
                                             color =
-                                            MaterialTheme.colorScheme.onSecondary
+                                            MaterialTheme.colorScheme.onPrimary
                                         )
 
                                     } else {
                                         Text(
                                             "Bs.---", fontSize = 17.sp, fontWeight = FontWeight.Bold, color =
-                                            MaterialTheme.colorScheme.onSecondary
+                                            MaterialTheme.colorScheme.onPrimary
                                         )
                                     }
                                 }
@@ -904,15 +905,15 @@ fun PresupuestoCard(
                                 //style = MaterialTheme.typography.titleMedium,
                                 fontSize = 22.sp,
                                 fontWeight = FontWeight.Normal,
-                                textAlign =
-                                TextAlign.Start
+                                textAlign = TextAlign.Start,
+                                color = MaterialTheme.colorScheme.onPrimary
 
                             )
                             Column(Modifier.fillMaxWidth()) {
                                 Text(
                                     "$${PrecioUsd} ", fontSize = 18.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = MaterialTheme.colorScheme.primary
+                                    color = MaterialTheme.colorScheme.onPrimary
                                 )
                                 when (UIDolar) {
                                     is UiStateDolar.neutral -> {
@@ -938,13 +939,13 @@ fun PresupuestoCard(
                                             Text(
                                                 "Bs.${presupuesto}",
                                                 fontSize = 15.sp,
-                                                color = MaterialTheme.colorScheme.primary
+                                                color = MaterialTheme.colorScheme.onPrimary
                                             )
                                         } else {
                                             Text(
                                                 "Bs. ---",
                                                 fontSize = 20.sp,
-                                                color = MaterialTheme.colorScheme.primary
+                                                color = MaterialTheme.colorScheme.onPrimary
                                             )
                                         }
                                     }

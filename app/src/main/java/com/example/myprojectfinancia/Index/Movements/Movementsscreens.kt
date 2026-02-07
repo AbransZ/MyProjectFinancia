@@ -26,6 +26,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -212,8 +213,11 @@ fun ListMountMovements(
     Card(
         modifier = Modifier
             .padding(5.dp)
-            .clickable { homeViewModel.showMovementsEdit(movimiento) }) {
+            .clickable { homeViewModel.showMovementsEdit(movimiento) },
+        //colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary)
+    ) {
         ListItem(
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
             headlineContent = {
                 Row {
                     Text("$${precioUSD}/ ", fontSize = 15.sp)
@@ -234,7 +238,11 @@ fun ListMountMovements(
                 )
             },
             trailingContent = {
-                Text(movimiento.naturaleza, fontSize = 14.sp, color = MaterialTheme.colorScheme.onPrimary)
+                Text(
+                    movimiento.naturaleza,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.primary
+                )
             }
         )
     }

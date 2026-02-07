@@ -122,11 +122,14 @@ fun SettingsScreen(
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
                 ) {
                     Column(Modifier.padding(10.dp)) {
-                        Text("Sobre Financia", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Text(
+                            "Sobre Financia", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme
+                                .colorScheme.primary
+                        )
                         Text(
                             "Detalles sobre la aplicaccion y version",
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSecondary
+                            color = MaterialTheme.colorScheme.secondary
                         )
                     }
                 }
@@ -167,14 +170,28 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                             "Sobre Financia",
                             fontSize = 30.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center, color = MaterialTheme
+                                .colorScheme.primary
                         )
                     }
                     item { HeaderFinancia() }
                     item { Spacer(Modifier.padding(10.dp)) }
-                    item { Text("Manual de usuario", fontSize = 30.sp, fontWeight = FontWeight.Bold) }
+                    item {
+                        Text(
+                            "Manual de usuario", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = MaterialTheme
+                                .colorScheme.primary
+                        )
+                    }
                     item { Spacer(Modifier.padding(10.dp)) }
-                    item { Text("\uD83C\uDFE0 Pantalla Principal", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                    item {
+                        Text(
+                            "\uD83C\uDFE0 Pantalla Principal",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme
+                                .colorScheme.primary
+                        )
+                    }
                     item { Spacer(Modifier.padding(6.dp)) }
                     item {
                         Text(
@@ -194,7 +211,8 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                             "\uD83D\uDCCA Cómo Registrar una Transacción",
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center, color = MaterialTheme
+                                .colorScheme.primary
                         )
                     }
                     item { Spacer(Modifier.padding(6.dp)) }
@@ -213,7 +231,15 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                     }
                     item { Spacer(Modifier.padding(10.dp)) }
 
-                    item { Text("\uD83D\uDCB0 Planes Financieros", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                    item {
+                        Text(
+                            "\uD83D\uDCB0 Planes Financieros",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme
+                                .colorScheme.primary
+                        )
+                    }
                     item { Spacer(Modifier.padding(6.dp)) }
                     item {
                         Text(
@@ -223,7 +249,15 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                                     "• Monitorea el progreso de cada plan con \nsu respectiva barra de progreso\n\n"
                         )
                     }
-                    item { Text("\uD83D\uDCCA Transacciones\n", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                    item {
+                        Text(
+                            "\uD83D\uDCCA Transacciones\n",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme
+                                .colorScheme.primary
+                        )
+                    }
                     item {
                         Text(
                             text = "Para crear un nuevo Plan:\n" +
@@ -237,7 +271,15 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                             modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     }
-                    item { Text("⚙\uFE0F Herramientas\n", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                    item {
+                        Text(
+                            "⚙\uFE0F Herramientas\n",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme
+                                .colorScheme.primary
+                        )
+                    }
                     item {
                         Text(
                             text = "1. Accede desde el icono de tuerca [⚙️] en la barra de navegación.\n\n" +
@@ -248,7 +290,15 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                             modifier = Modifier.padding(horizontal = 8.dp)
                         )
                     }
-                    item { Text("\uD83D\uDCA1 Consejos Útiles\n", fontSize = 20.sp, fontWeight = FontWeight.Bold) }
+                    item {
+                        Text(
+                            "\uD83D\uDCA1 Consejos Útiles\n",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme
+                                .colorScheme.primary
+                        )
+                    }
                     item {
                         Text(
                             "• Registra tus gastos diariamente para mejor control\n" +
@@ -259,7 +309,12 @@ fun AboutFinanciaDialog(showAbout: Boolean, settingsViewmodel: settingsViewmodel
                         )
                     }
                     item { Spacer(Modifier.padding(20.dp)) }
-                    item { Text("Contáctanos", fontSize = 30.sp, fontWeight = FontWeight.Bold) }
+                    item {
+                        Text(
+                            "Contáctanos", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = MaterialTheme
+                                .colorScheme.primary
+                        )
+                    }
                     item { ContactUs() }
                     item { ExtraInfo() }
                 }
@@ -284,7 +339,10 @@ fun ExtraInfo() {
             tint = Color.Red
         )
         Spacer(Modifier.height(15.dp))
-        Text("¡Gracias por usas Financia!", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        Text(
+            "¡Gracias por usas Financia!", fontSize = 25.sp, fontWeight = FontWeight.Bold, color = MaterialTheme
+                .colorScheme.primary
+        )
         Spacer(Modifier.height(5.dp))
         Text(
             "Tu confianza nos motiva a seguir mejorando y crear la mejor experiencia de gestión financiera para ti" +
@@ -309,7 +367,9 @@ fun ContactUs() {
                     .fillMaxWidth()
                     .padding(6.dp)
             ) {
-                Text("Desarrollador FullStack", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    "Desarrollador FullStack", fontSize = 20.sp, fontWeight = FontWeight.Bold
+                )
                 Text("Email: abrahannieves700@gmail.com", fontSize = 15.sp)
                 Spacer(Modifier.padding(2.dp))
                 Text(
@@ -344,7 +404,7 @@ fun HeaderFinancia() {
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme
-                    .onPrimary
+                    .primary
             )
             Text("V1.0", textAlign = TextAlign.Center, fontSize = 15.sp)
             Spacer(Modifier.height(6.dp))
@@ -383,7 +443,7 @@ fun ButtonClose(
                     }
                 },
                 modifier = Modifier.height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.onErrorContainer),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Row(modifier = modifier.fillMaxWidth()) {
@@ -435,7 +495,7 @@ fun AboutFinancia(modifier: Modifier, CMovements: Int, CPlans: Int, Aplanes: Int
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimary
+                color = MaterialTheme.colorScheme.primary
             )
             Row(modifier = modifier.fillMaxWidth()) {
                 Column(
@@ -450,9 +510,9 @@ fun AboutFinancia(modifier: Modifier, CMovements: Int, CPlans: Int, Aplanes: Int
                     )
                     Text(
                         "Movimientos",
-                        fontSize = 10.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondary
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
 
@@ -471,7 +531,7 @@ fun AboutFinancia(modifier: Modifier, CMovements: Int, CPlans: Int, Aplanes: Int
                         "Planes Activos",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondary
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
                 Column(
@@ -489,7 +549,7 @@ fun AboutFinancia(modifier: Modifier, CMovements: Int, CPlans: Int, Aplanes: Int
                         "Planes Completados",
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSecondary,
+                        color = MaterialTheme.colorScheme.secondary,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -589,8 +649,8 @@ fun ConversorMoneda(
             Spacer(modifier.padding(4.dp))
             Text(
                 text = "Tasa oficial del Banco Central de Venezuela",
-                fontSize = 10.sp,
-                color = MaterialTheme.colorScheme.onSecondary,
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.secondary,
             )
 
 
@@ -604,7 +664,9 @@ fun UserItem(modifier: Modifier, name: String, email: String, dateCration: Strin
         modifier = Modifier
             .height(100.dp)
             .fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
         Row(
             modifier = Modifier
@@ -612,27 +674,27 @@ fun UserItem(modifier: Modifier, name: String, email: String, dateCration: Strin
                 .padding(10.dp),
             horizontalArrangement = Arrangement.SpaceAround
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_user),
-                contentDescription = "Usericon",
-                modifier.size(100.dp)
-            )
-            Column(verticalArrangement = Arrangement.Center) {
+            /*  Image(
+                  painter = painterResource(R.drawable.ic_user),
+                  contentDescription = "Usericon",
+                  modifier.size(100.dp)
+              )*/
+            Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.Center) {
                 Text(
                     name,
-                    fontSize = 20.sp,
+                    fontSize = 30.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onPrimary
+                    color = MaterialTheme.colorScheme.primary
                 )
 
-                Spacer(modifier.padding(3.dp))
+                //Spacer(modifier.padding(3.dp))
 
                 Text(
                     "Correo: ${email}",
                     fontSize = 12.sp
                 )
 
-                Spacer(modifier.padding(3.dp))
+                // Spacer(modifier.padding(3.dp))
 
                 Text(
                     "fecha de Ingreso ${dateCration.toString()}",

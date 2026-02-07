@@ -1087,10 +1087,12 @@ fun PlanesList(
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .align(Alignment.CenterHorizontally), contentAlignment = Alignment.Center
+                        .align(Alignment.CenterHorizontally),
+                    contentAlignment = Alignment.Center
                 ) {
                     Box(
-                        modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
                     ) {
                         CircularProgressIndicator()
                     }

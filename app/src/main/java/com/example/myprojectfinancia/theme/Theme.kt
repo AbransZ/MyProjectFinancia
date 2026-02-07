@@ -70,7 +70,7 @@ private val LightColors = lightColorScheme(
 
     // surface: Las Tarjetas (Cards), BottomSheets, Dialogs
     // En light mode, las tarjetas deben ser BLANCAS o casi blancas para resaltar sobre el fondo.
-    surface = Color(0xFFFFFFFF),
+    surface = Color(0xFFE0E2EC),
     onSurface = Color(0xFF1A1C1E), // El texto en las tarjetas debe ser oscuro
 
     // 6. VARIANTES (Campos de texto, bordes)
@@ -84,25 +84,42 @@ private val LightColors = lightColorScheme(
     onErrorContainer = Color(0xFF410002)
 )
 
-// Esquema de colores para el modo oscuro
 private val DarkColors = darkColorScheme(
-    primary = Color(0xFF3C96F5),
+    // 1. PRIMARY (MANTENIDO)
+    primary = Color(0xFF1783F6),
     onPrimary = Color.White,
-    secondary = Color(0xFF3D7F90),
-    onSecondary = Color(0xFFC5C5C7),
+
+    // 2. PRIMARY CONTAINER (AJUSTADO)
+    primaryContainer = Color(0xFF002F7F),
+    onPrimaryContainer = Color(0xFFD1E4FF),
+
+    // 3. SECONDARY (SINCRONIZADO)
+    secondary = Color(0xFFB0C0D6),
+    onSecondary = Color(0xFF1B2938),
+
+    secondaryContainer = Color(0xFF324050),
+    onSecondaryContainer = Color(0xFFD7E3F7),
+
+    // 4. TERTIARY (MANTENIDO)
     tertiary = Color(0xFF3C95F4),
+    onTertiary = Color.White,
+
+    // 5. BACKGROUND (MANTENIDO - Es el alma de tu tema oscuro)
     background = Color(0xFF001021),
     onBackground = Color.White,
-    surface = Color(0xFF2C4468),
+
+    // 6. SURFACE (SINCRONIZADO - El cambio más importante)
+    surface = Color(0xFF121D2B),
     onSurface = Color.White,
-    primaryContainer = Color(0xFF21274B),
-    onPrimaryContainer = Color(0xFF0276F5),
-    onErrorContainer = Color(0xB7E80505),
-    errorContainer = Color(0xFF30669E),
-    surfaceVariant = Color(0xFF001021),
-    secondaryContainer = Color(0x9A275ED9)
 
+    // 7. VARIANTES & ERRORES
+    surfaceVariant = Color(0xFF252F3D),
+    onSurfaceVariant = Color(0xFFC4C7D0),
 
+    error = Color(0xFFCE1300),
+    onError = Color(0xFF690005),
+    errorContainer = Color(0xFF93000A),
+    onErrorContainer = Color(0xFFFFDAD6)
 )
 
 @Composable
