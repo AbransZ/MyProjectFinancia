@@ -9,18 +9,18 @@ Financia es una aplicación nativa para Android diseñada para el control eficie
 
 | Pantalla Principal | Registro de Gasto |
 | :---: | :---: |
-| (Imagen aquí) | (Imagen aquí) |
+|![pantalla de login](https://raw.githubusercontent.com/AbransZ/MyProjectFinancia/39d50691970c9a6452bbad0028ce4fcf6f402ea1/imagen.png)  |![pantalla de registro de gastos](https://github.com/AbransZ/MyProjectFinancia/blob/master/WhatsApp%20Image%202026-04-06%20at%208.39.49%20PM.jpeg?raw=true) |
 
 ---
 
 ## 🛠 Stack Tecnológico
 Para este proyecto se utilizaron las herramientas más modernas del ecosistema Android:
 
-  **Lenguaje:** Kotlin.
-  **Interfaz (UI):** Jetpack Compose (Desarrollo declarativo).
-  **Inyección de Dependencias:** Dagger Hilt.
-  **Red / API:** Retrofit con Corrutinas de Kotlin para llamadas asíncronas.
-  **Base de Datos:** Room (Persistencia local).
+ * **Lenguaje:** Kotlin.
+ * **Interfaz (UI):** Jetpack Compose (Desarrollo declarativo).
+ * **Inyección de Dependencias:** Dagger Hilt.
+ * **Red / API:** Retrofit con Corrutinas de Kotlin para llamadas asíncronas.
+ * **Base de Datos:** Firebase (Firestore,Authentication,etc).
 
 ---
 
